@@ -1,5 +1,4 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
@@ -9,26 +8,7 @@ import appCss from "../styles.css?url";
 
 const APP_NAME = "Her First Meal";
 
-const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
-  try {
-    const { getSessionUser } = await import("@/lib/auth/verify.server");
-    const u = await getSessionUser();
-    return u ? { id: u.id, email: u.email } : null;
-  } catch (err) {
-    console.error("[auth] session lookup failed", err);
-    return null;
-  }
-});
-
 export const Route = createRootRoute({
-  beforeLoad: async () => {
-    try {
-      return { sessionUser: await fetchSessionUser() };
-    } catch (err) {
-      console.error("[root] beforeLoad failed", err);
-      return { sessionUser: null };
-    }
-  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

@@ -87,5 +87,19 @@ function copyPgliteAssets() {
   }
 }
 
+function patchFunctionConfig() {
+  const path = join(func, ".vc-config.json");
+  if (!existsSync(path)) {
+    console.log("[patch-vercel] no .vc-config.json");
+    return;
+  }
+  const cfg = JSON.parse(readFileSync(path, "utf8"));
+  cfg.maxDuration = 30;
+  cfg.memory = 1024;
+  writeFileSync(path, JSON.stringify(cfg, null, 2) + "\n");
+  console.log("[patch-vercel] set function maxDuration=30 memory=1024");
+}
+
 patchSsrExports();
 copyPgliteAssets();
+patchFunctionConfig();
