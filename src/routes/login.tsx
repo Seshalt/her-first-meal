@@ -8,9 +8,10 @@ import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/clie
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { atelierReadyLocal, markAtelierReady } from "@/lib/atelier-ready";
 import { getMyRole } from "@/lib/server/admin";
-import { hasAdministrator } from "@/lib/server/public";
+import { hasAdministrator, recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { usePublicSite } from "@/lib/use-public-site";
+import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>): { next?: "/admin" } =>
@@ -29,6 +30,9 @@ function Login() {
   const [busy, setBusy] = useState(false);
   const [home, setHome] = useState<"/" | "/app" | "/admin" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [recover, setRecover] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -62,18 +66,54 @@ function Login() {
       return;
     }
     setBusy(true);
+    setFormError("");
     try {
       const { error } = await authClient.signIn.email({
         email,
         password,
         callbackURL: ownerDoor ? "/login?next=/admin" : "/login",
       });
-      if (error) throw new Error(error.message);
+      if (error) throw error;
       const r = await getMyRole();
       if (r.role === "admin") markAtelierReady();
       void navigate({ to: r.role === "admin" || ownerDoor ? "/admin" : "/app" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Sign-in could not complete.");
+      const message = readableAuthError(err, "That email or password does not match.");
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onRecover(e: FormEvent) {
+    e.preventDefault();
+    if (guard.honey.trim()) return;
+    if (!guard.human) {
+      const message = "Please confirm you are a person.";
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+    setBusy(true);
+    setFormError("");
+    try {
+      await recoverOwner({
+        data: {
+          email,
+          password: newPassword,
+          honey: guard.honey,
+          startedAt: guard.startedAt,
+          human: guard.human,
+        },
+      });
+      setPassword(newPassword);
+      setRecover(false);
+      toast.success("Owner password updated. Sign in with the new password.");
+    } catch (err) {
+      const message = readableAuthError(err, "Could not update the owner password.");
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -142,10 +182,47 @@ function Login() {
               honey={guard.honey}
               onHoney={guard.setHoney}
             />
+            {formError ? (
+              <p className="rounded-xl bg-clay px-4 py-3 text-sm text-paper" role="alert">
+                {formError}
+              </p>
+            ) : null}
             <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
               {busy ? "Entering…" : ownerDoor ? "Enter the atelier" : "Enter the house"}
             </Button>
           </form>
+          {ownerDoor ? (
+            <div className="mt-6 max-w-md">
+              <button
+                type="button"
+                className="text-sm text-primary underline-offset-4 hover:underline"
+                onClick={() => setRecover((v) => !v)}
+              >
+                {recover ? "Hide password reset" : "Forgot the owner password?"}
+              </button>
+              {recover ? (
+                <form onSubmit={(e) => void onRecover(e)} className="mt-4 space-y-4">
+                  <p className="text-sm text-ink-soft">
+                    Enter Maat’s owner email and a new password. This replaces the saved password so you can sign in.
+                  </p>
+                  <div>
+                    <Label htmlFor="new-password">New owner password</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={busy || !guard.human}>
+                    {busy ? "Updating…" : "Set new owner password"}
+                  </Button>
+                </form>
+              ) : null}
+            </div>
+          ) : null}
           <p className="mt-8 max-w-md text-sm text-muted-foreground">
             New here?{" "}
             <Link to="/pricing" className="text-primary">

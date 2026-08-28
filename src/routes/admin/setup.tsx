@@ -10,6 +10,7 @@ import { claimFirstAdmin, saveSetupWizard } from "@/lib/server/admin";
 import { hasAdministrator } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { atelierReadyLocal, markAtelierReady } from "@/lib/atelier-ready";
+import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/admin/setup")({ component: Setup });
 
@@ -76,13 +77,13 @@ function Setup() {
           name,
           callbackURL: "/admin/setup",
         });
-        if (error) throw new Error(error.message);
+        if (error) throw error;
       }
       await claimFirstAdmin({ data: { displayName: name } });
       markAtelierReady();
       setStep(1);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not create the owner account.");
+      toast.error(readableAuthError(err, "Could not create the owner account."));
     } finally {
       setBusy(false);
     }

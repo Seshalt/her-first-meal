@@ -11,6 +11,7 @@ import {
 } from "@/lib/landing";
 import { DEFAULT_SITE_COPY, mergeSite, type SiteCopy } from "@/lib/site";
 import { mergeStudio, type StudioTheme } from "@/lib/theme-studio";
+import { assertHuman, rateLimit } from "./abuse";
 
 type SettingsRow = {
   business_name: string;
@@ -139,3 +140,57 @@ export const getLanding = createServerFn({ method: "GET" }).handler(async () => 
     };
   }
 });
+
+export const recoverOwner = createServerFn({ method: "POST" })
+  .validator(
+    (input: {
+      email: string;
+      password: string;
+      honey?: string;
+      startedAt?: number;
+      human?: boolean;
+    }) => input,
+  )
+  .handler(async ({ data }) => {
+    assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
+    rateLimit("recover-owner", 6, 15 * 60 * 1000);
+    const email = data.email.trim().toLowerCase();
+    const password = data.password;
+    if (!email.includes("@") || password.length < 8) {
+      throw new Error("Use a real email and a password at least 8 characters.");
+    }
+    const sql = await getSql();
+    const admins = await sql<{ id: string; email: string; name: string; display_name: string | null }>`
+      select u.id, u.email, u.name, p.display_name
+      from "user" u
+      join profiles p on p.user_id = u.id
+      where p.role = 'admin'
+    `;
+    const byEmail = admins.find((row) => row.email.toLowerCase() === email);
+    const onlyOwner = admins.length === 1 ? admins[0] : undefined;
+    const target = byEmail ?? onlyOwner;
+    if (!target) {
+      throw new Error("No owner account matches that email. Create the owner account first.");
+    }
+    const { hashPassword } = await import("better-auth/crypto");
+    const hash = await hashPassword(password);
+    await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
+    const accounts = await sql<{ id: string }>`
+      select id from account where "userId" = ${target.id} and "providerId" = 'credential'
+    `;
+    if (accounts[0]) {
+      await sql`update account set password = ${hash}, "updatedAt" = now() where id = ${accounts[0].id}`;
+    } else {
+      const id = crypto.randomUUID();
+      await sql`
+        insert into account (
+          id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt"
+        ) values (
+          ${id}, ${target.id}, 'credential', ${target.id}, ${hash}, now(), now()
+        )
+      `;
+    }
+    await sql`delete from session where "userId" = ${target.id}`;
+    return { ok: true };
+  });
+

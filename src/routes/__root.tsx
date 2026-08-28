@@ -61,6 +61,13 @@ function RootDocument() {
               position="top-center"
               toastOptions={{
                 className: "font-sans",
+                classNames: {
+                  toast: "bg-paper text-ink border border-ink/10 shadow-lg",
+                  title: "text-ink font-medium",
+                  description: "text-ink",
+                  error: "bg-clay text-paper border-clay-deep",
+                  success: "bg-sea text-paper border-sea-deep",
+                },
               }}
             />
           </ThemeProvider>
