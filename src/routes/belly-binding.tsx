@@ -1,0 +1,64 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/card";
+import { usePublicSite } from "@/lib/use-public-site";
+
+export const Route = createFileRoute("/belly-binding")({ component: BindingPage });
+
+function BindingPage() {
+  const { site, content } = usePublicSite();
+  const steps = [
+    { title: site.bindStep1Title, body: site.bindStep1Body, image: content.images.bindStep1 },
+    { title: site.bindStep2Title, body: site.bindStep2Body, image: content.images.bindStep2 },
+    { title: site.bindStep3Title, body: site.bindStep3Body, image: content.images.bindStep3 },
+    { title: site.bindStep4Title, body: site.bindStep4Body, image: content.images.bindStep4 },
+  ];
+  const faqs = [
+    { q: site.faq1q, a: site.faq1a },
+    { q: site.faq2q, a: site.faq2a },
+    { q: site.faq3q, a: site.faq3a },
+    { q: site.faq4q, a: site.faq4a },
+  ];
+  return (
+    <div>
+      <PublicNav />
+      <section className="bg-wash-blush">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
+          <div>
+            <Badge tone="blush">{site.bindPageKicker}</Badge>
+            <h1 className="mt-4 font-display text-5xl">{site.bindPageTitle}</h1>
+            <p className="mt-4 text-lg text-muted-foreground">{site.bindPageBody}</p>
+            <Button asChild className="mt-8" variant="blush">
+              <Link to="/pricing">{site.bindPageCta}</Link>
+            </Button>
+          </div>
+          <img src={content.images.bindHero} alt="" className="media h-80 w-full rounded-[32px] object-cover" />
+        </div>
+      </section>
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-2">
+        {steps.map((s) => (
+          <article key={s.title} className="overflow-hidden rounded-[28px] bg-card shadow-[var(--shadow-border)]">
+            <img src={s.image} alt="" className="media h-44 w-full object-cover" />
+            <div className="p-6">
+              <h2 className="font-display text-2xl">{s.title}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+      <section className="mx-auto max-w-3xl px-4 pb-16">
+        <h2 className="font-display text-3xl">{site.bindQuestions}</h2>
+        <dl className="mt-6 space-y-5">
+          {faqs.map((f) => (
+            <div key={f.q} className="rounded-2xl bg-card p-5 shadow-[var(--shadow-border)]">
+              <dt className="font-medium">{f.q}</dt>
+              <dd className="mt-2 text-sm text-muted-foreground">{f.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+      <PublicFooter />
+    </div>
+  );
+}

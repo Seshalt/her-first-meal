@@ -1,0 +1,204 @@
+import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Menu, X } from "lucide-react";
+import { Wordmark } from "@/components/brand/logo";
+import { SignedIn, SignedOut } from "@/lib/auth/gates";
+import { usePublicSite } from "@/lib/use-public-site";
+import { cn } from "@/lib/utils";
+
+export function PublicNav({ overlay = false }: { overlay?: boolean }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { site } = usePublicSite();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const links = [
+    { to: "/about" as const, label: site.navAbout },
+    { to: "/belly-binding" as const, label: site.navBinding },
+    { to: "/nouri" as const, label: site.navNouri },
+    { to: "/pricing" as const, label: site.navMembership },
+  ];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const onHero = overlay && !scrolled && !open;
+  const ink = onHero ? "text-paper" : "text-foreground";
+
+  return (
+    <header
+      className={cn(
+        overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
+        "transition-[background-color,border-color,color] duration-300",
+        onHero
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-border/70 bg-background/95 text-foreground backdrop-blur-md",
+      )}
+    >
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:h-[4.75rem] md:px-6">
+        <Wordmark className={cn("min-w-0", ink)} />
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
+          {links.map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className={cn(
+                "text-sm tracking-wide transition-colors",
+                onHero ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
+                pathname === l.to && (onHero ? "text-paper" : "text-foreground"),
+              )}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+          <SignedOut>
+            <Link
+              to="/login"
+              search={{}}
+              className={cn(
+                "inline-flex h-11 items-center px-2 text-sm underline-offset-4 hover:underline sm:px-3",
+                ink,
+              )}
+            >
+              {site.navSignIn}
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <Link
+              to="/app"
+              className={cn(
+                "inline-flex h-11 items-center px-2 text-sm underline-offset-4 hover:underline sm:px-3",
+                ink,
+              )}
+            >
+              {site.navHome}
+            </Link>
+          </SignedIn>
+          <Link
+            to="/pricing"
+            className={cn(
+              "hidden h-11 items-center rounded-full px-5 text-sm font-medium sm:inline-flex",
+              onHero ? "bg-paper text-ink hover:bg-cream" : "bg-primary text-primary-foreground hover:bg-sea-deep",
+            )}
+          >
+            {site.navCta}
+          </Link>
+          <button
+            type="button"
+            className={cn(
+              "relative z-[90] grid size-12 place-items-center rounded-full lg:hidden",
+              ink,
+            )}
+            aria-expanded={open}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="size-6" /> : <Menu className="size-6" />}
+          </button>
+        </div>
+      </div>
+
+      {open ? (
+        <div className="fixed inset-0 z-[100] flex flex-col bg-background text-foreground">
+          <div className="flex h-16 items-center justify-between px-4">
+            <Wordmark />
+            <button
+              type="button"
+              className="grid size-12 place-items-center rounded-full"
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+            >
+              <X className="size-6" />
+            </button>
+          </div>
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-10 pt-6" aria-label="Mobile">
+            {links.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setOpen(false)}
+                className="rounded-2xl px-3 py-4 font-display text-3xl"
+              >
+                {l.label}
+              </Link>
+            ))}
+            <Link
+              to="/pricing"
+              onClick={() => setOpen(false)}
+              className="mt-6 rounded-full bg-primary px-5 py-4 text-center text-base font-medium text-primary-foreground"
+            >
+              {site.navCta}
+            </Link>
+            <SignedOut>
+              <Link to="/login" search={{}} onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
+                {site.navSignIn}
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link to="/app" onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
+                {site.navHome}
+              </Link>
+            </SignedIn>
+          </nav>
+        </div>
+      ) : null}
+    </header>
+  );
+}
+
+export function PublicFooter() {
+  const { site, content } = usePublicSite();
+  return (
+    <footer className="bg-ink text-paper">
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
+        <div className="md:col-span-2">
+          <Wordmark stacked className="text-paper" />
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
+            {content.headlineAccent} {site.footerBlurb}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerVisit}</p>
+          <ul className="mt-4 space-y-3 text-sm text-paper/80">
+            <li>
+              <Link to="/about">{site.footerStory}</Link>
+            </li>
+            <li>
+              <Link to="/belly-binding">{site.footerStudio}</Link>
+            </li>
+            <li>
+              <Link to="/nouri">{site.footerNouri}</Link>
+            </li>
+            <li>
+              <Link to="/pricing">{site.footerMembership}</Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerEnter}</p>
+          <ul className="mt-4 space-y-3 text-sm text-paper/80">
+            <li>
+              <Link to="/login" search={{}}>{site.footerSignIn}</Link>
+            </li>
+            <li>
+              <Link to="/privacy">{site.footerPrivacy}</Link>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p className="border-t border-white/10 px-4 py-6 text-center text-xs text-paper/50">{site.footerLegal}</p>
+    </footer>
+  );
+}

@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /about
+Allow: /belly-binding
+Allow: /nouri
+Allow: /privacy
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /app
+Disallow: /app/
+Disallow: /api
+Disallow: /api/
+Disallow: /login
+Disallow: /join
+Disallow: /checkout
+
+# Member rooms and the atelier are not for crawlers.
