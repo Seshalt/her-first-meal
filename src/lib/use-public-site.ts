@@ -25,10 +25,6 @@ export function bustPublicSiteCache() {
 export function usePublicSite(): PublicSite {
   const [page, setPage] = useState<PublicSite>(cache ?? fallback);
   useEffect(() => {
-    if (cache) {
-      setPage(cache);
-      return;
-    }
     void getLanding()
       .then((d) => {
         cache = d;
