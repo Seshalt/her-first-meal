@@ -67,19 +67,24 @@ const FALLBACK_SETTINGS: BusinessSettings = {
 };
 
 export const getPublicPricing = createServerFn({ method: "GET" }).handler(async () => {
-  const sql = await getSql();
-  const rows = await sql<SettingsRow>`select * from business_settings where id = 1`;
-  const settings = rows[0] ? mapSettings(rows[0]) : FALLBACK_SETTINGS;
-  const products = await sql<{
-    id: number;
-    slug: string;
-    name: string;
-    description: string;
-    price_cents: number;
-    kind: string;
-    image: string | null;
-  }>`select id, slug, name, description, price_cents, kind, image from products where active = true order by id`;
-  return { settings, products };
+  try {
+    const sql = await getSql();
+    const rows = await sql<SettingsRow>`select * from business_settings where id = 1`;
+    const settings = rows[0] ? mapSettings(rows[0]) : FALLBACK_SETTINGS;
+    const products = await sql<{
+      id: number;
+      slug: string;
+      name: string;
+      description: string;
+      price_cents: number;
+      kind: string;
+      image: string | null;
+    }>`select id, slug, name, description, price_cents, kind, image from products where active = true order by id`;
+    return { settings, products };
+  } catch (err) {
+    console.error("[public] getPublicPricing failed", err);
+    return { settings: FALLBACK_SETTINGS, products: [] };
+  }
 });
 
 export const hasAdministrator = createServerFn({ method: "GET" }).handler(async () => {

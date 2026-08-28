@@ -235,3 +235,18 @@ if (typeof window === "undefined" && dbSource === "pglite") {
     console.error("[db] PGLite bootstrap failed:", err);
   });
 }
+
+// Vercel Node isolates die on unhandled rejections (PGLite ENOENT used to
+// take the whole worker down → `{ error: true, status: 500, unhandled: true }`).
+if (typeof window === "undefined" && typeof process !== "undefined" && process.on) {
+  const g = globalThis as typeof globalThis & { __hfmProcessGuards__?: boolean };
+  if (!g.__hfmProcessGuards__) {
+    g.__hfmProcessGuards__ = true;
+    process.on("unhandledRejection", (err) => {
+      console.error("[process] unhandledRejection", err);
+    });
+    process.on("uncaughtException", (err) => {
+      console.error("[process] uncaughtException", err);
+    });
+  }
+}

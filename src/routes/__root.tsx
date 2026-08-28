@@ -21,6 +21,7 @@ const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export const Route = createRootRoute({
+  ssr: false,
   beforeLoad: async () => {
     try {
       return { sessionUser: await fetchSessionUser() };
