@@ -10,13 +10,25 @@ import appCss from "../styles.css?url";
 const APP_NAME = "Her First Meal";
 
 const fetchSessionUser = createServerFn({ method: "GET" }).handler(async () => {
-  const { getSessionUser } = await import("@/lib/auth/verify.server");
-  const u = await getSessionUser();
-  return u ? { id: u.id, email: u.email } : null;
+  try {
+    const { getSessionUser } = await import("@/lib/auth/verify.server");
+    const u = await getSessionUser();
+    return u ? { id: u.id, email: u.email } : null;
+  } catch (err) {
+    console.error("[auth] session lookup failed", err);
+    return null;
+  }
 });
 
 export const Route = createRootRoute({
-  beforeLoad: async () => ({ sessionUser: await fetchSessionUser() }),
+  beforeLoad: async () => {
+    try {
+      return { sessionUser: await fetchSessionUser() };
+    } catch (err) {
+      console.error("[root] beforeLoad failed", err);
+      return { sessionUser: null };
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

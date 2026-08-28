@@ -65,7 +65,7 @@ export async function getSessionUser(
     headers = new Headers(request.headers);
     headers.set("Authorization", `Bearer ${bearerToken}`);
   }
-  const session = await auth.api.getSession({ headers });
+  const session = await auth.api.getSession({ headers }).catch(() => null);
   if (!session?.user) return null;
   return { id: session.user.id, email: session.user.email ?? null };
 }
