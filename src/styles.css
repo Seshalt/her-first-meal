@@ -689,34 +689,38 @@ html[data-pricing="linen"] .pricing-stage {
   border-bottom-color: color-mix(in oklab, #ffffff 40%, transparent);
 }
 
-.offer-stage {
-  display: grid;
-  gap: 1rem;
-  padding: 1.5rem 1rem 2rem;
-  grid-template-columns: 1fr;
+.offer-stack {
+  position: relative;
+  padding-bottom: 18vh;
+}
+.offer-sheet {
+  position: sticky;
+  display: flex;
+  align-items: flex-end;
+  min-height: 58vh;
+  padding: 0 1rem 1.25rem;
+}
+.offer-sheet-card {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+  border-radius: 32px;
+  padding: 1.6rem 1.6rem 1.8rem;
+  background: color-mix(in oklab, #ffffff 58%, transparent);
+  backdrop-filter: blur(26px) saturate(1.7);
+  -webkit-backdrop-filter: blur(26px) saturate(1.7);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
+    0 24px 50px -28px color-mix(in oklab, var(--color-ink) 38%, transparent);
+  transform-origin: 50% 100%;
 }
 @media (min-width: 768px) {
-  .offer-stage {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 2rem 1.5rem 2.5rem;
+  .offer-sheet {
+    min-height: 64vh;
+    padding: 0 1.5rem 1.5rem;
   }
-}
-.offer-card {
-  border-radius: 28px;
-  padding: 1.35rem 1.4rem;
-  background: color-mix(in oklab, #ffffff 46%, transparent);
-  backdrop-filter: blur(22px) saturate(1.6);
-  -webkit-backdrop-filter: blur(22px) saturate(1.6);
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #ffffff 65%, transparent),
-    0 18px 40px -28px color-mix(in oklab, var(--color-ink) 35%, transparent);
-  animation: offer-float 7s ease-in-out infinite;
-}
-.offer-card:nth-child(2) { animation-delay: -2.2s; }
-.offer-card:nth-child(3) { animation-delay: -4.4s; }
-@keyframes offer-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  .offer-sheet-card {
+    padding: 2.2rem 2.4rem 2.4rem;
+  }
 }
 
 .split-board {

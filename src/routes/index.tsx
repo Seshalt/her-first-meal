@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { MagneticLink } from "@/components/motion/magnetic-button";
 import { ParallaxFrame, Reveal } from "@/components/motion/parallax";
@@ -149,18 +149,56 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
 
 function Ticker({ items }: { items: string[] }) {
   const source = items.length ? items : ["Personalized meals", "Belly Binding Studio", "Nouri"];
-  const shown = source.slice(0, 3);
+  const shown = source.slice(0, 5);
+  const rootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const sheets = [...root.querySelectorAll<HTMLElement>("[data-sheet]")];
+    let frame = 0;
+    const update = () => {
+      sheets.forEach((sheet) => {
+        const card = sheet.querySelector<HTMLElement>("[data-card]");
+        if (!card) return;
+        const rect = sheet.getBoundingClientRect();
+        const pin = parseFloat(sheet.style.top || "90") || 90;
+        const progress = Math.min(1, Math.max(0, (pin + 24 - rect.top) / 260));
+        card.style.transform = `translate3d(0, ${progress * -12}px, 0) scale(${1 - progress * 0.045})`;
+      });
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [shown.join("|")]);
+
   return (
-    <div className="relative overflow-hidden bg-wash-linen">
-      <div className="offer-stage mx-auto max-w-6xl">
-        {shown.map((item) => (
-          <article key={item} className="offer-card">
-            <p className="text-xs uppercase tracking-[0.22em] text-ink/45">In the house</p>
-            <p className="mt-3 font-display text-2xl leading-tight md:text-3xl">{item}</p>
-          </article>
-        ))}
+    <section ref={rootRef} className="offer-stack bg-wash-linen">
+      <div className="mx-auto max-w-5xl px-4 pt-10 md:px-6">
+        <p className="text-xs uppercase tracking-[0.28em] text-ink/40">What the house holds</p>
       </div>
-    </div>
+      {shown.map((item, i) => (
+        <div
+          key={item}
+          data-sheet
+          className="offer-sheet"
+          style={{ top: `calc(5.6rem + ${i * 0.7}rem)`, zIndex: i + 1 }}
+        >
+          <article data-card className="offer-sheet-card">
+            <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
+            <p className="mt-4 font-display text-[clamp(2rem,5vw,3.6rem)] leading-[1.02]">{item}</p>
+          </article>
+        </div>
+      ))}
+    </section>
   );
 }
 
