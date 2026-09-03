@@ -3,8 +3,18 @@ import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
 import { Button } from "@/components/ui/button";
 import { usePublicSite } from "@/lib/use-public-site";
+import { getLanding } from "@/lib/server/public";
 
-export const Route = createFileRoute("/about")({ component: About });
+export const Route = createFileRoute("/about")({
+  loader: async () => {
+    try {
+      return await getLanding();
+    } catch {
+      return null;
+    }
+  },
+  component: About,
+});
 
 function About() {
   const { site, content } = usePublicSite();

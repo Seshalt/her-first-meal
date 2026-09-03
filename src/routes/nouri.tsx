@@ -4,8 +4,18 @@ import { PageCanvas } from "@/components/layout/page-canvas";
 import { Button } from "@/components/ui/button";
 import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
+import { getLanding } from "@/lib/server/public";
 
-export const Route = createFileRoute("/nouri")({ component: NouriMarketing });
+export const Route = createFileRoute("/nouri")({
+  loader: async () => {
+    try {
+      return await getLanding();
+    } catch {
+      return null;
+    }
+  },
+  component: NouriMarketing,
+});
 
 function NouriMarketing() {
   const { site, content } = usePublicSite();

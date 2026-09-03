@@ -6,8 +6,18 @@ import { PageCanvas } from "@/components/layout/page-canvas";
 import { Reveal } from "@/components/motion/parallax";
 import { usePublicSite } from "@/lib/use-public-site";
 import { publicHttpUrl } from "@/lib/site";
+import { getLanding } from "@/lib/server/public";
 
-export const Route = createFileRoute("/contact")({ component: Contact });
+export const Route = createFileRoute("/contact")({
+  loader: async () => {
+    try {
+      return await getLanding();
+    } catch {
+      return null;
+    }
+  },
+  component: Contact,
+});
 
 function Contact() {
   const { site } = usePublicSite();

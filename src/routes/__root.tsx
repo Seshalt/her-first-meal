@@ -18,8 +18,12 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The world celebrates the baby. We remember the mother. Pregnancy and postpartum wellness, meals, belly binding, and Nouri.",
+          "The world celebrates the baby. We remember the mother. Pregnancy and postpartum meals, belly binding studio, movement, grocery planning, and Nouri.",
       },
+      { name: "robots", content: "index,follow" },
+      { property: "og:title", content: "Her First Meal" },
+      { property: "og:description", content: "The world celebrates the baby. We remember the mother." },
+      { property: "og:type", content: "website" },
       { name: "theme-color", content: "#1F5F8A" },
     ],
     links: [

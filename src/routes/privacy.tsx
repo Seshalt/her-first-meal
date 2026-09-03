@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
 
-export const Route = createFileRoute("/privacy")({ component: Privacy });
+export const Route = createFileRoute("/privacy")({
+  loader: () => ({ title: "Privacy" }),
+  component: Privacy,
+});
 
 function Privacy() {
   return (

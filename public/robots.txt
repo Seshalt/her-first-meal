@@ -1,3 +1,19 @@
+User-agent: Googlebot
+Allow: /
+Allow: /pricing
+Allow: /about
+Allow: /belly-binding
+Allow: /nouri
+Allow: /privacy
+Allow: /contact
+Disallow: /admin
+Disallow: /app
+Disallow: /api
+Disallow: /login
+Disallow: /join
+Disallow: /checkout
+Disallow: /hearth
+
 User-agent: *
 Allow: /
 Allow: /pricing
@@ -5,7 +21,7 @@ Allow: /about
 Allow: /belly-binding
 Allow: /nouri
 Allow: /privacy
-
+Allow: /contact
 Disallow: /admin
 Disallow: /admin/
 Disallow: /app
@@ -17,4 +33,4 @@ Disallow: /join
 Disallow: /checkout
 Disallow: /hearth
 
-# Member rooms and the atelier are not for crawlers.
+Sitemap: https://her-first-meal-now.vercel.app/sitemap.xml

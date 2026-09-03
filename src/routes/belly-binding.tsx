@@ -4,8 +4,18 @@ import { PageCanvas } from "@/components/layout/page-canvas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { usePublicSite } from "@/lib/use-public-site";
+import { getLanding } from "@/lib/server/public";
 
-export const Route = createFileRoute("/belly-binding")({ component: BindingPage });
+export const Route = createFileRoute("/belly-binding")({
+  loader: async () => {
+    try {
+      return await getLanding();
+    } catch {
+      return null;
+    }
+  },
+  component: BindingPage,
+});
 
 function BindingPage() {
   const { site, content } = usePublicSite();

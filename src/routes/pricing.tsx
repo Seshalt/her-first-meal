@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { Button } from "@/components/ui/button";
 import { MEMBERSHIP_INCLUDES, yearlySavings } from "@/lib/pricing";
@@ -9,25 +9,25 @@ import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
 import { cn, formatCurrency } from "@/lib/utils";
 
-export const Route = createFileRoute("/pricing")({ component: Pricing });
+export const Route = createFileRoute("/pricing")({
+  loader: async () => {
+    try {
+      return await getPublicPricing();
+    } catch {
+      return null;
+    }
+  },
+  component: Pricing,
+});
 
 function Pricing() {
+  const priced = Route.useLoaderData();
   const { site, content } = usePublicSite();
-  const [monthly, setMonthly] = useState(4900);
-  const [yearly, setYearly] = useState(49000);
-  const [meeting, setMeeting] = useState(12000);
+  const monthly = priced?.settings.monthlyPriceCents ?? 4900;
+  const yearly = priced?.settings.yearlyPriceCents ?? 49000;
+  const consult = priced?.products.find((p) => p.kind === "consultation" || p.slug === "consultation");
+  const meeting = consult?.price_cents ?? 12000;
   const [yearlyOn, setYearlyOn] = useState(true);
-
-  useEffect(() => {
-    void getPublicPricing()
-      .then((d) => {
-        setMonthly(d.settings.monthlyPriceCents);
-        setYearly(d.settings.yearlyPriceCents);
-        const consult = d.products.find((p) => p.kind === "consultation" || p.slug === "consultation");
-        if (consult) setMeeting(consult.price_cents);
-      })
-      .catch(() => undefined);
-  }, []);
 
   const save = yearlySavings(monthly, yearly);
   const includes = lines(site.pricingIncludes);

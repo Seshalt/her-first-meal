@@ -12,16 +12,19 @@ import { lines } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
 import { HouseMark } from "@/components/brand/logo";
 
-export const Route = createFileRoute("/")({ component: Home });
+export const Route = createFileRoute("/")({
+  loader: async () => {
+    try {
+      return await getLanding();
+    } catch {
+      return null;
+    }
+  },
+  component: Home,
+});
 
 function Home() {
-  const [page, setPage] = useState<Awaited<ReturnType<typeof getLanding>> | null>(null);
-
-  useEffect(() => {
-    void getLanding()
-      .then(setPage)
-      .catch(() => undefined);
-  }, []);
+  const page = Route.useLoaderData();
 
   const content = page?.content ?? mergeLanding(null);
   const ticker = lines(page?.site.ticker ?? "");
