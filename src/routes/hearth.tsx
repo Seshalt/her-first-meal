@@ -18,7 +18,7 @@ export const Route = createFileRoute("/hearth")({ component: Hearth });
 function Hearth() {
   const { user, isPending } = useCurrentUserState();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("womenarewomen@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -79,8 +79,8 @@ function Hearth() {
       toast.error(message);
       return;
     }
-    if (password.length < 8) {
-      const message = "Use at least 8 characters.";
+    if (password.length < 10) {
+      const message = "Use a password of at least 12 characters.";
       setFormError(message);
       toast.error(message);
       return;
@@ -104,6 +104,8 @@ function Hearth() {
         },
       });
       setSaved(true);
+      setPassword("");
+      setConfirm("");
       const { error } = await authClient.signIn.email({
         email,
         password,
@@ -159,7 +161,7 @@ function Hearth() {
               <Input
                 id="hearth-email"
                 type="email"
-                autoComplete="username"
+                autoComplete="off"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -171,9 +173,8 @@ function Hearth() {
               <Input
                 id="hearth-new"
                 type="password"
-                autoComplete="new-password"
+                autoComplete="off"
                 required
-                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-[#efe6d6] text-[#101918]"
@@ -184,14 +185,13 @@ function Hearth() {
               <Input
                 id="hearth-confirm"
                 type="password"
-                autoComplete="new-password"
+                autoComplete="off"
                 required
-                minLength={8}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className="bg-[#efe6d6] text-[#101918]"
               />
-              <p className="mt-2 text-xs text-[#efe6d6]/50">At least eight characters. This becomes the owner password.</p>
+              <p className="mt-2 text-xs text-[#efe6d6]/50">Must be at least 12 characters.</p>
             </div>
             <HumanCheck
               tone="dark"

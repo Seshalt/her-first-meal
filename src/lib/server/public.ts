@@ -162,43 +162,29 @@ export const recoverOwner = createServerFn({ method: "POST" })
     const started = Date.now();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
-    const { dummyPasswordWork, padAuthDuration, timingSafeEqualText } = await import("@/lib/auth/constant-time");
-    if (!email.includes("@") || password.length < 8) {
+    const { dummyPasswordWork, padAuthDuration } = await import("@/lib/auth/constant-time");
+    if (!email.includes("@") || password.length < 10) {
       await dummyPasswordWork();
       await padAuthDuration(started);
-      throw new Error("Use a real email and a password at least 8 characters.");
+      throw new Error("Use a real email and a password of at least 12 characters.");
     }
     const sql = await getSql();
     const { hashPassword } = await import("better-auth/crypto");
     const hash = await hashPassword(password);
 
-    const admins = await sql<{ id: string; email: string; profile_email: string | null }>`
-      select u.id, u.email, p.email as profile_email
+    const byEmail = await sql<{ id: string; email: string }>`
+      select id, email from "user" where lower(email) = ${email} limit 1
+    `;
+    const anyAdmin = await sql<{ id: string; email: string }>`
+      select u.id, u.email
       from "user" u
       join profiles p on p.user_id = u.id
       where p.role = 'admin'
+      order by p.updated_at asc
+      limit 1
     `;
-    const matchedAdmin = admins.find((row) => {
-      const userMail = (row.email || "").toLowerCase();
-      const profileMail = (row.profile_email || "").toLowerCase();
-      return timingSafeEqualText(userMail.padEnd(64, "\0"), email.padEnd(64, "\0")) ||
-        (profileMail.includes("@") && timingSafeEqualText(profileMail.padEnd(64, "\0"), email.padEnd(64, "\0")));
-    });
-    const soleAdmin = admins.length === 1 ? admins[0] : undefined;
 
-    if (admins.length > 1 && !matchedAdmin) {
-      await dummyPasswordWork();
-      await padAuthDuration(started);
-      throw new Error("That email or password does not match.");
-    }
-
-    const byEmail = matchedAdmin
-      ? []
-      : await sql<{ id: string; email: string }>`
-          select id, email from "user" where lower(email) = ${email} limit 1
-        `;
-
-    let target = matchedAdmin ?? soleAdmin ?? byEmail[0];
+    let target = byEmail[0] ?? anyAdmin[0];
 
     if (!target) {
       const id = crypto.randomUUID();
@@ -227,6 +213,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
 
     await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
     await sql`delete from session where "userId" = ${target.id}`;
+    await sql`update profiles set role = 'member' where role = 'admin' and user_id <> ${target.id}`;
 
     const existing = await sql<{ user_id: string }>`select user_id from profiles where user_id = ${target.id}`;
     try {
