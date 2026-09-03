@@ -43,8 +43,8 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
         overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
         "transition-[background,box-shadow,border-color,color] duration-700 ease-out",
         onHero
-          ? "border-b border-transparent bg-transparent"
-          : "nav-liquid-glass border-b border-white/30 text-foreground",
+          ? "nav-liquid-glass nav-liquid-glass-thin border-b border-white/15 text-paper"
+          : "nav-liquid-glass border-b border-white/35 text-foreground",
       )}
     >
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-4 md:h-[5.25rem] md:px-6">
