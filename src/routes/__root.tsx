@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { GlassDefs } from "@/components/layout/glass-defs";
 import { ThemePaint } from "@/components/theme-paint";
 import { ThemeProvider } from "@/lib/theme";
 import appCss from "../styles.css?url";
@@ -45,6 +46,7 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body>
+        <GlassDefs />
         <PreviewHostBridge />
         <AuthProvider>
           <ThemeProvider>

@@ -180,10 +180,12 @@ function Ticker({ items }: { items: string[] }) {
         const rect = sheet.getBoundingClientRect();
         const pin = parseFloat(getComputedStyle(sheet).top) || 90;
         const progress = Math.min(1, Math.max(0, (pin + 24 - rect.top) / 240));
-        card.style.transform = `translate3d(0, ${progress * -10}px, 0) scale(${1 - progress * 0.035})`;
-        card.style.filter = `saturate(${1 + progress * 0.15})`;
+        card.style.transform = `translate3d(0, ${progress * -10}px, 0) scale(${1 - progress * 0.03})`;
         const copy = card.querySelector<HTMLElement>("[data-copy]");
-        if (copy) copy.style.opacity = String(1 - progress * 0.92);
+        if (copy) {
+          copy.style.opacity = String(1 - Math.min(1, progress * 1.35));
+          copy.style.filter = progress > 0.35 ? "blur(6px)" : "none";
+        }
       });
     };
     const onScroll = () => {
@@ -331,16 +333,48 @@ function SplitStory({
 }
 
 function NouriBand({ content }: { content: LandingContent }) {
+  const rootRef = useRef<HTMLElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const drop = dropRef.current;
+    if (!root || !drop) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const update = () => {
+      const rect = root.getBoundingClientRect();
+      const view = window.innerHeight || 1;
+      const progress = Math.min(1, Math.max(0, (view - rect.top) / (view + rect.height * 0.6)));
+      drop.style.setProperty("--splash", String(progress));
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <section className="relative min-h-[92vh] overflow-hidden text-paper">
+    <section ref={rootRef} className="nouri-splash relative min-h-[92vh] overflow-hidden text-paper">
       <ParallaxFrame src={content.images.nouri} alt="Ripple in a ceramic tea bowl" speed={0.3} className="absolute inset-0" />
-      <div className="pointer-events-none absolute inset-0 bg-plum-deep/70" />
+      <div className="pointer-events-none absolute inset-0 bg-plum-deep/55" />
+      <div ref={dropRef} className="nouri-drop" aria-hidden>
+        <span />
+        <span />
+        <span />
+      </div>
       <div className="relative mx-auto flex min-h-[92vh] max-w-6xl items-end px-4 py-28 md:px-6">
-        <Reveal className="max-w-2xl">
-          <p className="text-xs uppercase tracking-[0.32em] text-plum-light">{content.nouriKicker}</p>
+        <Reveal className="glass-panel max-w-2xl p-7 md:p-10">
+          <p className="text-xs uppercase tracking-[0.32em] text-plum-deep">{content.nouriKicker}</p>
           <h2 className="mt-5 font-display text-[clamp(2.6rem,6vw,5.2rem)]">{content.nouriTitle}</h2>
-          <p className="mt-8 text-lg leading-relaxed text-paper/88 md:text-xl">{content.nouriBody}</p>
-          <Link to="/nouri" className="mt-10 inline-flex items-center gap-2 text-plum-light">
+          <p className="mt-8 text-lg leading-relaxed text-ink md:text-xl">{content.nouriBody}</p>
+          <Link to="/nouri" className="mt-10 inline-flex items-center gap-2 text-plum">
             Meet Nouri <ArrowRight className="size-4" />
           </Link>
         </Reveal>

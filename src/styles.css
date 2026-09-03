@@ -362,15 +362,45 @@
 .editorial-rule-sea { background: var(--color-sea); }
 
 .glass-panel {
-  background: color-mix(in oklab, var(--color-paper) 74%, transparent);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 80% at 18% 0%, rgba(255,255,255,0.34), transparent 42%),
+    radial-gradient(90% 70% at 88% 100%, rgba(180, 210, 255, 0.12), transparent 46%),
+    rgba(255,255,255,0.11);
+  backdrop-filter: blur(20px) saturate(1.75) brightness(1.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.75) brightness(1.08);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #fff 75%, transparent),
-    0 0 0 1px color-mix(in oklab, #fff 38%, transparent),
-    0 18px 50px -28px color-mix(in oklab, var(--color-ink) 35%, transparent);
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -10px 18px rgba(20, 30, 50, 0.08),
+    0 18px 40px -24px rgba(20, 24, 28, 0.28),
+    0 2px 8px rgba(20, 24, 28, 0.08);
   border-radius: 36px;
   transition: transform 420ms var(--ease-out-soft), box-shadow 420ms var(--ease-out-soft);
+}
+.glass-panel::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.28),
+    inset 0 0 0 2px rgba(160, 210, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22), transparent 28%, transparent 72%, rgba(40,50,70,0.08));
+}
+.glass-panel::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    radial-gradient(80% 50% at 20% -10%, rgba(255,255,255,0.45), transparent 46%),
+    radial-gradient(40% 30% at 90% 110%, rgba(210, 170, 255, 0.12), transparent 50%);
+  mix-blend-mode: screen;
 }
 .glass-panel:hover {
   transform: translateY(-6px);
@@ -681,13 +711,15 @@ html[data-pricing="linen"] .pricing-stage {
 }
 
 .nav-liquid-glass {
-  background: color-mix(in oklab, #ffffff 52%, transparent);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
+  background:
+    radial-gradient(90% 140% at 12% 0%, rgba(255,255,255,0.28), transparent 46%),
+    rgba(255,255,255,0.1);
+  backdrop-filter: blur(22px) saturate(1.8) brightness(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(1.08);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
-    0 8px 28px -18px color-mix(in oklab, var(--color-ink) 28%, transparent);
-  border-bottom-color: color-mix(in oklab, #ffffff 40%, transparent);
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 10px 28px -20px rgba(20,24,28,0.22);
+  border-bottom-color: rgba(255,255,255,0.22);
 }
 
 .offer-stack {
@@ -704,15 +736,19 @@ html[data-pricing="linen"] .pricing-stage {
 .offer-sheet-card {
   width: min(100%, 56rem);
   margin-inline: auto;
+  overflow: hidden;
+  isolation: isolate;
   border-radius: 36px;
   padding: 1.6rem 1.6rem 1.8rem;
-  background: color-mix(in oklab, #fffaf3 82%, transparent);
-  backdrop-filter: blur(32px) saturate(1.9);
-  -webkit-backdrop-filter: blur(32px) saturate(1.9);
+  background:
+    radial-gradient(120% 80% at 16% 0%, rgba(255,255,255,0.38), transparent 44%),
+    rgba(255,255,255,0.12);
+  backdrop-filter: blur(22px) saturate(1.8) brightness(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(1.08);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #ffffff 82%, transparent),
-    0 0 0 1px color-mix(in oklab, #ffffff 42%, transparent),
-    0 28px 54px -26px color-mix(in oklab, var(--color-ink) 36%, transparent);
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    inset 0 -12px 22px rgba(30,40,60,0.08),
+    0 22px 44px -24px rgba(20,24,28,0.3);
   transform-origin: 50% 100%;
 }
 @media (min-width: 768px) {
@@ -762,6 +798,37 @@ html[data-pricing="linen"] .pricing-stage {
   width: 18rem; height: 18rem; right: 18%; bottom: 22%;
   background: color-mix(in oklab, var(--color-plum) 28%, transparent);
   animation-delay: -3s;
+}
+
+.nouri-drop {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  --splash: 0;
+}
+.nouri-drop span {
+  position: absolute;
+  left: 58%;
+  top: 42%;
+  width: 8rem;
+  height: 8rem;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 999px;
+  transform: translate(-50%, -50%) scale(calc(0.35 + var(--splash) * 2.4));
+  opacity: calc(0.55 - var(--splash) * 0.45);
+}
+.nouri-drop span:nth-child(2) {
+  width: 12rem;
+  height: 12rem;
+  transform: translate(-50%, -50%) scale(calc(0.2 + var(--splash) * 2.8));
+  opacity: calc(0.4 - var(--splash) * 0.35);
+}
+.nouri-drop span:nth-child(3) {
+  width: 3.2rem;
+  height: 3.2rem;
+  background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 70%);
+  border: 0;
+  transform: translate(-50%, calc(-50% + var(--splash) * 18px)) scale(calc(1.1 - var(--splash) * 0.35));
 }
 
 .split-board {
