@@ -149,18 +149,16 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
 
 function Ticker({ items }: { items: string[] }) {
   const source = items.length ? items : ["Personalized meals", "Belly Binding Studio", "Nouri"];
-  const loop = [...source, ...source];
+  const shown = source.slice(0, 3);
   return (
-    <div className="bg-clay py-6 text-paper">
-      <div className="marquee">
-        <div className="marquee-track">
-          {loop.map((item, i) => (
-            <span key={`${item}-${i}`} className="flex items-center px-8 text-sm tracking-[0.18em] uppercase md:px-14 md:text-base">
-              {item}
-              <span className="mx-8 inline-block size-1.5 rounded-full bg-gold md:mx-14" />
-            </span>
-          ))}
-        </div>
+    <div className="relative overflow-hidden bg-wash-linen">
+      <div className="offer-stage mx-auto max-w-6xl">
+        {shown.map((item) => (
+          <article key={item} className="offer-card">
+            <p className="text-xs uppercase tracking-[0.22em] text-ink/45">In the house</p>
+            <p className="mt-3 font-display text-2xl leading-tight md:text-3xl">{item}</p>
+          </article>
+        ))}
       </div>
     </div>
   );
@@ -231,31 +229,31 @@ function SplitStory({
           ? "text-plum"
           : "text-primary";
   const copy = (
-    <Reveal className={`flex min-h-[70vh] flex-col justify-center px-5 py-24 md:px-16 md:py-32 lg:min-h-dvh lg:px-20 ${wash}`}>
-      <div className="glass-panel max-w-xl p-7 md:p-10">
+    <div className={`split-copy flex min-h-[58vh] items-center px-1 py-8 lg:min-h-[auto] lg:py-16 ${wash}`}>
+      <Reveal className="glass-panel w-full max-w-xl p-7 md:p-10">
       <p className={`text-xs uppercase tracking-[0.32em] ${kickerColor}`}>{kicker}</p>
       <h2 className="mt-6 font-display text-[clamp(2.4rem,4.5vw,4.4rem)] leading-[1.02]">{title}</h2>
       <p className="mt-8 max-w-md text-lg leading-relaxed text-ink-soft md:text-xl">{body}</p>
       <Link to={href} className={`mt-10 inline-flex items-center gap-2 ${linkColor}`}>
         {linkLabel} <ArrowRight className="size-4" />
       </Link>
-      </div>
-    </Reveal>
+      </Reveal>
+    </div>
   );
   const picture = (
-    <div className="relative min-h-[70vh] lg:min-h-dvh">
+    <div className="split-photo relative">
       <ParallaxFrame src={src} alt={alt} speed={0.34} className="absolute inset-0" />
       {extraSrc ? (
         <img
           src={extraSrc}
           alt={extraAlt ?? ""}
-          className="media absolute bottom-10 right-8 hidden w-44 rounded-2xl object-cover shadow-[var(--shadow-border)] md:block md:h-56 md:w-48"
+          className="media absolute bottom-8 right-6 hidden w-40 rounded-3xl object-cover shadow-[var(--shadow-border)] md:block md:h-52 md:w-44"
         />
       ) : null}
     </div>
   );
   return (
-    <section className="grid lg:min-h-dvh lg:grid-cols-2">
+    <section className={`split-board grid lg:min-h-[auto] lg:grid-cols-2 ${photo === "left" ? "is-left" : "is-right"} ${wash}`}>
       {photo === "left" ? (
         <>
           {picture}

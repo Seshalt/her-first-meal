@@ -679,21 +679,66 @@ html[data-pricing="linen"] .pricing-stage {
   }
 }
 
-.nav-gold-glass {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, #e4b75a 72%, var(--color-paper)) 0%,
-      color-mix(in oklab, var(--color-gold) 58%, var(--color-paper)) 48%,
-      color-mix(in oklab, #c4923a 46%, var(--color-paper)) 100%
-    );
-  backdrop-filter: blur(28px) saturate(1.7);
-  -webkit-backdrop-filter: blur(28px) saturate(1.7);
+.nav-liquid-glass {
+  background: color-mix(in oklab, #ffffff 52%, transparent);
+  backdrop-filter: blur(28px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.8);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #fff8e8 70%, transparent),
-    0 1px 0 color-mix(in oklab, var(--color-gold) 55%, transparent),
-    0 16px 36px -20px color-mix(in oklab, #8a5a18 45%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
+    inset 0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
+    0 8px 28px -18px color-mix(in oklab, var(--color-ink) 28%, transparent);
+  border-bottom-color: color-mix(in oklab, #ffffff 40%, transparent);
+}
+
+.offer-stage {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem 1rem 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .offer-stage {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 2rem 1.5rem 2.5rem;
+  }
+}
+.offer-card {
+  border-radius: 28px;
+  padding: 1.35rem 1.4rem;
+  background: color-mix(in oklab, #ffffff 46%, transparent);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #ffffff 65%, transparent),
+    0 18px 40px -28px color-mix(in oklab, var(--color-ink) 35%, transparent);
+  animation: offer-float 7s ease-in-out infinite;
+}
+.offer-card:nth-child(2) { animation-delay: -2.2s; }
+.offer-card:nth-child(3) { animation-delay: -4.4s; }
+@keyframes offer-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.split-board {
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: transparent;
+}
+.split-photo {
+  overflow: hidden;
+  border-radius: 32px;
+  min-height: 58vh;
+  box-shadow: 0 24px 50px -28px color-mix(in oklab, var(--color-ink) 40%, transparent);
+}
+@media (min-width: 1024px) {
+  .split-board {
+    padding: 2rem;
+  }
+  .split-photo {
+    min-height: calc(100vh - 8rem);
+  }
+  .split-board.is-left .split-copy { transform: translateY(2.5rem); }
+  .split-board.is-right .split-copy { transform: translateY(-1.5rem); }
 }
 
 

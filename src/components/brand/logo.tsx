@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePublicSite } from "@/lib/use-public-site";
 
-export const HOUSE_MARK = "/images/logos/mark-hfm.png?v=7";
+export const HOUSE_MARK = "/images/logos/mark-hfm.png?v=8";
 
 export function HouseMark({ className }: { className?: string }) {
   return (
