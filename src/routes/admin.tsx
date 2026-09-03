@@ -1,10 +1,10 @@
-import { createFileRoute, Outlet, useRouterState, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouterState, Navigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/layout/admin-shell";
 import { markAtelierReady } from "@/lib/atelier-ready";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getMyRole } from "@/lib/server/admin";
-import { hasAdministrator } from "@/lib/server/public";
+import { signOut } from "@/lib/auth/client";
 
 export const Route = createFileRoute("/admin")({ component: AdminGate });
 
@@ -12,27 +12,12 @@ function AdminGate() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, isPending } = useCurrentUserState();
   const [role, setRole] = useState<string | null>(null);
-  const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [denied, setDenied] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
-    const t = window.setTimeout(() => setTimedOut(true), 7000);
+    const t = window.setTimeout(() => setTimedOut(true), 8000);
     return () => window.clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    let live = true;
-    void hasAdministrator()
-      .then((r) => {
-        if (live) setHasAdmin(r.hasAdmin);
-      })
-      .catch(() => {
-        if (live) setHasAdmin(null);
-      });
-    return () => {
-      live = false;
-    };
   }, []);
 
   useEffect(() => {
@@ -58,23 +43,11 @@ function AdminGate() {
 
   const stillWaiting = isPending || (Boolean(user) && !role && !denied);
   if (stillWaiting && !timedOut) {
-    return <div className="grid min-h-dvh place-items-center bg-[#101918] text-[#efe6d6]">Loading…</div>;
+    return <div className="grid min-h-dvh place-items-center bg-[#101918] text-[#efe6d6]">Opening the atelier…</div>;
   }
 
   if (!user) {
     return <Navigate to="/hearth" />;
-  }
-  if (denied || (role && role !== "admin")) {
-    return (
-      <div className="grid min-h-dvh place-items-center bg-background px-6 text-center">
-        <div>
-          <h1 className="font-display text-3xl">This page isn't available.</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Sign in with the owner email. Members enter through the house, not the atelier.
-          </p>
-        </div>
-      </div>
-    );
   }
   if (role === "admin") {
     return (
@@ -83,6 +56,28 @@ function AdminGate() {
       </AdminShell>
     );
   }
-  if (hasAdmin === false) return <Navigate to="/hearth" />;
-  return <div className="grid min-h-dvh place-items-center bg-[#101918] text-[#efe6d6]">Loading…</div>;
+  return (
+    <div className="grid min-h-dvh place-items-center bg-[#101918] px-6 text-center text-[#efe6d6]">
+      <div>
+        <h1 className="font-display text-3xl">Use the private door.</h1>
+        <p className="mt-3 max-w-sm text-sm text-[#efe6d6]/70">
+          This browser is signed in as a member. Sign out, then enter at the hearth with the owner email and password.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            className="rounded-full bg-[#efe6d6] px-5 py-3 text-sm text-[#101918]"
+            onClick={() => {
+              void signOut("/hearth");
+            }}
+          >
+            Sign out and open the hearth
+          </button>
+          <Link to="/hearth" className="rounded-full border border-white/20 px-5 py-3 text-sm">
+            Go to the hearth
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
