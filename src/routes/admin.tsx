@@ -16,7 +16,7 @@ function AdminGate() {
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
-    const t = window.setTimeout(() => setTimedOut(true), 8000);
+    const t = window.setTimeout(() => setTimedOut(true), 2500);
     return () => window.clearTimeout(t);
   }, []);
 
