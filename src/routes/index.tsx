@@ -75,13 +75,10 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
       <section className="grid min-h-[100dvh] bg-wash-linen lg:grid-cols-2">
         <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
           <h1>
-            <HouseMark className="h-20 w-auto md:h-24" />
+            <HouseMark className="h-20 w-auto max-w-none md:h-24" />
             <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className="mt-8 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[1.05] text-ink">
-            Her First Meal
-          </p>
-          <p className="mt-4 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-ink">
+          <p className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-ink">
             The world celebrates the baby.
             <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>
@@ -121,14 +118,11 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         }
       >
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
-          <h1 className={centered ? "flex flex-col items-center" : ""}>
-            <HouseMark className={`h-24 w-auto md:h-32 ${centered ? "mx-auto" : ""}`} />
+          <h1 className={`overflow-visible ${centered ? "flex flex-col items-center" : ""}`}>
+            <HouseMark className={`h-28 w-auto max-w-none md:h-36 ${centered ? "mx-auto" : ""}`} />
             <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className={`mt-8 font-display text-[clamp(2.6rem,6vw,5rem)] leading-[1.02] text-paper [text-shadow:0_10px_32px_rgba(12,16,14,0.4)] ${centered ? "text-center" : ""}`}>
-            Her First Meal
-          </p>
-          <p className={`mt-5 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-paper [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
+          <p className={`mt-8 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-paper [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
             The world celebrates the baby.
             <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>

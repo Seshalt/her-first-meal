@@ -2,10 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePublicSite } from "@/lib/use-public-site";
 
-export const HOUSE_MARK = "/images/logos/mark-hfm.png";
+export const HOUSE_MARK = "/images/logos/mark-hfm.png?v=7";
 
 export function HouseMark({ className }: { className?: string }) {
-  return <img src={HOUSE_MARK} alt="" className={cn("bg-transparent object-contain", className)} />;
+  return (
+    <img
+      src={HOUSE_MARK}
+      alt=""
+      className={cn("max-w-none bg-transparent object-contain object-left", className)}
+    />
+  );
 }
 
 export function BrandEmblem({ className }: { className?: string }) {
