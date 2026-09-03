@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
-import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -17,7 +16,6 @@ function NouriMarketing() {
       <section>
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
           <div>
-            <HouseMark className="mb-6 h-16 w-auto" />
             <p className="text-xs uppercase tracking-[0.28em] text-plum">{site.nouriPageKicker}</p>
             <h1 className="mt-3 font-display text-5xl">{site.nouriPageTitle}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{site.nouriPageBody}</p>

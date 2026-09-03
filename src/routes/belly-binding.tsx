@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
-import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -29,7 +28,6 @@ function BindingPage() {
       <section>
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
           <div>
-            <HouseMark className="mb-6 h-16 w-auto" />
             <Badge tone="blush">{site.bindPageKicker}</Badge>
             <h1 className="mt-4 font-display text-5xl">{site.bindPageTitle}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{site.bindPageBody}</p>

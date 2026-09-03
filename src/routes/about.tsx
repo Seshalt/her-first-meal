@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
-import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { usePublicSite } from "@/lib/use-public-site";
 
@@ -14,7 +13,6 @@ function About() {
       <PublicNav />
       <PageCanvas tone="linen">
         <article className="mx-auto max-w-3xl px-4 py-16">
-          <HouseMark className="mb-6 h-16 w-auto" />
           <p className="text-xs uppercase tracking-[0.28em] text-clay">{site.aboutKicker}</p>
           <h1 className="mt-3 font-display text-5xl">{site.aboutTitle}</h1>
           <img

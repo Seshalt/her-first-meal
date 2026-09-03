@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
-import { HouseMark } from "@/components/brand/logo";
 
 export const Route = createFileRoute("/privacy")({ component: Privacy });
 
@@ -11,7 +10,6 @@ function Privacy() {
       <PublicNav />
       <PageCanvas>
         <article className="mx-auto max-w-2xl px-4 py-16">
-          <HouseMark className="mb-6 h-16 w-auto" />
           <h1 className="font-display text-5xl">Privacy</h1>
           <div className="glass-panel mt-8 space-y-4 p-6 text-muted-foreground md:p-8">
             <p>

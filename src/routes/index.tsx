@@ -81,7 +81,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
           <p className="mt-8 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[1.05] text-ink">
             Her First Meal
           </p>
-          <p className="mt-4 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-sea-deep">
+          <p className="mt-4 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-ink">
             The world celebrates the baby.
             <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>
@@ -128,7 +128,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
           <p className={`mt-8 font-display text-[clamp(2.6rem,6vw,5rem)] leading-[1.02] text-paper [text-shadow:0_10px_32px_rgba(12,16,14,0.4)] ${centered ? "text-center" : ""}`}>
             Her First Meal
           </p>
-          <p className={`mt-5 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-aqua [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
+          <p className={`mt-5 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-paper [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
             The world celebrates the baby.
             <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>

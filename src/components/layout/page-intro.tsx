@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { HouseMark } from "@/components/brand/logo";
 import { Kicker } from "@/components/layout/room-hero";
 
 export function PageIntro({
@@ -27,7 +26,6 @@ export function PageIntro({
             : "editorial-rule";
   return (
     <header className="max-w-3xl">
-      <HouseMark className="mb-5 h-14 w-auto md:h-16" />
       {kicker ? <Kicker tone={tone}>{kicker}</Kicker> : null}
       <h1 className="mt-4 font-display text-[clamp(2.4rem,5vw,4.4rem)] leading-[1.02]">{title}</h1>
       {body ? <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">{body}</p> : null}
