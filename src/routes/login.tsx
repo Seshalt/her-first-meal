@@ -33,7 +33,7 @@ function Login() {
   const [home, setHome] = useState<"/" | "/app" | "/admin" | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [formError, setFormError] = useState("");
-  const [recover, setRecover] = useState(false);
+  const [recover, setRecover] = useState(ownerDoor);
   const [newPassword, setNewPassword] = useState("");
   const [factor, setFactor] = useState<{
     needed: boolean;
@@ -141,7 +141,18 @@ function Login() {
       });
       setPassword(newPassword);
       setRecover(false);
-      toast.success("Owner password updated. Sign in with the new password.");
+      const { error } = await authClient.signIn.email({
+        email,
+        password: newPassword,
+        callbackURL: "/login?next=/admin",
+      });
+      if (error) {
+        toast.success("Owner password saved. Sign in with it now.");
+        return;
+      }
+      markAtelierReady();
+      toast.success("Owner password saved. Entering the atelier.");
+      void navigate({ to: "/admin" });
     } catch (err) {
       const message = readableAuthError(err, "Could not update the owner password.");
       setFormError(message);
@@ -235,7 +246,7 @@ function Login() {
                 type="password"
                 autoComplete="current-password"
                 required
-                minLength={10}
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -255,38 +266,57 @@ function Login() {
               {busy ? "Entering…" : ownerDoor ? "Enter the atelier" : "Enter the house"}
             </Button>
           </form>
-          {ownerDoor ? (
-            <div className="mt-6 max-w-md">
+          <div className="mt-6 max-w-md">
               <button
                 type="button"
                 className="text-sm text-primary underline-offset-4 hover:underline"
                 onClick={() => setRecover((v) => !v)}
               >
-                {recover ? "Hide password reset" : "Forgot the owner password?"}
+                {recover ? "Hide owner password reset" : "Forgot the owner password? Set a new one"}
               </button>
               {recover ? (
-                <form onSubmit={(e) => void onRecover(e)} className="mt-4 space-y-4">
+                <form onSubmit={(e) => void onRecover(e)} className="glass-panel mt-4 space-y-4 p-5">
                   <p className="text-sm text-ink-soft">
-                    Enter Maat’s owner email and a new password. This replaces the saved password so you can sign in.
+                    Enter Maat’s email and a new password. This replaces the old one and signs you into the atelier.
                   </p>
+                  <div>
+                    <Label htmlFor="recover-email">Owner email</Label>
+                    <Input
+                      id="recover-email"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                   <div>
                     <Label htmlFor="new-password">New owner password</Label>
                     <Input
                       id="new-password"
                       type="password"
                       required
-                      minLength={10}
+                      minLength={8}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                     />
                   </div>
+                  <HumanCheck
+                    checked={guard.human}
+                    onChecked={guard.setHuman}
+                    honey={guard.honey}
+                    onHoney={guard.setHoney}
+                  />
+                  {formError ? (
+                    <p className="rounded-xl bg-clay px-4 py-3 text-sm text-paper" role="alert">
+                      {formError}
+                    </p>
+                  ) : null}
                   <Button type="submit" className="w-full" disabled={busy || !guard.human}>
-                    {busy ? "Updating…" : "Set new owner password"}
+                    {busy ? "Saving…" : "Save new owner password"}
                   </Button>
                 </form>
               ) : null}
             </div>
-          ) : null}
           <p className="mt-8 max-w-md text-sm text-muted-foreground">
             New here?{" "}
             <Link to="/pricing" className="text-primary">

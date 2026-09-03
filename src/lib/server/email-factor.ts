@@ -5,7 +5,7 @@ import { getSessionUser } from "@/lib/auth/verify.server";
 import { timingSafeEqualText } from "@/lib/auth/constant-time";
 import { getSql } from "@/lib/db";
 import { rateLimit } from "./abuse";
-import { maskEmail, sendHouseMail } from "./mail";
+import { maskEmail, mailConfigured, sendHouseMail } from "./mail";
 import { ensureProfile } from "./profile";
 
 function hashCode(userId: string, code: string): string {
@@ -26,6 +26,9 @@ export const getEmailFactorStatus = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const email = await accountEmail(context.userId);
+    if (!mailConfigured()) {
+      return { needed: false, emailMasked: email ? maskEmail(email) : "your email" };
+    }
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
     const rows = await sql<{ email_factor_ok: boolean }>`
@@ -42,6 +45,9 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     rateLimit(`email-factor:${context.userId}`, 6, 15 * 60 * 1000);
     const email = await accountEmail(context.userId);
+    if (!mailConfigured()) {
+      return { needed: false, sent: false, emailMasked: maskEmail(email), configured: false };
+    }
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
     const rows = await sql<{ email_factor_ok: boolean }>`

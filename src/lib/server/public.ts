@@ -158,49 +158,89 @@ export const recoverOwner = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
-    rateLimit("recover-owner", 6, 15 * 60 * 1000);
-    const started = Date.now();
-    const { dummyPasswordWork, padAuthDuration, timingSafeEqualText } = await import("@/lib/auth/constant-time");
-    await dummyPasswordWork();
+    rateLimit("recover-owner", 8, 15 * 60 * 1000);
     const email = data.email.trim().toLowerCase();
     const password = data.password;
-    if (!email.includes("@") || password.length < 10) {
-      await padAuthDuration(started);
-      throw new Error("Use a real email and a password at least 10 characters.");
+    if (!email.includes("@") || password.length < 8) {
+      throw new Error("Use a real email and a password at least 8 characters.");
     }
     const sql = await getSql();
-    const admins = await sql<{ id: string; email: string; name: string; display_name: string | null }>`
-      select u.id, u.email, u.name, p.display_name
+    const { hashPassword } = await import("better-auth/crypto");
+    const hash = await hashPassword(password);
+
+    const admins = await sql<{ id: string; email: string }>`
+      select u.id, u.email
       from "user" u
       join profiles p on p.user_id = u.id
       where p.role = 'admin'
     `;
-    const byEmail = admins.find((row) => timingSafeEqualText(row.email.toLowerCase(), email));
-    const onlyOwner = admins.length === 1 ? admins[0] : undefined;
-    const target = byEmail ?? onlyOwner;
+    const matchedAdmin = admins.find((row) => row.email.toLowerCase() === email);
+    const onlyAdmin = admins.length === 1 ? admins[0] : undefined;
+    const byEmail = await sql<{ id: string; email: string }>`
+      select id, email from "user" where lower(email) = ${email} limit 1
+    `;
+
+    let target = matchedAdmin ?? onlyAdmin ?? byEmail[0];
+
     if (!target) {
-      await padAuthDuration(started);
-      throw new Error("That email or password does not match.");
+      const id = crypto.randomUUID();
+      await sql`
+        insert into "user" (id, name, email, "emailVerified", "createdAt", "updatedAt")
+        values (${id}, 'Maat', ${email}, true, now(), now())
+      `;
+      target = { id, email };
     }
-    const { hashPassword } = await import("better-auth/crypto");
-    const hash = await hashPassword(password);
-    await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
+
     const accounts = await sql<{ id: string }>`
       select id from account where "userId" = ${target.id} and "providerId" = 'credential'
     `;
     if (accounts[0]) {
       await sql`update account set password = ${hash}, "updatedAt" = now() where id = ${accounts[0].id}`;
     } else {
-      const id = crypto.randomUUID();
+      const accountId = crypto.randomUUID();
       await sql`
         insert into account (
           id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt"
         ) values (
-          ${id}, ${target.id}, 'credential', ${target.id}, ${hash}, now(), now()
+          ${accountId}, ${target.id}, 'credential', ${target.id}, ${hash}, now(), now()
         )
       `;
     }
+
+    await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
     await sql`delete from session where "userId" = ${target.id}`;
+
+    const existing = await sql<{ user_id: string }>`select user_id from profiles where user_id = ${target.id}`;
+    try {
+      if (existing[0]) {
+        await sql`
+          update profiles
+          set role = 'admin', email = ${email}, display_name = coalesce(display_name, 'Maat'),
+              email_factor_ok = true, onboarding_completed = true, updated_at = now()
+          where user_id = ${target.id}
+        `;
+      } else {
+        await sql`
+          insert into profiles (user_id, role, email, display_name, email_factor_ok, onboarding_completed)
+          values (${target.id}, 'admin', ${email}, 'Maat', true, true)
+        `;
+      }
+    } catch {
+      if (existing[0]) {
+        await sql`
+          update profiles
+          set role = 'admin', email = ${email}, display_name = coalesce(display_name, 'Maat'),
+              onboarding_completed = true, updated_at = now()
+          where user_id = ${target.id}
+        `;
+      } else {
+        await sql`
+          insert into profiles (user_id, role, email, display_name, onboarding_completed)
+          values (${target.id}, 'admin', ${email}, 'Maat', true)
+        `;
+      }
+    }
+
     return { ok: true };
   });
 

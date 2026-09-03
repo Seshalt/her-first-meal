@@ -7,6 +7,10 @@ function env(name: string): string | undefined {
   return value || undefined;
 }
 
+export function mailConfigured(): boolean {
+  return Boolean(env("RESEND_API_KEY"));
+}
+
 export async function sendHouseMail(input: {
   to: string;
   subject: string;
