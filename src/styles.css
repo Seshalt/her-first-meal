@@ -711,16 +711,22 @@ html[data-pricing="linen"] .pricing-stage {
 }
 
 .nav-liquid-glass {
-  --nav-a: rgba(42, 117, 108, 0.38);
-  --nav-b: rgba(212, 162, 74, 0.22);
+  --nav-a: rgba(42, 117, 108, 0.16);
+  --nav-b: rgba(212, 162, 74, 0.1);
   background:
-    linear-gradient(105deg, var(--nav-a), rgba(255,250,243,0.72) 46%, var(--nav-b));
-  backdrop-filter: blur(28px) saturate(1.6);
-  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    linear-gradient(105deg, var(--nav-a), transparent 42%, var(--nav-b)),
+    rgba(255, 250, 243, 0.94);
+  backdrop-filter: blur(24px) saturate(1.35);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.7),
-    0 10px 28px -18px rgba(20,24,28,0.22);
-  border-bottom-color: rgba(255,255,255,0.45);
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    0 10px 24px -18px rgba(20,24,28,0.2);
+  border-bottom-color: rgba(40, 36, 32, 0.08);
+}
+.nav-liquid-glass-thin {
+  background:
+    linear-gradient(180deg, rgba(18, 20, 18, 0.42), rgba(18, 20, 18, 0.22));
+  border-bottom-color: rgba(255,255,255,0.1);
 }
 .nav-liquid-glass-thin {
   background:
@@ -872,7 +878,7 @@ html[data-pricing="linen"] .pricing-stage {
   opacity: calc(var(--splash) * 0.5 - 0.12);
 }
 .nouri-photo {
-  transform-origin: 63% 42%;
+  transform-origin: 58% 46%;
   will-change: transform;
 }
 

@@ -259,14 +259,6 @@ function SplitStory({
   extraAlt?: string;
   tone?: "sea" | "clay" | "blush" | "plum";
 }) {
-  const wash =
-    tone === "clay"
-      ? "bg-wash-clay"
-      : tone === "blush"
-        ? "bg-wash-blush"
-        : tone === "plum"
-          ? "bg-wash-plum"
-          : "bg-wash-sea";
   const kickerColor =
     tone === "clay"
       ? "text-clay"
@@ -284,7 +276,7 @@ function SplitStory({
           ? "text-plum"
           : "text-primary";
   const copy = (
-    <div className={`split-copy flex min-h-[58vh] items-center px-1 py-8 lg:min-h-[auto] lg:py-16 ${wash}`}>
+    <div className="split-copy flex min-h-[58vh] items-center px-1 py-8 lg:min-h-[auto] lg:py-16">
       <Reveal className="glass-panel w-full max-w-xl p-7 md:p-10">
       <p className={`text-xs uppercase tracking-[0.32em] ${kickerColor}`}>{kicker}</p>
       <h2 className="mt-6 font-display text-[clamp(2.4rem,4.5vw,4.4rem)] leading-[1.02]">{title}</h2>
@@ -308,7 +300,7 @@ function SplitStory({
     </div>
   );
   return (
-    <section className={`split-board grid lg:min-h-[auto] lg:grid-cols-2 ${photo === "left" ? "is-left" : "is-right"} ${wash}`}>
+    <section className={`split-board grid lg:min-h-[auto] lg:grid-cols-2 ${photo === "left" ? "is-left" : "is-right"}`}>
       {photo === "left" ? (
         <>
           {picture}
@@ -326,21 +318,19 @@ function SplitStory({
 
 function NouriBand({ content }: { content: LandingContent }) {
   const rootRef = useRef<HTMLElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
-    const drop = dropRef.current;
-    if (!root || !drop) return;
+    if (!root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const photo = root.querySelector<HTMLElement>("[data-nouri-photo]");
+    if (!photo) return;
     let frame = 0;
     const update = () => {
       const rect = root.getBoundingClientRect();
       const view = window.innerHeight || 1;
       const progress = Math.min(1, Math.max(0, (view - rect.top) / (view + rect.height * 0.45)));
-      drop.style.setProperty("--splash", String(progress));
-      const photo = root.querySelector<HTMLElement>("[data-nouri-photo]");
-      if (photo) photo.style.transform = `translate3d(0, ${progress * 36}px, 0) scale(${1 + progress * 0.12})`;
+      photo.style.transform = `translate3d(0, ${progress * 70}px, 0) scale(${1.04 + progress * 0.18})`;
     };
     const onScroll = () => {
       cancelAnimationFrame(frame);
@@ -359,12 +349,7 @@ function NouriBand({ content }: { content: LandingContent }) {
       <div className="nouri-photo absolute inset-0" data-nouri-photo>
         <ParallaxFrame src={content.images.nouri} alt="Ripple in a ceramic tea bowl" speed={0.18} className="absolute inset-0" />
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-plum-deep/40" />
-      <div ref={dropRef} className="nouri-drip" aria-hidden>
-        <i className="nouri-bead" />
-        <i className="nouri-ring" />
-        <i className="nouri-ring nouri-ring-2" />
-      </div>
+      <div className="pointer-events-none absolute inset-0 bg-plum-deep/32" />
       <div className="relative mx-auto flex min-h-[92vh] max-w-6xl items-end px-4 py-28 md:px-6">
         <Reveal className="glass-panel max-w-2xl p-7 md:p-10">
           <p className="text-xs uppercase tracking-[0.32em] text-plum-deep">{content.nouriKicker}</p>
@@ -397,14 +382,16 @@ function JourneyBand({ images }: { images: LandingContent["images"] }) {
         </Reveal>
       </div>
       {stages.map((s, i) => (
-        <article key={s.w} className="grid min-h-[78vh] lg:grid-cols-2">
-          <div className={i % 2 === 1 ? "relative min-h-[60vh] lg:order-2 lg:min-h-[78vh]" : "relative min-h-[60vh] lg:min-h-[78vh]"}>
+        <article key={s.w} className="split-board grid lg:grid-cols-2">
+          <div className={i % 2 === 1 ? "split-photo relative lg:order-2" : "split-photo relative"}>
             <ParallaxFrame src={s.img} alt={s.alt} speed={0.2} className="absolute inset-0" />
           </div>
-          <Reveal className={`flex flex-col justify-center px-5 py-20 md:px-16 ${s.wash}`}>
+          <Reveal className="split-copy flex items-center px-1 py-10">
+            <div className="glass-panel w-full max-w-xl p-7 md:p-10">
             <p className={`text-xs uppercase tracking-[0.32em] ${s.kicker}`}>0{i + 1}</p>
             <h3 className="mt-5 font-display text-4xl md:text-6xl">{s.w}</h3>
             <p className="mt-6 max-w-md text-lg text-ink-soft md:text-xl">{s.d}</p>
+            </div>
           </Reveal>
         </article>
       ))}

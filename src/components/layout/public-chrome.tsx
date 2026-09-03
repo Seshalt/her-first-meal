@@ -41,8 +41,8 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
       const c2 = mix(stops[Math.min(stops.length - 2, i + 1)]!, stops[Math.min(stops.length - 1, i + 2)]!);
       const header = document.querySelector<HTMLElement>("[data-site-nav]");
       if (!header) return;
-      header.style.setProperty("--nav-a", `rgba(${c1.join(",")},0.42)`);
-      header.style.setProperty("--nav-b", `rgba(${c2.join(",")},0.28)`);
+      header.style.setProperty("--nav-a", `rgba(${c1.join(",")},0.18)`);
+      header.style.setProperty("--nav-b", `rgba(${c2.join(",")},0.12)`);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
