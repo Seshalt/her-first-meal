@@ -679,17 +679,17 @@ html[data-pricing="linen"] .pricing-stage {
   background:
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--color-gold) 42%, transparent) 0%,
-      color-mix(in oklab, #e8c56a 28%, color-mix(in oklab, var(--color-paper) 35%, transparent)) 55%,
-      color-mix(in oklab, var(--color-gold) 22%, color-mix(in oklab, var(--color-paper) 45%, transparent)) 100%
+      color-mix(in oklab, #e4b75a 72%, var(--color-paper)) 0%,
+      color-mix(in oklab, var(--color-gold) 58%, var(--color-paper)) 48%,
+      color-mix(in oklab, #c4923a 46%, var(--color-paper)) 100%
     );
-  backdrop-filter: blur(22px) saturate(1.55);
-  -webkit-backdrop-filter: blur(22px) saturate(1.55);
+  backdrop-filter: blur(28px) saturate(1.7);
+  -webkit-backdrop-filter: blur(28px) saturate(1.7);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #fff 55%, transparent),
-    0 1px 0 color-mix(in oklab, var(--color-gold) 45%, transparent),
-    0 12px 40px -24px color-mix(in oklab, var(--color-gold) 50%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--color-gold) 38%, transparent);
+    inset 0 1px 0 color-mix(in oklab, #fff8e8 70%, transparent),
+    0 1px 0 color-mix(in oklab, var(--color-gold) 55%, transparent),
+    0 16px 36px -20px color-mix(in oklab, #8a5a18 45%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
 }
 
 

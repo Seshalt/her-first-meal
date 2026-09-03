@@ -69,7 +69,7 @@ export function Wordmark({
   return (
     <Link to={to} className={cn("flex min-w-0 items-center gap-2.5 text-foreground no-underline", className)}>
       {mark ? <HouseMark className={cn("shrink-0", stacked ? "size-14" : "size-11 md:size-12")} /> : null}
-      <BrandTitle size="nav" showTagline className="block min-w-0" />
+      <BrandTitle size="nav" showTagline={false} className="block min-w-0" />
     </Link>
   );
 }

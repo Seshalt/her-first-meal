@@ -9,7 +9,7 @@ import { yearlySavings } from "@/lib/pricing";
 import { getLanding } from "@/lib/server/public";
 import { lines } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
-import { BrandTitle, HouseMark } from "@/components/brand/logo";
+import { HouseMark } from "@/components/brand/logo";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -76,9 +76,12 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
           <h1>
             <HouseMark className="h-20 w-auto md:h-24" />
-            <BrandTitle size="hero" className="mt-5 block text-ink" />
+            <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className="mt-8 font-display text-[clamp(2.2rem,4.6vw,4.2rem)] leading-[1.05] text-ink">
+          <p className="mt-8 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[1.05] text-ink">
+            Her First Meal
+          </p>
+          <p className="mt-4 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-sea-deep">
             The world celebrates the baby.
             <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>
@@ -120,11 +123,14 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
           <h1 className={centered ? "flex flex-col items-center" : ""}>
             <HouseMark className={`h-24 w-auto md:h-32 ${centered ? "mx-auto" : ""}`} />
-            <BrandTitle size="hero" className="mt-5 block text-paper" />
+            <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className={`mt-8 font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05] text-paper [text-shadow:0_12px_40px_rgba(12,16,14,0.45)] ${centered ? "text-center" : ""}`}>
+          <p className={`mt-8 font-display text-[clamp(2.6rem,6vw,5rem)] leading-[1.02] text-paper [text-shadow:0_10px_32px_rgba(12,16,14,0.4)] ${centered ? "text-center" : ""}`}>
+            Her First Meal
+          </p>
+          <p className={`mt-5 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-aqua [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
             The world celebrates the baby.
-            <span className="mt-3 block italic text-gold">We remember the mother.</span>
+            <span className="mt-2 block italic text-gold">We remember the mother.</span>
           </p>
           <p className={`mt-8 max-w-lg text-lg leading-relaxed text-paper/88 md:text-xl ${centered ? "mx-auto" : ""}`}>
             {content.subhead}

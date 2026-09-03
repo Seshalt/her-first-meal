@@ -41,7 +41,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
     <header
       className={cn(
         overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
-        "transition-[background-color,border-color,color] duration-300",
+        "transition-[background,box-shadow,border-color,color] duration-700 ease-out",
         onHero
           ? "border-b border-transparent bg-transparent"
           : "nav-gold-glass border-b border-gold/20 text-foreground",
