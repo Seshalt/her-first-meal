@@ -260,12 +260,20 @@
 }
 
 .hero-veil {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--color-ink) 22%, transparent) 0%,
-    color-mix(in oklab, var(--color-clay-deep) 10%, transparent) 42%,
-    color-mix(in oklab, var(--color-sea-deep) 72%, var(--color-ink)) 100%
-  );
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-ink) 38%, transparent) 0%,
+      color-mix(in oklab, var(--color-ink) 8%, transparent) 28%,
+      color-mix(in oklab, var(--color-sea-deep) 28%, transparent) 58%,
+      color-mix(in oklab, var(--color-ink) 78%, var(--color-sea-deep)) 100%
+    ),
+    radial-gradient(
+      90% 70% at 50% 110%,
+      color-mix(in oklab, var(--color-clay-deep) 35%, transparent),
+      transparent 62%
+    );
+  box-shadow: inset 0 0 120px color-mix(in oklab, var(--color-ink) 28%, transparent);
 }
 
 .hero-veil-clay {

@@ -9,7 +9,7 @@ import { yearlySavings } from "@/lib/pricing";
 import { getLanding } from "@/lib/server/public";
 import { lines } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
-import { BrandEmblem, BrandTitle } from "@/components/brand/logo";
+import { BrandTitle, HouseMark } from "@/components/brand/logo";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -74,7 +74,10 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
     return (
       <section className="grid min-h-[100dvh] bg-wash-linen lg:grid-cols-2">
         <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
-          <BrandTitle size="hero" className="block text-ink" />
+          <h1>
+            <HouseMark className="mb-6 h-20 w-auto md:h-24" />
+            <BrandTitle size="hero" className="block text-ink" />
+          </h1>
           <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-soft">{content.subhead}</p>
           <div className="mt-12 flex flex-wrap items-center gap-6">
             <MagneticLink to="/pricing" className="bg-primary text-primary-foreground">
@@ -87,6 +90,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         </div>
         <div className="relative min-h-[50vh] lg:min-h-full">
           <img src={content.images.hero} alt="" className="media absolute inset-0 h-full w-full object-cover" />
+          <div className="hero-veil pointer-events-none absolute inset-0" />
         </div>
       </section>
     );
@@ -110,11 +114,11 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         }
       >
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
-          <BrandEmblem className={`mb-8 h-28 w-28 md:h-40 md:w-40 ${centered ? "mx-auto" : ""}`} />
-          <p className="text-xs uppercase tracking-[0.38em] text-gold">{content.eyebrow}</p>
           <h1 className="mt-5">
+            <HouseMark className={`mb-6 h-24 w-auto md:h-32 ${centered ? "mx-auto" : ""}`} />
             <BrandTitle size="hero" className="block text-paper" />
           </h1>
+          <p className="mt-3 text-xs uppercase tracking-[0.38em] text-gold">{content.eyebrow}</p>
           <p className={`mt-8 max-w-lg text-lg leading-relaxed text-paper/88 md:text-xl ${centered ? "mx-auto" : ""}`}>
             {content.subhead}
           </p>

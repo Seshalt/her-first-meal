@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePublicSite } from "@/lib/use-public-site";
 
-export const HOUSE_MARK = "/images/logos/mark-hfm.jpg";
+export const HOUSE_MARK = "/images/logos/mark-hfm.png";
 
 export function HouseMark({ className }: { className?: string }) {
-  return <img src={HOUSE_MARK} alt="Her First Meal" className={cn("object-contain", className)} />;
+  return <img src={HOUSE_MARK} alt="" className={cn("bg-transparent object-contain", className)} />;
 }
 
 export function BrandEmblem({ className }: { className?: string }) {
@@ -59,14 +59,16 @@ export function Wordmark({
   to = "/",
   className,
   stacked = false,
+  mark = false,
 }: {
   to?: "/" | "/app" | "/admin";
   className?: string;
   stacked?: boolean;
+  mark?: boolean;
 }) {
   return (
     <Link to={to} className={cn("flex min-w-0 items-center gap-2.5 text-foreground no-underline", className)}>
-      <HouseMark className={cn("shrink-0", stacked ? "size-14" : "size-11 md:size-12")} />
+      {mark ? <HouseMark className={cn("shrink-0", stacked ? "size-14" : "size-11 md:size-12")} /> : null}
       <BrandTitle size="nav" showTagline className="block min-w-0" />
     </Link>
   );

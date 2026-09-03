@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { Wordmark, BrandEmblem } from "@/components/brand/logo";
+import { Wordmark } from "@/components/brand/logo";
 import { SignedIn, SignedOut } from "@/lib/auth/gates";
 import { usePublicSite } from "@/lib/use-public-site";
 import { publicHttpUrl } from "@/lib/site";
@@ -169,7 +169,6 @@ export function PublicFooter() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_280px_at_10%_0%,rgba(212,162,74,0.12),transparent_60%),radial-gradient(640px_240px_at_90%_100%,rgba(42,117,108,0.16),transparent_55%)]" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
-          <BrandEmblem className="mb-5 h-28 w-28" />
           <Wordmark stacked className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
             {content.headlineAccent} {site.footerBlurb}

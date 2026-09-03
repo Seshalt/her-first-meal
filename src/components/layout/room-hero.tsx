@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { HouseMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 
 export type RoomTone = "sea" | "clay" | "blush" | "plum" | "gold";
@@ -39,6 +40,7 @@ export function RoomHero({
       <img src={src} alt={alt} className="media absolute inset-0 h-full w-full object-cover" />
       <div className={cn("pointer-events-none absolute inset-0", VEIL[tone])} />
       <div className="relative mx-auto flex min-h-[44vh] max-w-5xl flex-col justify-end px-5 pb-12 pt-20 md:min-h-[52vh] md:px-10 md:pb-16">
+        <HouseMark className="mb-5 h-16 w-auto md:h-20" />
         {kicker ? <p className={cn("text-xs uppercase tracking-[0.32em]", KICKER[tone])}>{kicker}</p> : null}
         <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.4rem)] leading-[0.95]">{title}</h1>
         {body ? <p className="mt-5 max-w-xl text-lg leading-relaxed text-paper/88 md:text-xl">{body}</p> : null}
