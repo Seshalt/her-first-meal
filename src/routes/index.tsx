@@ -110,7 +110,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         }
       >
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
-          <BrandEmblem className={`mb-8 h-28 w-28 rounded-[1.75rem] bg-paper/10 object-cover md:h-36 md:w-36 ${centered ? "mx-auto" : ""}`} />
+          <BrandEmblem className={`mb-8 h-28 w-28 md:h-40 md:w-40 ${centered ? "mx-auto" : ""}`} />
           <p className="text-xs uppercase tracking-[0.38em] text-gold">{content.eyebrow}</p>
           <h1 className="mt-5">
             <BrandTitle size="hero" className="block text-paper" />

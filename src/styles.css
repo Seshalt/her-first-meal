@@ -580,3 +580,39 @@ html[data-pricing="linen"] .pricing-stage {
   background: var(--wash-linen);
   color: var(--foreground);
 }
+
+.house-mark .steam {
+  transform-origin: 100px 128px;
+  animation: house-steam 3.6s ease-in-out infinite;
+}
+.house-mark .steam-b { animation-delay: -1.1s; }
+.house-mark .steam-c { animation-delay: -2.2s; }
+.house-mark .herb {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: house-herb 4.8s ease-in-out infinite;
+}
+.house-mark .herb-b { animation-delay: -1.4s; }
+.house-mark .herb-c { animation-delay: -2.6s; }
+.house-mark .herb-d { animation-delay: -0.7s; }
+.house-mark .herb-e { animation-delay: -3.1s; }
+
+@keyframes house-steam {
+  0% { opacity: 0.15; transform: translateY(8px) scaleY(0.85); }
+  35% { opacity: 0.95; }
+  100% { opacity: 0; transform: translateY(-28px) scaleY(1.15); }
+}
+@keyframes house-herb {
+  0% { opacity: 0.2; transform: translateY(10px) rotate(-8deg); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-36px) rotate(12deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .house-mark .steam,
+  .house-mark .herb {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
