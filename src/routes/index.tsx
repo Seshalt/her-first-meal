@@ -152,14 +152,22 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
 }
 
 const OFFER_COPY: Record<string, string> = {
-  "Personalized meals": "Plates built for her body, culture, store, and season — not a dump of recipes on day one.",
-  "Belly Binding Studio": "Cloth, breath, and a private room after birth. Education first, never spectacle.",
-  Nouri: "A quiet companion for the week she is in. Questions, not a diagnosis.",
-  Movement: "Soft walks and recovery work that follow the season she is actually in.",
-  "Grocery lists": "Lists that match the kitchen she already has and the market she actually walks into.",
-  "Partner lane": "A useful lane for the person beside her — what to cook, hold, and stop guessing about.",
-  "Week-by-week journey": "The house changes as the weeks change. Nothing is frozen at week twelve.",
-  "Fourth trimester care": "The months after birth are a season here, not a discharge summary.",
+  "Personalized meals":
+    "Meal plans written for her body, culture, store, pantry, and season — so she is not starting from a blank page each morning.",
+  "Belly Binding Studio":
+    "Wrap education after birth: studio video, wrap comparison, a private journal, and optional review with Maat. Teaching first, never spectacle.",
+  Nouri:
+    "An AI companion inside the membership. Ask what to eat this week, where a wrap lesson lives, or what the house holds next. Not a clinician.",
+  Movement:
+    "Recovery movement matched to trying, pregnancy, or postpartum — walks, rest, and gentle work for the body she is in, not a generic gym plan.",
+  "Grocery lists":
+    "The week’s meals turned into a list for the kitchen she already has and the market she actually walks into.",
+  "Partner lane":
+    "A private place for the person beside her: what to cook, what to buy, and how to help today — without reading her medical chart.",
+  "Week-by-week journey":
+    "Meals, movement, and questions change as the weeks change. The house does not freeze at week twelve.",
+  "Fourth trimester care":
+    "The months after birth stay open: binding studio, recovery plates, and rest that treats postpartum as a season, not a discharge paper.",
 };
 
 function Ticker({ items }: { items: string[] }) {
@@ -366,10 +374,10 @@ function NouriBand({ content }: { content: LandingContent }) {
 
 function JourneyBand({ images }: { images: LandingContent["images"] }) {
   const stages = [
-    { w: "Trying", d: "Mineral-rich plates and a softer nervous system.", img: images.hydration, alt: "Lemon water in a ceramic pitcher", wash: "bg-wash-sea", kicker: "text-sea" },
-    { w: "Pregnancy", d: "Ginger broths, iron, walks, questions for the next visit.", img: images.movement, alt: "A pregnant woman stretching on a mat", wash: "bg-wash-clay", kicker: "text-clay" },
-    { w: "Postpartum", d: "Binding studio, recovery movement, the fourth trimester.", img: images.rest, alt: "A postpartum mother resting by a window", wash: "bg-wash-blush", kicker: "text-blush" },
-    { w: "The table", d: "Household size and culture shape the plan — partners get a useful lane.", img: images.family, alt: "A family sharing a meal at the kitchen table", wash: "bg-wash-plum", kicker: "text-plum" },
+    { w: "Trying", d: "Mineral-rich plates, grocery lists for the kitchen she has, and gentler movement while she waits.", img: images.hydration, alt: "Lemon water in a ceramic pitcher", wash: "bg-wash-sea", kicker: "text-sea" },
+    { w: "Pregnancy", d: "Meals that follow appetite and week, iron and broths, walks, and questions worth bringing to the next visit.", img: images.movement, alt: "A pregnant woman stretching on a mat", wash: "bg-wash-clay", kicker: "text-clay" },
+    { w: "Postpartum", d: "Recovery plates, the Belly Binding Studio, and movement that treats the fourth trimester as a season.", img: images.rest, alt: "A postpartum mother resting by a window", wash: "bg-wash-blush", kicker: "text-blush" },
+    { w: "The table", d: "Household size and culture shape the meals. Partners get a grocery list and a lane that is useful — not her chart.", img: images.family, alt: "A family sharing a meal at the kitchen table", wash: "bg-wash-plum", kicker: "text-plum" },
   ];
   return (
     <section>
@@ -377,7 +385,7 @@ function JourneyBand({ images }: { images: LandingContent["images"] }) {
         <Reveal>
           <p className="text-xs uppercase tracking-[0.32em] text-plum">The house grows with you</p>
           <h2 className="mt-6 max-w-3xl font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05]">
-            New recipes, movement, and questions unlock by week.
+            Meals, movement, and questions change with the week she is in.
           </h2>
         </Reveal>
       </div>
@@ -409,7 +417,7 @@ function PartnerBand({ src }: { src: string }) {
           <p className="text-xs uppercase tracking-[0.32em] text-gold">For partners, too</p>
           <h2 className="mt-5 font-display text-4xl md:text-6xl">A useful, private lane — not her medical chart.</h2>
           <p className="mt-6 text-lg leading-relaxed text-paper/85">
-            Grocery lists, meals, and how to help today. The mother remains the patient we refuse to forget.
+            Partners get the week’s grocery list, the meals to cook, and a short note on how to help today. Her record stays hers.
           </p>
         </Reveal>
       </div>
@@ -442,7 +450,7 @@ function MembershipClose({
             Save {save.percent}% versus monthly · {formatCurrency(yearly)} / year
           </p>
           <p className="mt-2 text-sm text-primary-foreground/70">
-            Or {formatCurrency(monthly)} month to month. A meeting with Maat is the only extra.
+            Or {formatCurrency(monthly)} month to month. A private session with Maat is the only extra.
           </p>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
             <MagneticLink to="/pricing" className="bg-paper text-ink hover:bg-cream dark:hover:bg-cream">

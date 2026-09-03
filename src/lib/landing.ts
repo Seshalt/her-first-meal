@@ -55,23 +55,25 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
     "A membership home for pregnancy and postpartum — meals for her body, a belly binding studio, movement, grocery intelligence, and Nouri. Not a course. Not a blog. A house you return to.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
-  offerLine: "One membership holds the house. A private meeting with Maat is the only extra.",
+  offerLine:
+    "One membership opens the house: personalized meals, grocery and pantry planning, belly binding education, movement for her stage, week-by-week guidance, a partner lane, and Nouri. A private session with Maat is the only extra.",
   manifesto:
-    "Before we ask what the baby needs, we set the table for the woman who grew them. Culture, appetite, rest, wrapping, and a partner who finally has somewhere useful to stand.",
+    "Before we ask what the baby needs, we set the table for the woman who grew them — with meals, wrapping education, recovery movement, and a partner who finally has somewhere useful to stand.",
   mealsKicker: "Nourishment",
   mealsTitle: "Meals that bow to her real kitchen.",
   mealsBody:
-    "Plans that respect diet, dislikes, household size, budget, and the grocery store she actually walks into. Not a default Western plate. Not a dump of recipes on day one.",
+    "Members receive personalized meal guidance for pregnancy and postpartum — built around her culture, appetite, household size, budget, pantry, and the store she actually walks into. Not a default Western plate. Not a dump of recipes on day one.",
   bindingKicker: "Flagship practice",
   bindingTitle: "Belly binding, held with care.",
   bindingBody:
-    "Studio video, wrap comparison, a private journal, and live Zoom review when you want Maat’s eyes on the wrap. Education — never a diagnosis.",
+    "The Belly Binding Studio holds wrap education: studio video, wrap comparison, a private journal, and a live Zoom review when you want Maat’s eyes on the cloth. Teaching — never a diagnosis.",
   nouriKicker: "Companion",
   nouriTitle: "Need help? Ask Nouri.",
   nouriBody:
-    "Nouri is named for nourish. She remembers your week, your plate, your stores, and your last conversation. She will not pretend to be your clinician.",
+    "Nouri is the AI companion inside Her First Meal. She remembers your week, your plate, your stores, and your last conversation, and helps you find the meals, studio, and guidance already in the house. She will not pretend to be your clinician.",
   closeTitle: "What does her body need?",
-  closeBody: "Membership includes meals, studio, Nouri, movement, grocery, pantry, and the partner lane. The only extra is a private meeting with Maat.",
+  closeBody:
+    "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, the partner lane, and Nouri. The only extra is a private meeting with Maat.",
 };
 
 export type LandingContent = LandingCopy & {
