@@ -22,7 +22,7 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#1F5F8A" },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg?v=mark3" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg?v=hfm4" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
       { rel: "icon", type: "image/png", sizes: "180x180", href: "/icon-180.png" },
       { rel: "apple-touch-icon", href: "/icon-180.png" },
