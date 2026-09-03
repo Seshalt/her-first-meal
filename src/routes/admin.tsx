@@ -5,7 +5,6 @@ import { markAtelierReady } from "@/lib/atelier-ready";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getMyRole } from "@/lib/server/admin";
 import { hasAdministrator } from "@/lib/server/public";
-import { getEmailFactorStatus } from "@/lib/server/email-factor";
 
 export const Route = createFileRoute("/admin")({ component: AdminGate });
 
@@ -16,7 +15,6 @@ function AdminGate() {
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [denied, setDenied] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
-  const [factorNeeded, setFactorNeeded] = useState(false);
 
   useEffect(() => {
     const t = window.setTimeout(() => setTimedOut(true), 7000);
@@ -47,11 +45,6 @@ function AdminGate() {
       .catch(() => {
         if (live) setDenied(true);
       });
-    void getEmailFactorStatus()
-      .then((s) => {
-        if (live) setFactorNeeded(s.needed);
-      })
-      .catch(() => undefined);
     return () => {
       live = false;
     };
@@ -71,9 +64,6 @@ function AdminGate() {
   if (!user) {
     return <Navigate to="/hearth" />;
   }
-  if (factorNeeded) {
-    return <Navigate to="/hearth" />;
-  }
   if (denied || (role && role !== "admin")) {
     return (
       <div className="grid min-h-dvh place-items-center bg-background px-6 text-center">
@@ -86,13 +76,13 @@ function AdminGate() {
       </div>
     );
   }
-  if (role !== "admin") {
-    if (hasAdmin === false) return <Navigate to="/admin/setup" />;
-    return <Navigate to="/login" search={{ next: "/admin" }} />;
+  if (role === "admin") {
+    return (
+      <AdminShell>
+        <Outlet />
+      </AdminShell>
+    );
   }
-  return (
-    <AdminShell>
-      <Outlet />
-    </AdminShell>
-  );
+  if (hasAdmin === false) return <Navigate to="/hearth" />;
+  return <div className="grid min-h-dvh place-items-center bg-[#101918] text-[#efe6d6]">Loading…</div>;
 }

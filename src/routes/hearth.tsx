@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,27 +9,18 @@ import { markAtelierReady } from "@/lib/atelier-ready";
 import { getMyRole } from "@/lib/server/admin";
 import { recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
-import { getEmailFactorStatus, requestEmailFactor } from "@/lib/server/email-factor";
-import { EmailFactorForm } from "@/components/security/email-factor";
 import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/hearth")({ component: Hearth });
 
 function Hearth() {
   const { user, isPending } = useCurrentUserState();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
-  const [saved, setSaved] = useState(false);
-  const [factor, setFactor] = useState<{
-    needed: boolean;
-    sent: boolean;
-    configured: boolean;
-    emailMasked: string;
-  } | null>(null);
+  const [mode, setMode] = useState<"save" | "enter">("enter");
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -46,29 +37,19 @@ function Hearth() {
   useEffect(() => {
     if (!user) return;
     let live = true;
-    void (async () => {
-      try {
-        const status = await getEmailFactorStatus();
-        if (!live) return;
-        if (status.needed) {
-          const sent = await requestEmailFactor();
-          if (live) setFactor(sent);
-          return;
-        }
-        const r = await getMyRole();
+    void getMyRole()
+      .then((r) => {
         if (!live) return;
         if (r.role === "admin") {
           markAtelierReady();
-          void navigate({ to: "/admin" });
+          window.location.assign("/admin");
         }
-      } catch {
-        /* stay on the door */
-      }
-    })();
+      })
+      .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [user, navigate]);
+  }, [user]);
 
   async function onSave(e: FormEvent) {
     e.preventDefault();
@@ -94,38 +75,56 @@ function Hearth() {
     setBusy(true);
     setFormError("");
     try {
+      const nextPassword = password;
       await recoverOwner({
         data: {
           email,
-          password,
+          password: nextPassword,
           honey: guard.honey,
           startedAt: guard.startedAt,
           human: guard.human,
         },
       });
-      setSaved(true);
-      setPassword("");
-      setConfirm("");
       const { error } = await authClient.signIn.email({
         email,
-        password,
-        callbackURL: "/hearth",
+        password: nextPassword,
       });
       if (error) {
-        toast.success("Password saved. Sign in below with it.");
-        return;
-      }
-      const status = await requestEmailFactor();
-      if (status.needed) {
-        setFactor(status);
-        toast.success("Password saved. Enter the email code to finish.");
+        toast.success("Password saved. Use Sign in on this page with it.");
+        setFormError("");
         return;
       }
       markAtelierReady();
-      toast.success("Password saved.");
-      void navigate({ to: "/admin" });
+      toast.success("You are in.");
+      window.location.assign("/admin");
     } catch (err) {
       const message = readableAuthError(err, "Could not save that password.");
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onEnter(e: FormEvent) {
+    e.preventDefault();
+    if (guard.honey.trim()) return;
+    if (!guard.human) {
+      const message = "Tick the box that says you are a person.";
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+    setBusy(true);
+    setFormError("");
+    try {
+      const { error } = await authClient.signIn.email({ email, password });
+      if (error) throw error;
+      markAtelierReady();
+      toast.success("You are in.");
+      window.location.assign("/admin");
+    } catch (err) {
+      const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);
       toast.error(message);
     } finally {
@@ -139,23 +138,18 @@ function Hearth() {
         <p className="text-xs uppercase tracking-[0.32em] text-[#c4a574]">Private door</p>
         <h1 className="mt-4 font-display text-4xl leading-[1.05]">The hearth.</h1>
         <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
-          Enter the owner email and the password you want. Save writes it, then opens the atelier.
+          Sign in with the owner email. Use Set password only when you need a new one.
         </p>
-        {factor?.needed ? (
-          <div className="mt-8">
-            <EmailFactorForm
-              emailMasked={factor.emailMasked}
-              sent={factor.sent}
-              configured={factor.configured}
-              onVerified={() => {
-                setFactor(null);
-                markAtelierReady();
-                void navigate({ to: "/admin" });
-              }}
-            />
-          </div>
-        ) : authEnabled ? (
-          <form onSubmit={(e) => void onSave(e)} className="mt-8 space-y-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
+        {authEnabled ? (
+          <form onSubmit={(e) => void (mode === "save" ? onSave(e) : onEnter(e))} className="mt-8 space-y-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
+            <div className="flex gap-4 text-sm">
+              <button type="button" className={mode === "enter" ? "underline" : "text-[#efe6d6]/50"} onClick={() => setMode("enter")}>
+                Sign in
+              </button>
+              <button type="button" className={mode === "save" ? "underline" : "text-[#efe6d6]/50"} onClick={() => setMode("save")}>
+                Set password
+              </button>
+            </div>
             <div>
               <Label htmlFor="hearth-email">Owner email</Label>
               <Input
@@ -169,7 +163,7 @@ function Hearth() {
               />
             </div>
             <div>
-              <Label htmlFor="hearth-new">New password</Label>
+              <Label htmlFor="hearth-new">{mode === "save" ? "New password" : "Password"}</Label>
               <Input
                 id="hearth-new"
                 type="password"
@@ -180,19 +174,21 @@ function Hearth() {
                 className="bg-[#efe6d6] text-[#101918]"
               />
             </div>
-            <div>
-              <Label htmlFor="hearth-confirm">Type it again</Label>
-              <Input
-                id="hearth-confirm"
-                type="password"
-                autoComplete="off"
-                required
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="bg-[#efe6d6] text-[#101918]"
-              />
-              <p className="mt-2 text-xs text-[#efe6d6]/50">Must be at least 12 characters.</p>
-            </div>
+            {mode === "save" ? (
+              <div>
+                <Label htmlFor="hearth-confirm">Type it again</Label>
+                <Input
+                  id="hearth-confirm"
+                  type="password"
+                  autoComplete="off"
+                  required
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  className="bg-[#efe6d6] text-[#101918]"
+                />
+                <p className="mt-2 text-xs text-[#efe6d6]/50">Must be at least 12 characters.</p>
+              </div>
+            ) : null}
             <HumanCheck
               tone="dark"
               checked={guard.human}
@@ -204,11 +200,9 @@ function Hearth() {
               <p className="rounded-xl bg-[#8a4a3b] px-4 py-3 text-sm" role="alert">
                 {formError}
               </p>
-            ) : saved ? (
-              <p className="rounded-xl bg-[#2a5a4a] px-4 py-3 text-sm">Password saved. You can enter the atelier.</p>
             ) : null}
             <Button type="submit" className="w-full" size="lg" disabled={busy}>
-              {busy ? "Saving…" : "Save password and enter"}
+              {busy ? "Working…" : mode === "save" ? "Save password and enter" : "Enter"}
             </Button>
           </form>
         ) : (

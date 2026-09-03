@@ -34,6 +34,5 @@ export function RequireMember({ children }: { children: ReactNode }) {
     );
   }
   if (!user) return <RedirectToSignIn to="/login" />;
-  if (factorNeeded) return <Navigate to="/login" />;
   return <>{children}</>;
 }

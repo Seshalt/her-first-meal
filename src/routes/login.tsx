@@ -74,7 +74,6 @@ function Login() {
       const { error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/login",
       });
       if (error) throw error;
       const status = await requestEmailFactor();
@@ -83,7 +82,7 @@ function Login() {
         toast.success(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in.");
         return;
       }
-      void navigate({ to: "/app" });
+      window.location.assign("/app");
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);

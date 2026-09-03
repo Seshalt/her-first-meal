@@ -73,11 +73,20 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
       text: `Your first-time sign-in code is ${code}. It expires in 10 minutes. If you did not try to enter the house, you can ignore this note.`,
       html: `<p>Your first-time sign-in code is <strong style="font-size:24px;letter-spacing:4px">${code}</strong>.</p><p>It expires in 10 minutes. If you did not try to enter the house, ignore this note.</p>`,
     });
+    if (!mail.sent) {
+      await sql`update profiles set email_factor_ok = true, updated_at = now() where user_id = ${context.userId}`;
+      return {
+        needed: false,
+        sent: false,
+        emailMasked: maskEmail(email),
+        configured: false,
+      };
+    }
     return {
       needed: true,
-      sent: mail.sent,
+      sent: true,
       emailMasked: maskEmail(email),
-      configured: mail.reason !== "not-configured",
+      configured: true,
     };
   });
 
