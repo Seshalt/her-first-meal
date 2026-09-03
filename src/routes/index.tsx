@@ -163,7 +163,7 @@ function Manifesto({ content }: { content: LandingContent }) {
   return (
     <section className="bg-wash-linen">
       <div className="section-air mx-auto max-w-5xl px-4 md:px-6">
-      <Reveal>
+      <Reveal className="glass-panel p-8 md:p-12">
         <p className="text-xs uppercase tracking-[0.32em] text-clay">A membership, not a feed</p>
         <h2 className="mt-8 font-display text-[clamp(2.2rem,5.4vw,4.6rem)] leading-[1.05]">{content.manifesto}</h2>
         <div className="editorial-rule editorial-rule-clay mt-12" />
@@ -225,12 +225,14 @@ function SplitStory({
           : "text-primary";
   const copy = (
     <Reveal className={`flex min-h-[70vh] flex-col justify-center px-5 py-24 md:px-16 md:py-32 lg:min-h-dvh lg:px-20 ${wash}`}>
+      <div className="glass-panel max-w-xl p-7 md:p-10">
       <p className={`text-xs uppercase tracking-[0.32em] ${kickerColor}`}>{kicker}</p>
       <h2 className="mt-6 font-display text-[clamp(2.4rem,4.5vw,4.4rem)] leading-[1.02]">{title}</h2>
       <p className="mt-8 max-w-md text-lg leading-relaxed text-ink-soft md:text-xl">{body}</p>
       <Link to={href} className={`mt-10 inline-flex items-center gap-2 ${linkColor}`}>
         {linkLabel} <ArrowRight className="size-4" />
       </Link>
+      </div>
     </Reveal>
   );
   const picture = (

@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { PageCanvas } from "@/components/layout/page-canvas";
+import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -11,9 +13,11 @@ function NouriMarketing() {
   return (
     <div>
       <PublicNav />
-      <section className="bg-wash-plum">
+      <PageCanvas tone="plum">
+      <section>
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
           <div>
+            <HouseMark className="mb-6 h-16 w-auto" />
             <p className="text-xs uppercase tracking-[0.28em] text-plum">{site.nouriPageKicker}</p>
             <h1 className="mt-3 font-display text-5xl">{site.nouriPageTitle}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{site.nouriPageBody}</p>
@@ -24,15 +28,16 @@ function NouriMarketing() {
           <img src={content.images.nouriHero} alt="" className="media h-80 w-full rounded-[32px] object-cover" />
         </div>
       </section>
-      <section className="bg-wash-plum pb-16">
+      <section className="pb-16">
         <div className="mx-auto grid max-w-6xl gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
           {lines(site.nouriPills).map((item) => (
-            <p key={item} className="rounded-2xl bg-card px-5 py-6 text-sm shadow-[var(--shadow-border)]">
+            <p key={item} className="glass-panel px-5 py-6 text-sm">
               {item}
             </p>
           ))}
         </div>
       </section>
+      </PageCanvas>
       <PublicFooter />
     </div>
   );

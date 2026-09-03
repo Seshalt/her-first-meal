@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { PageCanvas } from "@/components/layout/page-canvas";
+import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { usePublicSite } from "@/lib/use-public-site";
 
@@ -10,8 +12,9 @@ function About() {
   return (
     <div>
       <PublicNav />
-      <article className="bg-wash-linen">
-        <div className="mx-auto max-w-3xl px-4 py-16">
+      <PageCanvas tone="linen">
+        <article className="mx-auto max-w-3xl px-4 py-16">
+          <HouseMark className="mb-6 h-16 w-auto" />
           <p className="text-xs uppercase tracking-[0.28em] text-clay">{site.aboutKicker}</p>
           <h1 className="mt-3 font-display text-5xl">{site.aboutTitle}</h1>
           <img
@@ -19,7 +22,7 @@ function About() {
             alt=""
             className="media mt-10 h-72 w-full rounded-[28px] object-cover"
           />
-          <div className="mt-10 space-y-5 text-lg leading-relaxed text-ink-soft">
+          <div className="glass-panel mt-10 space-y-5 p-6 text-lg leading-relaxed text-ink-soft md:p-8">
             <p>{site.aboutP1}</p>
             <p>{site.aboutP2}</p>
             <p className="font-display text-3xl italic text-foreground">{site.aboutQuote}</p>
@@ -29,8 +32,8 @@ function About() {
           <Button asChild className="mt-10" variant="clay">
             <Link to="/pricing">{site.aboutCta}</Link>
           </Button>
-        </div>
-      </article>
+        </article>
+      </PageCanvas>
       <PublicFooter />
     </div>
   );

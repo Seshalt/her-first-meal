@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { PageCanvas } from "@/components/layout/page-canvas";
+import { HouseMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -23,9 +25,11 @@ function BindingPage() {
   return (
     <div>
       <PublicNav />
-      <section className="bg-wash-blush">
+      <PageCanvas tone="blush">
+      <section>
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
           <div>
+            <HouseMark className="mb-6 h-16 w-auto" />
             <Badge tone="blush">{site.bindPageKicker}</Badge>
             <h1 className="mt-4 font-display text-5xl">{site.bindPageTitle}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{site.bindPageBody}</p>
@@ -38,7 +42,7 @@ function BindingPage() {
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-2">
         {steps.map((s) => (
-          <article key={s.title} className="overflow-hidden rounded-[28px] bg-card shadow-[var(--shadow-border)]">
+          <article key={s.title} className="glass-panel overflow-hidden">
             <img src={s.image} alt="" className="media h-44 w-full object-cover" />
             <div className="p-6">
               <h2 className="font-display text-2xl">{s.title}</h2>
@@ -51,13 +55,14 @@ function BindingPage() {
         <h2 className="font-display text-3xl">{site.bindQuestions}</h2>
         <dl className="mt-6 space-y-5">
           {faqs.map((f) => (
-            <div key={f.q} className="rounded-2xl bg-card p-5 shadow-[var(--shadow-border)]">
+            <div key={f.q} className="glass-panel p-5">
               <dt className="font-medium">{f.q}</dt>
               <dd className="mt-2 text-sm text-muted-foreground">{f.a}</dd>
             </div>
           ))}
         </dl>
       </section>
+      </PageCanvas>
       <PublicFooter />
     </div>
   );

@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { PageCanvas } from "@/components/layout/page-canvas";
+import { HouseMark } from "@/components/brand/logo";
 import { Reveal } from "@/components/motion/parallax";
 import { usePublicSite } from "@/lib/use-public-site";
 import { publicHttpUrl } from "@/lib/site";
@@ -14,12 +16,14 @@ function Contact() {
   const tiktok = publicHttpUrl(site.tiktokUrl);
 
   return (
-    <div className="bg-background">
+    <div>
       <PublicNav />
-      <section className="relative overflow-hidden">
+      <PageCanvas tone="linen">
+      <section className="relative">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_10%_-10%,rgba(42,117,108,0.16),transparent_60%),radial-gradient(700px_380px_at_90%_0%,rgba(196,92,62,0.12),transparent_55%)]" />
         <div className="section-air relative mx-auto max-w-5xl px-4 md:px-6">
           <Reveal>
+            <HouseMark className="mb-6 h-16 w-auto" />
             <p className="text-xs uppercase tracking-[0.32em] text-clay">{site.contactKicker}</p>
             <h1 className="mt-6 font-display text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.92]">{site.contactTitle}</h1>
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">{site.contactIntro}</p>
@@ -59,6 +63,7 @@ function Contact() {
           )}
         </div>
       </section>
+      </PageCanvas>
       <PublicFooter />
     </div>
   );
