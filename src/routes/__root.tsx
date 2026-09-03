@@ -5,6 +5,7 @@ import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { GlassDefs } from "@/components/layout/glass-defs";
 import { ThemePaint } from "@/components/theme-paint";
 import { ThemeProvider } from "@/lib/theme";
+import { CookieConsent } from "@/components/security/cookie-consent";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Her First Meal";
@@ -23,10 +24,15 @@ export const Route = createRootRoute({
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Her First Meal" },
       { property: "og:description", content: "The world celebrates the baby. We remember the mother." },
-      { property: "og:type", content: "website" },
+      { property: "og:image", content: "/og.jpg" },
+      { property: "og:url", content: "https://her-first-meal-now.vercel.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Her First Meal" },
+      { name: "twitter:description", content: "The world celebrates the baby. We remember the mother." },
       { name: "theme-color", content: "#1F5F8A" },
     ],
     links: [
+      { rel: "canonical", href: "https://her-first-meal-now.vercel.app/" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png?v=hfm8" },
       { rel: "icon", type: "image/png", sizes: "180x180", href: "/icon-180.png?v=hfm8" },
       { rel: "apple-touch-icon", href: "/icon-180.png" },
@@ -56,6 +62,7 @@ function RootDocument() {
           <ThemeProvider>
             <ThemePaint />
             <Outlet />
+            <CookieConsent />
             <Toaster
               position="top-center"
               toastOptions={{

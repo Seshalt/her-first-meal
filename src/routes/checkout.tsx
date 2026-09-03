@@ -12,16 +12,22 @@ import { formatCurrency } from "@/lib/utils";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
+import { ReceiptPrinter } from "@/components/commerce/receipt-printer";
+import { isMemberWalk } from "@/lib/preview-mode";
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
     plan: s.plan === "yearly" ? ("yearly" as const) : ("monthly" as const),
+    preview: s.preview === "1" || s.preview === 1 ? true : undefined,
   }),
   component: Checkout,
 });
 
 function Checkout() {
-  const { plan } = Route.useSearch();
+  const { plan, preview } = Route.useSearch();
+  const mock = preview || isMemberWalk();
+  const [printed, setPrinted] = useState(false);
+  const [joinToken, setJoinToken] = useState("");
   const { site, content } = usePublicSite();
   const navigate = useNavigate();
   const [monthly, setMonthly] = useState(4900);
@@ -49,6 +55,10 @@ function Checkout() {
     e.preventDefault();
     setBusy(true);
     try {
+      if (mock) {
+        setPrinted(true);
+        return;
+      }
       const res = await startMembershipCheckout({
         data: {
           plan,
@@ -61,7 +71,8 @@ function Checkout() {
         },
       });
       toast.success("Membership reserved. Create your account to enter.");
-      void navigate({ to: "/join", search: { token: res.token } });
+      setJoinToken(res.token);
+      setPrinted(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Checkout could not finish.");
     } finally {
@@ -72,6 +83,22 @@ function Checkout() {
   return (
     <div>
       <PublicNav />
+      {printed ? (
+        <div className="px-4 py-16">
+          <ReceiptPrinter
+            plan={plan}
+            amountCents={price}
+            email={email}
+            onDone={() => {
+              if (mock) {
+                void navigate({ to: "/app" });
+                return;
+              }
+              void navigate({ to: "/join", search: { token: joinToken } });
+            }}
+          />
+        </div>
+      ) : (
       <div className="mx-auto grid max-w-5xl gap-10 px-4 py-16 md:grid-cols-[1fr_0.9fr]">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
@@ -137,9 +164,10 @@ function Checkout() {
               Compare monthly and yearly
             </Link>
           </p>
-          <img src={content.images.checkout} alt="" className="media mt-6 h-48 w-full rounded-2xl object-cover" />
+          <img src={content.images.checkout} alt="A bowl set for the first meal after birth" className="media mt-6 h-48 w-full rounded-2xl object-cover" />
         </aside>
       </div>
+      )}
       <PublicFooter />
     </div>
   );

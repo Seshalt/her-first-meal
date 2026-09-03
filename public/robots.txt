@@ -6,6 +6,7 @@ Allow: /belly-binding
 Allow: /nouri
 Allow: /privacy
 Allow: /contact
+Allow: /terms
 Disallow: /admin
 Disallow: /app
 Disallow: /api
@@ -22,6 +23,7 @@ Allow: /belly-binding
 Allow: /nouri
 Allow: /privacy
 Allow: /contact
+Allow: /terms
 Disallow: /admin
 Disallow: /admin/
 Disallow: /app

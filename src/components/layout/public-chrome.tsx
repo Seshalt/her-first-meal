@@ -245,6 +245,9 @@ export function PublicFooter() {
             <li>
               <Link to="/privacy">{site.footerPrivacy}</Link>
             </li>
+            <li>
+              <Link to="/terms">Terms</Link>
+            </li>
           </ul>
         </div>
       </div>

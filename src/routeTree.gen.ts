@@ -22,6 +22,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as NouriRouteImport } from './routes/nouri'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as AdminBusinessRouteImport } from './routes/admin/business'
@@ -30,6 +31,7 @@ import { Route as AdminClientsRouteImport } from './routes/admin/clients'
 import { Route as AdminContentRouteImport } from './routes/admin/content'
 import { Route as AdminLandingRouteImport } from './routes/admin/landing'
 import { Route as AdminNouriRouteImport } from './routes/admin/nouri'
+import { Route as AdminPreviewRouteImport } from './routes/admin/preview'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAppointmentsRouteImport } from './routes/app/appointments'
@@ -113,6 +115,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -151,6 +158,11 @@ const AdminLandingRoute = AdminLandingRouteImport.update({
 const AdminNouriRoute = AdminNouriRouteImport.update({
   id: '/nouri',
   path: '/nouri',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPreviewRoute = AdminPreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSetupRoute = AdminSetupRouteImport.update({
@@ -253,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/nouri': typeof NouriRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/business': typeof AdminBusinessRoute
   '/admin/calendar': typeof AdminCalendarRoute
@@ -260,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/nouri': typeof AdminNouriRoute
+  '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/binding': typeof AppBindingRoute
@@ -291,6 +305,7 @@ export interface FileRoutesByTo {
   '/nouri': typeof NouriRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/business': typeof AdminBusinessRoute
   '/admin/calendar': typeof AdminCalendarRoute
@@ -298,6 +313,7 @@ export interface FileRoutesByTo {
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/nouri': typeof AdminNouriRoute
+  '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/binding': typeof AppBindingRoute
@@ -332,6 +348,7 @@ export interface FileRoutesById {
   '/nouri': typeof NouriRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/business': typeof AdminBusinessRoute
   '/admin/calendar': typeof AdminCalendarRoute
@@ -339,6 +356,7 @@ export interface FileRoutesById {
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
   '/admin/nouri': typeof AdminNouriRoute
+  '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/binding': typeof AppBindingRoute
@@ -374,6 +392,7 @@ export interface FileRouteTypes {
     | '/nouri'
     | '/pricing'
     | '/privacy'
+    | '/terms'
     | '/admin/analytics'
     | '/admin/business'
     | '/admin/calendar'
@@ -381,6 +400,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/landing'
     | '/admin/nouri'
+    | '/admin/preview'
     | '/admin/setup'
     | '/app/appointments'
     | '/app/binding'
@@ -412,6 +432,7 @@ export interface FileRouteTypes {
     | '/nouri'
     | '/pricing'
     | '/privacy'
+    | '/terms'
     | '/admin/analytics'
     | '/admin/business'
     | '/admin/calendar'
@@ -419,6 +440,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/landing'
     | '/admin/nouri'
+    | '/admin/preview'
     | '/admin/setup'
     | '/app/appointments'
     | '/app/binding'
@@ -452,6 +474,7 @@ export interface FileRouteTypes {
     | '/nouri'
     | '/pricing'
     | '/privacy'
+    | '/terms'
     | '/admin/analytics'
     | '/admin/business'
     | '/admin/calendar'
@@ -459,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/content'
     | '/admin/landing'
     | '/admin/nouri'
+    | '/admin/preview'
     | '/admin/setup'
     | '/app/appointments'
     | '/app/binding'
@@ -493,6 +517,7 @@ export interface RootRouteChildren {
   NouriRoute: typeof NouriRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -589,6 +614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -643,6 +675,13 @@ declare module '@tanstack/react-router' {
       path: '/nouri'
       fullPath: '/admin/nouri'
       preLoaderRoute: typeof AdminNouriRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/preview': {
+      id: '/admin/preview'
+      path: '/preview'
+      fullPath: '/admin/preview'
+      preLoaderRoute: typeof AdminPreviewRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/setup': {
@@ -787,6 +826,7 @@ interface AdminRouteChildren {
   AdminContentRoute: typeof AdminContentRoute
   AdminLandingRoute: typeof AdminLandingRoute
   AdminNouriRoute: typeof AdminNouriRoute
+  AdminPreviewRoute: typeof AdminPreviewRoute
   AdminSetupRoute: typeof AdminSetupRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -799,6 +839,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContentRoute: AdminContentRoute,
   AdminLandingRoute: AdminLandingRoute,
   AdminNouriRoute: AdminNouriRoute,
+  AdminPreviewRoute: AdminPreviewRoute,
   AdminSetupRoute: AdminSetupRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -855,6 +896,7 @@ const rootRouteChildren: RootRouteChildren = {
   NouriRoute: NouriRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
