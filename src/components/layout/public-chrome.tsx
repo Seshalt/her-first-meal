@@ -21,7 +21,29 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
   ];
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const t = Math.min(1, Math.max(0, window.scrollY / max));
+      const stops = [
+        [42, 117, 108],
+        [212, 162, 74],
+        [193, 107, 120],
+        [93, 74, 114],
+        [42, 117, 108],
+      ];
+      const pos = t * (stops.length - 1);
+      const i = Math.min(stops.length - 2, Math.floor(pos));
+      const f = pos - i;
+      const mix = (a: number[], b: number[]) =>
+        a.map((n, idx) => Math.round(n + (b[idx]! - n) * f)) as number[];
+      const c1 = mix(stops[i]!, stops[i + 1]!);
+      const c2 = mix(stops[Math.min(stops.length - 2, i + 1)]!, stops[Math.min(stops.length - 1, i + 2)]!);
+      const header = document.querySelector<HTMLElement>("[data-site-nav]");
+      if (!header) return;
+      header.style.setProperty("--nav-a", `rgba(${c1.join(",")},0.42)`);
+      header.style.setProperty("--nav-b", `rgba(${c2.join(",")},0.28)`);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -39,6 +61,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
 
   return (
     <header
+      data-site-nav
       className={cn(
         overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
         "transition-[background,box-shadow,border-color,color] duration-700 ease-out",

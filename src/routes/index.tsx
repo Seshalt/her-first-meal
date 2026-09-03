@@ -170,20 +170,19 @@ function Ticker({ items }: { items: string[] }) {
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const sheets = [...root.querySelectorAll<HTMLElement>("[data-sheet]")];
+    const cards = [...root.querySelectorAll<HTMLElement>("[data-card]")];
     let frame = 0;
     const update = () => {
-      let front = sheets[0];
-      sheets.forEach((sheet) => {
-        const pin = parseFloat(getComputedStyle(sheet).top) || 90;
-        if (sheet.getBoundingClientRect().top <= pin + 6) front = sheet;
-      });
-      sheets.forEach((sheet) => {
-        const behind = sheet !== front;
-        sheet.classList.toggle("is-behind", behind);
-        const card = sheet.querySelector<HTMLElement>("[data-card]");
-        if (!card) return;
-        card.style.transform = behind ? "scale(0.985)" : "scale(1)";
+      const rect = root.getBoundingClientRect();
+      const travel = Math.max(1, root.offsetHeight - window.innerHeight);
+      const passed = Math.min(travel, Math.max(0, -rect.top));
+      const p = (passed / travel) * (cards.length - 0.001);
+      cards.forEach((card, i) => {
+        const d = Math.abs(p - i);
+        const opacity = Math.max(0, 1 - d * 1.15);
+        card.style.opacity = String(opacity);
+        card.style.transform = `translate3d(0, ${(p - i) * 18}px, 0)`;
+        card.style.pointerEvents = opacity > 0.4 ? "auto" : "none";
       });
     };
     const onScroll = () => {
@@ -201,30 +200,21 @@ function Ticker({ items }: { items: string[] }) {
   }, [shown.join("|")]);
 
   return (
-    <section ref={rootRef} className="offer-stack">
-      <div className="mx-auto max-w-5xl px-4 pt-10 md:px-6">
+    <section ref={rootRef} className="offer-reel">
+      <div className="offer-reel-pin">
         <p className="text-xs uppercase tracking-[0.28em] text-ink/45">What the house holds</p>
-      </div>
-      {shown.map((item, i) => (
-        <div
-          key={item}
-          data-sheet
-          className="offer-sheet"
-          style={{ top: `calc(5.6rem + ${i * 0.55}rem)`, zIndex: i + 1 }}
-        >
-          <article data-card className="offer-sheet-card">
-            <p data-index className="text-xs uppercase tracking-[0.22em] text-ink/40">
-              0{i + 1}
-            </p>
-            <div data-copy>
+        <div className="offer-reel-stage">
+          {shown.map((item, i) => (
+            <article key={item} data-card className="offer-sheet-card offer-reel-card">
+              <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
               <p className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.02]">{item}</p>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft md:text-lg">
                 {OFFER_COPY[item] ?? "Part of the membership house — meals, binding, movement, and care that stay with her."}
               </p>
-            </div>
-          </article>
+            </article>
+          ))}
         </div>
-      ))}
+      </div>
     </section>
   );
 }
@@ -347,8 +337,10 @@ function NouriBand({ content }: { content: LandingContent }) {
     const update = () => {
       const rect = root.getBoundingClientRect();
       const view = window.innerHeight || 1;
-      const progress = Math.min(1, Math.max(0, (view - rect.top) / (view + rect.height * 0.6)));
+      const progress = Math.min(1, Math.max(0, (view - rect.top) / (view + rect.height * 0.45)));
       drop.style.setProperty("--splash", String(progress));
+      const photo = root.querySelector<HTMLElement>("[data-nouri-photo]");
+      if (photo) photo.style.transform = `translate3d(0, ${progress * 36}px, 0) scale(${1 + progress * 0.12})`;
     };
     const onScroll = () => {
       cancelAnimationFrame(frame);
@@ -363,13 +355,15 @@ function NouriBand({ content }: { content: LandingContent }) {
   }, []);
 
   return (
-    <section ref={rootRef} className="nouri-splash relative min-h-[92vh] overflow-hidden text-paper">
-      <ParallaxFrame src={content.images.nouri} alt="Ripple in a ceramic tea bowl" speed={0.3} className="absolute inset-0" />
-      <div className="pointer-events-none absolute inset-0 bg-plum-deep/55" />
-      <div ref={dropRef} className="nouri-drop" aria-hidden>
-        <span />
-        <span />
-        <span />
+    <section ref={rootRef} className="nouri-splash relative min-h-[120vh] overflow-hidden text-paper">
+      <div className="nouri-photo absolute inset-0" data-nouri-photo>
+        <ParallaxFrame src={content.images.nouri} alt="Ripple in a ceramic tea bowl" speed={0.18} className="absolute inset-0" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-plum-deep/40" />
+      <div ref={dropRef} className="nouri-drip" aria-hidden>
+        <i className="nouri-bead" />
+        <i className="nouri-ring" />
+        <i className="nouri-ring nouri-ring-2" />
       </div>
       <div className="relative mx-auto flex min-h-[92vh] max-w-6xl items-end px-4 py-28 md:px-6">
         <Reveal className="glass-panel max-w-2xl p-7 md:p-10">

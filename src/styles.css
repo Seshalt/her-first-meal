@@ -711,8 +711,10 @@ html[data-pricing="linen"] .pricing-stage {
 }
 
 .nav-liquid-glass {
+  --nav-a: rgba(42, 117, 108, 0.38);
+  --nav-b: rgba(212, 162, 74, 0.22);
   background:
-    linear-gradient(180deg, rgba(255,250,243,0.82), rgba(255,250,243,0.74));
+    linear-gradient(105deg, var(--nav-a), rgba(255,250,243,0.72) 46%, var(--nav-b));
   backdrop-filter: blur(28px) saturate(1.6);
   -webkit-backdrop-filter: blur(28px) saturate(1.6);
   box-shadow:
@@ -726,16 +728,35 @@ html[data-pricing="linen"] .pricing-stage {
   border-bottom-color: rgba(255,255,255,0.12);
 }
 
-.offer-stack {
+.offer-reel {
+  height: 280vh;
   position: relative;
-  padding-bottom: 18vh;
 }
-.offer-sheet {
+.offer-reel-pin {
   position: sticky;
+  top: 5.5rem;
   display: flex;
-  align-items: flex-end;
-  min-height: 58vh;
-  padding: 0 1rem 1.25rem;
+  min-height: calc(100vh - 6.5rem);
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.5rem 1rem 2rem;
+}
+.offer-reel-stage {
+  position: relative;
+  min-height: 22rem;
+}
+.offer-reel-card {
+  position: absolute;
+  inset: 0;
+  height: fit-content;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+@media (min-width: 768px) {
+  .offer-reel-pin {
+    padding: 2rem 1.5rem;
+  }
 }
 .offer-sheet-card {
   width: min(100%, 56rem);
@@ -815,35 +836,44 @@ html[data-pricing="linen"] .pricing-stage {
   animation-delay: -3s;
 }
 
-.nouri-drop {
+.nouri-drip {
   pointer-events: none;
   position: absolute;
   inset: 0;
   --splash: 0;
 }
-.nouri-drop span {
+.nouri-bead {
   position: absolute;
-  left: 58%;
-  top: 42%;
-  width: 8rem;
-  height: 8rem;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 999px;
-  transform: translate(-50%, -50%) scale(calc(0.35 + var(--splash) * 2.4));
-  opacity: calc(0.55 - var(--splash) * 0.45);
+  left: 63%;
+  top: 38%;
+  width: 18px;
+  height: 26px;
+  border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.9), rgba(190,220,230,0.35) 55%, rgba(255,255,255,0.05) 80%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35);
+  transform: translate(-50%, calc(var(--splash) * 42vh)) scale(calc(1 - var(--splash) * 0.25));
+  opacity: calc(1 - var(--splash) * 0.85);
 }
-.nouri-drop span:nth-child(2) {
-  width: 12rem;
-  height: 12rem;
-  transform: translate(-50%, -50%) scale(calc(0.2 + var(--splash) * 2.8));
-  opacity: calc(0.4 - var(--splash) * 0.35);
+.nouri-ring {
+  position: absolute;
+  left: 63%;
+  top: 72%;
+  width: 4.5rem;
+  height: 1.6rem;
+  border: 2px solid rgba(255,255,255,0.38);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(calc(0.15 + var(--splash) * 2.6));
+  opacity: calc(var(--splash) * 0.7 - 0.08);
 }
-.nouri-drop span:nth-child(3) {
-  width: 3.2rem;
-  height: 3.2rem;
-  background: radial-gradient(circle, rgba(255,255,255,0.55), transparent 70%);
-  border: 0;
-  transform: translate(-50%, calc(-50% + var(--splash) * 18px)) scale(calc(1.1 - var(--splash) * 0.35));
+.nouri-ring-2 {
+  width: 7rem;
+  height: 2.2rem;
+  transform: translate(-50%, -50%) scale(calc(0.08 + var(--splash) * 3.1));
+  opacity: calc(var(--splash) * 0.5 - 0.12);
+}
+.nouri-photo {
+  transform-origin: 63% 42%;
+  will-change: transform;
 }
 
 .split-board {
