@@ -76,7 +76,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
           <h1>
             <HouseMark className="h-20 w-auto md:h-24" />
-            <span className="sr-only">Her First Meal</span>
+            <BrandTitle size="hero" className="mt-5 block text-ink" />
           </h1>
           <p className="mt-8 font-display text-[clamp(2.2rem,4.6vw,4.2rem)] leading-[1.05] text-ink">
             The world celebrates the baby.
@@ -119,10 +119,10 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
       >
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
           <h1 className={centered ? "flex flex-col items-center" : ""}>
-            <HouseMark className={`h-28 w-auto md:h-40 ${centered ? "mx-auto" : ""}`} />
-            <span className="sr-only">Her First Meal</span>
+            <HouseMark className={`h-24 w-auto md:h-32 ${centered ? "mx-auto" : ""}`} />
+            <BrandTitle size="hero" className="mt-5 block text-paper" />
           </h1>
-          <p className={`mt-8 font-display text-[clamp(2.4rem,6vw,5.2rem)] leading-[1.02] text-paper [text-shadow:0_12px_40px_rgba(12,16,14,0.45)] ${centered ? "text-center" : ""}`}>
+          <p className={`mt-8 font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05] text-paper [text-shadow:0_12px_40px_rgba(12,16,14,0.45)] ${centered ? "text-center" : ""}`}>
             The world celebrates the baby.
             <span className="mt-3 block italic text-gold">We remember the mother.</span>
           </p>
