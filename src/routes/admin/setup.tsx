@@ -11,6 +11,7 @@ import { hasAdministrator } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { atelierReadyLocal, markAtelierReady } from "@/lib/atelier-ready";
 import { readableAuthError } from "@/lib/auth/errors";
+import { requestEmailFactor } from "@/lib/server/email-factor";
 
 export const Route = createFileRoute("/admin/setup")({ component: Setup });
 
@@ -81,6 +82,7 @@ function Setup() {
       }
       await claimFirstAdmin({ data: { displayName: name } });
       markAtelierReady();
+      await requestEmailFactor().catch(() => undefined);
       setStep(1);
     } catch (err) {
       toast.error(readableAuthError(err, "Could not create the owner account."));

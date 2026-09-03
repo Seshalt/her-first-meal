@@ -5,6 +5,7 @@ import { markAtelierReady } from "@/lib/atelier-ready";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getMyRole } from "@/lib/server/admin";
 import { hasAdministrator } from "@/lib/server/public";
+import { getEmailFactorStatus } from "@/lib/server/email-factor";
 
 export const Route = createFileRoute("/admin")({ component: AdminGate });
 
@@ -15,6 +16,7 @@ function AdminGate() {
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [denied, setDenied] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
+  const [factorNeeded, setFactorNeeded] = useState(false);
 
   useEffect(() => {
     const t = window.setTimeout(() => setTimedOut(true), 7000);
@@ -45,6 +47,11 @@ function AdminGate() {
       .catch(() => {
         if (live) setDenied(true);
       });
+    void getEmailFactorStatus()
+      .then((s) => {
+        if (live) setFactorNeeded(s.needed);
+      })
+      .catch(() => undefined);
     return () => {
       live = false;
     };
@@ -62,6 +69,9 @@ function AdminGate() {
   }
 
   if (!user) {
+    return <Navigate to="/login" search={{ next: "/admin" }} />;
+  }
+  if (factorNeeded) {
     return <Navigate to="/login" search={{ next: "/admin" }} />;
   }
   if (denied || (role && role !== "admin")) {

@@ -11,6 +11,8 @@ import { getMyRole } from "@/lib/server/admin";
 import { hasAdministrator, recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { usePublicSite } from "@/lib/use-public-site";
+import { getEmailFactorStatus, requestEmailFactor } from "@/lib/server/email-factor";
+import { EmailFactorForm } from "@/components/security/email-factor";
 import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/login")({
@@ -33,6 +35,12 @@ function Login() {
   const [formError, setFormError] = useState("");
   const [recover, setRecover] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [factor, setFactor] = useState<{
+    needed: boolean;
+    sent: boolean;
+    configured: boolean;
+    emailMasked: string;
+  } | null>(null);
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -47,16 +55,34 @@ function Login() {
 
   useEffect(() => {
     if (!user) return;
-    void getMyRole()
-      .then((r) => {
+    let live = true;
+    void (async () => {
+      try {
+        const status = await getEmailFactorStatus();
+        if (!live) return;
+        if (status.needed) {
+          const sent = await requestEmailFactor();
+          if (live) setFactor(sent);
+          return;
+        }
+        const r = await getMyRole();
+        if (!live) return;
         if (r.role === "admin") markAtelierReady();
-        const dest = r.role === "admin" || ownerDoor ? "/admin" : "/app";
-        setHome(dest);
-      })
-      .catch(() => setHome(ownerDoor ? "/admin" : "/app"));
+        setHome(r.role === "admin" || ownerDoor ? "/admin" : "/app");
+      } catch {
+        if (live) setHome(ownerDoor ? "/admin" : "/app");
+      }
+    })();
+    return () => {
+      live = false;
+    };
   }, [user, ownerDoor]);
 
-  if (!isPending && user && home) return <Navigate to={home} />;
+  if (!isPending && user && factor?.needed) {
+    // stay on the door and collect the email code
+  } else if (!isPending && user && home) {
+    return <Navigate to={home} />;
+  }
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
@@ -74,6 +100,12 @@ function Login() {
         callbackURL: ownerDoor ? "/login?next=/admin" : "/login",
       });
       if (error) throw error;
+      const status = await requestEmailFactor();
+      if (status.needed) {
+        setFactor(status);
+        toast.success(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in.");
+        return;
+      }
       const r = await getMyRole();
       if (r.role === "admin") markAtelierReady();
       void navigate({ to: r.role === "admin" || ownerDoor ? "/admin" : "/app" });
@@ -150,6 +182,23 @@ function Login() {
               : site.loginBody}
           </p>
           <div className="editorial-rule mt-8" />
+          {factor?.needed ? (
+            <EmailFactorForm
+              emailMasked={factor.emailMasked}
+              sent={factor.sent}
+              configured={factor.configured}
+              onVerified={() => {
+                setFactor(null);
+                void getMyRole()
+                  .then((r) => {
+                    if (r.role === "admin") markAtelierReady();
+                    void navigate({ to: r.role === "admin" || ownerDoor ? "/admin" : "/app" });
+                  })
+                  .catch(() => void navigate({ to: ownerDoor ? "/admin" : "/app" }));
+              }}
+            />
+          ) : (
+            <>
           {authEnabled ? (
             <div className="mt-10 space-y-3">
               {GROK_PROVIDERS.map((p) => (
@@ -255,6 +304,8 @@ function Login() {
             <p className="mt-3 max-w-md text-sm text-muted-foreground">
               Owner? Sign in with that email — you will land in the atelier.
             </p>
+          )}
+            </>
           )}
         </div>
       </section>

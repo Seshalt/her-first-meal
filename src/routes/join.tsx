@@ -8,6 +8,8 @@ import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/clie
 import { claimMembership, getCheckoutByToken } from "@/lib/server/checkout";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
+import { EmailFactorForm } from "@/components/security/email-factor";
+import { requestEmailFactor } from "@/lib/server/email-factor";
 import { usePublicSite } from "@/lib/use-public-site";
 
 export const Route = createFileRoute("/join")({
@@ -26,6 +28,12 @@ function Join() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [factor, setFactor] = useState<{
+    needed: boolean;
+    sent: boolean;
+    configured: boolean;
+    emailMasked: string;
+  } | null>(null);
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -36,11 +44,11 @@ function Join() {
   }, [token]);
 
   useEffect(() => {
-    if (isPending || !user) return;
+    if (isPending || !user || factor?.needed) return;
     void claimMembership({ data: { token: token || undefined } }).then(() => {
       void navigate({ to: "/app/onboarding" });
     });
-  }, [isPending, user, token, navigate]);
+  }, [isPending, user, token, navigate, factor?.needed]);
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
@@ -60,6 +68,11 @@ function Join() {
       if (error) throw new Error(error.message);
       toast.success("Account created.");
       await claimMembership({ data: { token: token || undefined } });
+      const status = await requestEmailFactor();
+      if (status.needed) {
+        setFactor(status);
+        return;
+      }
       void navigate({ to: "/app/onboarding" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create the account.");
@@ -112,7 +125,18 @@ function Join() {
               ))}
             </div>
           ) : null}
-          <form onSubmit={onEmail} className="mt-8 max-w-md space-y-4">
+          {factor?.needed ? (
+            <EmailFactorForm
+              emailMasked={factor.emailMasked}
+              sent={factor.sent}
+              configured={factor.configured}
+              onVerified={() => {
+                setFactor(null);
+                void navigate({ to: "/app/onboarding" });
+              }}
+            />
+          ) : (
+          <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
             <div>
               <Label htmlFor="name">Name</Label>
               <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
@@ -142,6 +166,7 @@ function Join() {
               {busy ? "Creating…" : "Enter the house"}
             </Button>
           </form>
+          )}
         </div>
       </section>
       <PublicFooter />
