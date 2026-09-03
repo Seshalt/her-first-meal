@@ -22,8 +22,33 @@ export const DEFAULT_SITE_COPY = {
   footerSignIn: "Sign in",
   footerOwner: "Owner atelier",
   footerPrivacy: "Privacy",
+  footerContact: "Contact us",
+  footerConnect: "Connect",
   footerLegal:
     "Educational wellness support. Not medical care. Speak with your healthcare provider for clinical decisions.",
+  footerCopyright: "© 2026 Her First Meal. All rights reserved.",
+
+  instagramLabel: "Instagram",
+  instagramUrl: "https://instagram.com/herfirstmeal",
+  tiktokLabel: "TikTok",
+  tiktokUrl: "https://tiktok.com/@herfirstmeal",
+
+  contactNav: "Contact",
+  contactKicker: "The house",
+  contactTitle: "Contact us.",
+  contactIntro:
+    "Write, call, or visit. Maat reads every note. Use the fields below — every line here can be changed in the atelier.",
+  contactStudioLabel: "Studio",
+  contactStudioName: "Her First Meal",
+  contactEmailLabel: "Email",
+  contactEmail: "hello@herfirstmeal.com",
+  contactPhoneLabel: "Phone",
+  contactPhone: "",
+  contactHoursLabel: "Hours",
+  contactHours: "By appointment",
+  contactAddressLabel: "Address",
+  contactAddress: "",
+  contactNote: "Membership questions, belly binding reviews, and press all come through this door.",
 
   ticker:
     "Personalized meals\nBelly Binding Studio\nNouri\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
@@ -150,17 +175,25 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "navHome", label: "Nav · signed-in home" },
       { key: "navCta", label: "Nav · button" },
       { key: "navOwner", label: "Nav · owner link" },
+      { key: "contactNav", label: "Nav · Contact" },
       { key: "footerBlurb", label: "Footer blurb", multiline: true },
       { key: "footerVisit", label: "Footer · Visit heading" },
       { key: "footerEnter", label: "Footer · Enter heading" },
+      { key: "footerConnect", label: "Footer · Connect heading" },
       { key: "footerStory", label: "Footer · story link" },
       { key: "footerStudio", label: "Footer · studio link" },
       { key: "footerNouri", label: "Footer · Nouri link" },
       { key: "footerMembership", label: "Footer · membership link" },
+      { key: "footerContact", label: "Footer · Contact us link" },
       { key: "footerSignIn", label: "Footer · sign in" },
       { key: "footerOwner", label: "Footer · owner" },
       { key: "footerPrivacy", label: "Footer · privacy" },
       { key: "footerLegal", label: "Footer legal line", multiline: true },
+      { key: "footerCopyright", label: "Copyright line" },
+      { key: "instagramLabel", label: "Instagram button text" },
+      { key: "instagramUrl", label: "Instagram URL (https://…)" },
+      { key: "tiktokLabel", label: "TikTok button text" },
+      { key: "tiktokUrl", label: "TikTok URL (https://…)" },
     ],
   },
   {
@@ -255,4 +288,36 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "checkoutAside", label: "Checkout · aside heading" },
     ],
   },
+  {
+    id: "contact",
+    label: "Contact page",
+    fields: [
+      { key: "contactKicker", label: "Kicker" },
+      { key: "contactTitle", label: "Title" },
+      { key: "contactIntro", label: "Introduction", multiline: true },
+      { key: "contactStudioLabel", label: "Studio label" },
+      { key: "contactStudioName", label: "Studio name" },
+      { key: "contactEmailLabel", label: "Email label" },
+      { key: "contactEmail", label: "Email address" },
+      { key: "contactPhoneLabel", label: "Phone label" },
+      { key: "contactPhone", label: "Phone number" },
+      { key: "contactHoursLabel", label: "Hours label" },
+      { key: "contactHours", label: "Hours", multiline: true },
+      { key: "contactAddressLabel", label: "Address label" },
+      { key: "contactAddress", label: "Address", multiline: true },
+      { key: "contactNote", label: "Closing note", multiline: true },
+    ],
+  },
 ];
+
+export function publicHttpUrl(value: string): string | null {
+  const trimmed = value.trim();
+  if (!/^https?:\/\//i.test(trimmed)) return null;
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}

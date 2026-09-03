@@ -167,14 +167,29 @@ function Login() {
           ) : (
             <p className="mt-6 text-sm text-muted-foreground">Sign-in is disabled.</p>
           )}
-          <form onSubmit={onEmail} className="mt-8 max-w-md space-y-4">
+          <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                minLength={10}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <HumanCheck
               checked={guard.human}
@@ -211,7 +226,7 @@ function Login() {
                       id="new-password"
                       type="password"
                       required
-                      minLength={8}
+                      minLength={10}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                     />

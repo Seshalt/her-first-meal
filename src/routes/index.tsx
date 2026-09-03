@@ -101,7 +101,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
       <ParallaxFrame
         src={content.images.hero}
         alt="A mother standing in warm kitchen light, hands on her belly"
-        speed={0.32}
+        speed={0.42}
         className="absolute inset-0"
       />
       <div className="hero-veil pointer-events-none absolute inset-0" />
@@ -234,7 +234,7 @@ function SplitStory({
   );
   const picture = (
     <div className="relative min-h-[70vh] lg:min-h-dvh">
-      <ParallaxFrame src={src} alt={alt} speed={0.24} className="absolute inset-0" />
+      <ParallaxFrame src={src} alt={alt} speed={0.34} className="absolute inset-0" />
       {extraSrc ? (
         <img
           src={extraSrc}

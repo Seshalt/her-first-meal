@@ -127,7 +127,7 @@ function Join() {
                 id="password"
                 type="password"
                 required
-                minLength={8}
+                minLength={10}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

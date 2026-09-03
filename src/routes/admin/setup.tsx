@@ -151,7 +151,7 @@ function Setup() {
                 </div>
                 <div>
                   <Label className="text-[#efe6d6]">Password</Label>
-                  <Input type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} required className="bg-white/8 text-[#efe6d6]" />
+                  <Input type="password" minLength={10} value={password} onChange={(e) => setPassword(e.target.value)} required className="bg-white/8 text-[#efe6d6]" />
                 </div>
               </>
             )}

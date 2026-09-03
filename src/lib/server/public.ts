@@ -159,10 +159,14 @@ export const recoverOwner = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
     rateLimit("recover-owner", 6, 15 * 60 * 1000);
+    const started = Date.now();
+    const { dummyPasswordWork, padAuthDuration, timingSafeEqualText } = await import("@/lib/auth/constant-time");
+    await dummyPasswordWork();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
-    if (!email.includes("@") || password.length < 8) {
-      throw new Error("Use a real email and a password at least 8 characters.");
+    if (!email.includes("@") || password.length < 10) {
+      await padAuthDuration(started);
+      throw new Error("Use a real email and a password at least 10 characters.");
     }
     const sql = await getSql();
     const admins = await sql<{ id: string; email: string; name: string; display_name: string | null }>`
@@ -171,11 +175,12 @@ export const recoverOwner = createServerFn({ method: "POST" })
       join profiles p on p.user_id = u.id
       where p.role = 'admin'
     `;
-    const byEmail = admins.find((row) => row.email.toLowerCase() === email);
+    const byEmail = admins.find((row) => timingSafeEqualText(row.email.toLowerCase(), email));
     const onlyOwner = admins.length === 1 ? admins[0] : undefined;
     const target = byEmail ?? onlyOwner;
     if (!target) {
-      throw new Error("No owner account matches that email. Create the owner account first.");
+      await padAuthDuration(started);
+      throw new Error("That email or password does not match.");
     }
     const { hashPassword } = await import("better-auth/crypto");
     const hash = await hashPassword(password);

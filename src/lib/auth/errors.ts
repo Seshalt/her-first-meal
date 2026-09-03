@@ -21,7 +21,7 @@ export function readableAuthError(error: unknown, fallback: string): string {
   if (
     code.includes("INVALID") ||
     code.includes("CREDENTIAL") ||
-    /invalid|incorrect|wrong password|does not match/i.test(raw ?? "")
+    /invalid|incorrect|wrong password|does not match|user not found|not found|no user/i.test(raw ?? "")
   ) {
     return "That email or password does not match.";
   }

@@ -27,8 +27,8 @@ export function ParallaxFrame({
       const rect = parent.getBoundingClientRect();
       const viewH = window.innerHeight || 1;
       const progress = (rect.top + rect.height / 2 - viewH / 2) / viewH;
-      const shift = Math.max(-72, Math.min(72, progress * speed * 140));
-      img.style.transform = `translate3d(0, ${shift}px, 0) scale(1.12)`;
+      const shift = Math.max(-110, Math.min(110, progress * speed * 220));
+      img.style.transform = `translate3d(0, ${shift}px, 0) scale(1.18)`;
     };
     const onScroll = () => {
       cancelAnimationFrame(frame);

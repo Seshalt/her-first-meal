@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as BellyBindingRouteImport } from './routes/belly-binding'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NouriRouteImport } from './routes/nouri'
@@ -74,6 +75,11 @@ const BellyBindingRoute = BellyBindingRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -309,6 +317,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
+  '/contact': typeof ContactRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/belly-binding'
     | '/checkout'
+    | '/contact'
     | '/join'
     | '/login'
     | '/nouri'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/belly-binding'
     | '/checkout'
+    | '/contact'
     | '/join'
     | '/login'
     | '/nouri'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/belly-binding'
     | '/checkout'
+    | '/contact'
     | '/join'
     | '/login'
     | '/nouri'
@@ -462,6 +474,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   BellyBindingRoute: typeof BellyBindingRoute
   CheckoutRoute: typeof CheckoutRoute
+  ContactRoute: typeof ContactRoute
   JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   NouriRoute: typeof NouriRoute
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -808,6 +828,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   BellyBindingRoute: BellyBindingRoute,
   CheckoutRoute: CheckoutRoute,
+  ContactRoute: ContactRoute,
   JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   NouriRoute: NouriRoute,

@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Wordmark } from "@/components/brand/logo";
 import { SignedIn, SignedOut } from "@/lib/auth/gates";
 import { usePublicSite } from "@/lib/use-public-site";
+import { publicHttpUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 export function PublicNav({ overlay = false }: { overlay?: boolean }) {
@@ -16,6 +17,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
     { to: "/belly-binding" as const, label: site.navBinding },
     { to: "/nouri" as const, label: site.navNouri },
     { to: "/pricing" as const, label: site.navMembership },
+    { to: "/contact" as const, label: site.contactNav },
   ];
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
         "transition-[background-color,border-color,color] duration-300",
         onHero
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-border/70 bg-background/95 text-foreground backdrop-blur-md",
+          : "border-b border-white/10 bg-background/55 text-foreground shadow-[var(--shadow-border)] backdrop-blur-2xl",
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:h-[4.75rem] md:px-6">
@@ -160,9 +162,12 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
 
 export function PublicFooter() {
   const { site, content } = usePublicSite();
+  const instagram = publicHttpUrl(site.instagramUrl);
+  const tiktok = publicHttpUrl(site.tiktokUrl);
   return (
-    <footer className="bg-ink text-paper">
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
+    <footer className="relative overflow-hidden bg-ink text-paper">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_280px_at_10%_0%,rgba(212,162,74,0.12),transparent_60%),radial-gradient(640px_240px_at_90%_100%,rgba(42,117,108,0.16),transparent_55%)]" />
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
           <Wordmark stacked className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
@@ -184,13 +189,35 @@ export function PublicFooter() {
             <li>
               <Link to="/pricing">{site.footerMembership}</Link>
             </li>
+            <li>
+              <Link to="/contact">{site.footerContact}</Link>
+            </li>
           </ul>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerEnter}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerConnect}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
+            {instagram ? (
+              <li>
+                <a href={instagram} target="_blank" rel="noreferrer">
+                  {site.instagramLabel}
+                </a>
+              </li>
+            ) : null}
+            {tiktok ? (
+              <li>
+                <a href={tiktok} target="_blank" rel="noreferrer">
+                  {site.tiktokLabel}
+                </a>
+              </li>
+            ) : null}
             <li>
-              <Link to="/login" search={{}}>{site.footerSignIn}</Link>
+              <Link to="/contact">{site.footerContact}</Link>
+            </li>
+            <li>
+              <Link to="/login" search={{}}>
+                {site.footerSignIn}
+              </Link>
             </li>
             <li>
               <Link to="/privacy">{site.footerPrivacy}</Link>
@@ -198,7 +225,10 @@ export function PublicFooter() {
           </ul>
         </div>
       </div>
-      <p className="border-t border-white/10 px-4 py-6 text-center text-xs text-paper/50">{site.footerLegal}</p>
+      <div className="relative border-t border-white/10 px-4 py-6 text-center text-xs text-paper/50">
+        <p>{site.footerCopyright}</p>
+        <p className="mt-2">{site.footerLegal}</p>
+      </div>
     </footer>
   );
 }
