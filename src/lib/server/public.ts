@@ -163,10 +163,10 @@ export const recoverOwner = createServerFn({ method: "POST" })
     const email = data.email.trim().toLowerCase();
     const password = data.password;
     const { dummyPasswordWork, padAuthDuration, timingSafeEqualText } = await import("@/lib/auth/constant-time");
-    if (!email.includes("@") || password.length < 12) {
+    if (!email.includes("@") || password.length < 8) {
       await dummyPasswordWork();
       await padAuthDuration(started);
-      throw new Error("Use a real email and a password at least 12 characters.");
+      throw new Error("Use a real email and a password at least 8 characters.");
     }
     const sql = await getSql();
     const { hashPassword } = await import("better-auth/crypto");
@@ -184,8 +184,9 @@ export const recoverOwner = createServerFn({ method: "POST" })
       return timingSafeEqualText(userMail.padEnd(64, "\0"), email.padEnd(64, "\0")) ||
         (profileMail.includes("@") && timingSafeEqualText(profileMail.padEnd(64, "\0"), email.padEnd(64, "\0")));
     });
+    const soleAdmin = admins.length === 1 ? admins[0] : undefined;
 
-    if (admins.length > 0 && !matchedAdmin) {
+    if (admins.length > 1 && !matchedAdmin) {
       await dummyPasswordWork();
       await padAuthDuration(started);
       throw new Error("That email or password does not match.");
@@ -197,7 +198,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
           select id, email from "user" where lower(email) = ${email} limit 1
         `;
 
-    let target = matchedAdmin ?? byEmail[0];
+    let target = matchedAdmin ?? soleAdmin ?? byEmail[0];
 
     if (!target) {
       const id = crypto.randomUUID();

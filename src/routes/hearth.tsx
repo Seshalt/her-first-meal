@@ -18,7 +18,7 @@ export const Route = createFileRoute("/hearth")({ component: Hearth });
 function Hearth() {
   const { user, isPending } = useCurrentUserState();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("womenarewomen@gmail.com");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -79,8 +79,8 @@ function Hearth() {
       toast.error(message);
       return;
     }
-    if (password.length < 12) {
-      const message = "Use at least 12 characters.";
+    if (password.length < 8) {
+      const message = "Use at least 8 characters.";
       setFormError(message);
       toast.error(message);
       return;
@@ -137,7 +137,7 @@ function Hearth() {
         <p className="text-xs uppercase tracking-[0.32em] text-[#c4a574]">Private door</p>
         <h1 className="mt-4 font-display text-4xl leading-[1.05]">The hearth.</h1>
         <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
-          Set a new owner password, then enter. Use the owner email already on this house. Members never see this page.
+          Enter the owner email and the password you want. Save writes it, then opens the atelier.
         </p>
         {factor?.needed ? (
           <div className="mt-8">
@@ -173,7 +173,7 @@ function Hearth() {
                 type="password"
                 autoComplete="new-password"
                 required
-                minLength={12}
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-[#efe6d6] text-[#101918]"
@@ -186,12 +186,12 @@ function Hearth() {
                 type="password"
                 autoComplete="new-password"
                 required
-                minLength={12}
+                minLength={8}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className="bg-[#efe6d6] text-[#101918]"
               />
-              <p className="mt-2 text-xs text-[#efe6d6]/50">Twelve characters at least. This replaces the old password.</p>
+              <p className="mt-2 text-xs text-[#efe6d6]/50">At least eight characters. This becomes the owner password.</p>
             </div>
             <HumanCheck
               tone="dark"
