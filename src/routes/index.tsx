@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { LiquidArt } from "@/components/layout/liquid-art";
 import { MagneticLink } from "@/components/motion/magnetic-button";
 import { ParallaxFrame, Reveal } from "@/components/motion/parallax";
 import { mergeLanding, type LandingContent } from "@/lib/landing";
@@ -31,7 +32,9 @@ function Home() {
   const photoStart = layout?.photo === "left" ? "left" : "right";
 
   return (
-    <div className="bg-background">
+    <div className="relative isolate">
+      <LiquidArt />
+      <div className="relative z-[1]">
       <PublicNav overlay={overlayNav} />
       <Hero content={content} variant={layout?.hero ?? "cinematic"} />
       <Ticker items={ticker} />
@@ -65,6 +68,7 @@ function Home() {
       <PartnerBand src={content.images.grocery} />
       <MembershipClose content={content} monthly={monthly} yearly={yearly} />
       <PublicFooter />
+      </div>
     </div>
   );
 }
@@ -147,9 +151,20 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
   );
 }
 
+const OFFER_COPY: Record<string, string> = {
+  "Personalized meals": "Plates built for her body, culture, store, and season — not a dump of recipes on day one.",
+  "Belly Binding Studio": "Cloth, breath, and a private room after birth. Education first, never spectacle.",
+  Nouri: "A quiet companion for the week she is in. Questions, not a diagnosis.",
+  Movement: "Soft walks and recovery work that follow the season she is actually in.",
+  "Grocery lists": "Lists that match the kitchen she already has and the market she actually walks into.",
+  "Partner lane": "A useful lane for the person beside her — what to cook, hold, and stop guessing about.",
+  "Week-by-week journey": "The house changes as the weeks change. Nothing is frozen at week twelve.",
+  "Fourth trimester care": "The months after birth are a season here, not a discharge summary.",
+};
+
 function Ticker({ items }: { items: string[] }) {
-  const source = items.length ? items : ["Personalized meals", "Belly Binding Studio", "Nouri"];
-  const shown = source.slice(0, 5);
+  const source = items.length ? items : Object.keys(OFFER_COPY);
+  const shown = source.slice(0, 6);
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -163,9 +178,12 @@ function Ticker({ items }: { items: string[] }) {
         const card = sheet.querySelector<HTMLElement>("[data-card]");
         if (!card) return;
         const rect = sheet.getBoundingClientRect();
-        const pin = parseFloat(sheet.style.top || "90") || 90;
-        const progress = Math.min(1, Math.max(0, (pin + 24 - rect.top) / 260));
-        card.style.transform = `translate3d(0, ${progress * -12}px, 0) scale(${1 - progress * 0.045})`;
+        const pin = parseFloat(getComputedStyle(sheet).top) || 90;
+        const progress = Math.min(1, Math.max(0, (pin + 24 - rect.top) / 240));
+        card.style.transform = `translate3d(0, ${progress * -10}px, 0) scale(${1 - progress * 0.035})`;
+        card.style.filter = `saturate(${1 + progress * 0.15})`;
+        const copy = card.querySelector<HTMLElement>("[data-copy]");
+        if (copy) copy.style.opacity = String(1 - progress * 0.92);
       });
     };
     const onScroll = () => {
@@ -181,9 +199,9 @@ function Ticker({ items }: { items: string[] }) {
   }, [shown.join("|")]);
 
   return (
-    <section ref={rootRef} className="offer-stack bg-wash-linen">
+    <section ref={rootRef} className="offer-stack">
       <div className="mx-auto max-w-5xl px-4 pt-10 md:px-6">
-        <p className="text-xs uppercase tracking-[0.28em] text-ink/40">What the house holds</p>
+        <p className="text-xs uppercase tracking-[0.28em] text-ink/45">What the house holds</p>
       </div>
       {shown.map((item, i) => (
         <div
@@ -194,7 +212,12 @@ function Ticker({ items }: { items: string[] }) {
         >
           <article data-card className="offer-sheet-card">
             <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
-            <p className="mt-4 font-display text-[clamp(2rem,5vw,3.6rem)] leading-[1.02]">{item}</p>
+            <div data-copy>
+              <p className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.02]">{item}</p>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft md:text-lg">
+                {OFFER_COPY[item] ?? "Part of the membership house — meals, binding, movement, and care that stay with her."}
+              </p>
+            </div>
           </article>
         </div>
       ))}
@@ -204,7 +227,7 @@ function Ticker({ items }: { items: string[] }) {
 
 function Manifesto({ content }: { content: LandingContent }) {
   return (
-    <section className="bg-wash-linen">
+    <section className="bg-transparent">
       <div className="section-air mx-auto max-w-5xl px-4 md:px-6">
       <Reveal className="glass-panel p-8 md:p-12">
         <p className="text-xs uppercase tracking-[0.32em] text-clay">A membership, not a feed</p>
