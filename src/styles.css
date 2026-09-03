@@ -751,6 +751,17 @@ html[data-pricing="linen"] .pricing-stage {
     0 22px 44px -24px rgba(20,24,28,0.3);
   transform-origin: 50% 100%;
 }
+.offer-sheet.is-behind [data-copy],
+.offer-sheet.is-behind [data-index] {
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+}
+.offer-sheet.is-behind .offer-sheet-card {
+  min-height: 3.25rem;
+  padding-block: 0.7rem;
+}
 @media (min-width: 768px) {
   .offer-sheet {
     min-height: 64vh;

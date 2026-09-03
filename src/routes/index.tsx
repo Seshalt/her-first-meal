@@ -164,28 +164,26 @@ const OFFER_COPY: Record<string, string> = {
 
 function Ticker({ items }: { items: string[] }) {
   const source = items.length ? items : Object.keys(OFFER_COPY);
-  const shown = source.slice(0, 6);
+  const shown = source.slice(0, 4);
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const sheets = [...root.querySelectorAll<HTMLElement>("[data-sheet]")];
     let frame = 0;
     const update = () => {
+      let front = sheets[0];
       sheets.forEach((sheet) => {
+        const pin = parseFloat(getComputedStyle(sheet).top) || 90;
+        if (sheet.getBoundingClientRect().top <= pin + 6) front = sheet;
+      });
+      sheets.forEach((sheet) => {
+        const behind = sheet !== front;
+        sheet.classList.toggle("is-behind", behind);
         const card = sheet.querySelector<HTMLElement>("[data-card]");
         if (!card) return;
-        const rect = sheet.getBoundingClientRect();
-        const pin = parseFloat(getComputedStyle(sheet).top) || 90;
-        const progress = Math.min(1, Math.max(0, (pin + 24 - rect.top) / 240));
-        card.style.transform = `translate3d(0, ${progress * -10}px, 0) scale(${1 - progress * 0.03})`;
-        const copy = card.querySelector<HTMLElement>("[data-copy]");
-        if (copy) {
-          copy.style.opacity = String(1 - Math.min(1, progress * 1.35));
-          copy.style.filter = progress > 0.35 ? "blur(6px)" : "none";
-        }
+        card.style.transform = behind ? "scale(0.985)" : "scale(1)";
       });
     };
     const onScroll = () => {
@@ -194,9 +192,11 @@ function Ticker({ items }: { items: string[] }) {
     };
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, [shown.join("|")]);
 
@@ -210,10 +210,12 @@ function Ticker({ items }: { items: string[] }) {
           key={item}
           data-sheet
           className="offer-sheet"
-          style={{ top: `calc(5.6rem + ${i * 0.7}rem)`, zIndex: i + 1 }}
+          style={{ top: `calc(5.6rem + ${i * 0.55}rem)`, zIndex: i + 1 }}
         >
           <article data-card className="offer-sheet-card">
-            <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
+            <p data-index className="text-xs uppercase tracking-[0.22em] text-ink/40">
+              0{i + 1}
+            </p>
             <div data-copy>
               <p className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.02]">{item}</p>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft md:text-lg">
