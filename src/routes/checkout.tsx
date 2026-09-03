@@ -6,7 +6,7 @@ import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { MEMBERSHIP_INCLUDES, yearlySavings } from "@/lib/pricing";
-import { startMembershipCheckout } from "@/lib/server/checkout";
+import { startMembershipCheckout, confirmStripeCheckout } from "@/lib/server/checkout";
 import { getPublicPricing } from "@/lib/server/public";
 import { formatCurrency } from "@/lib/utils";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
@@ -19,12 +19,14 @@ export const Route = createFileRoute("/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
     plan: s.plan === "yearly" ? ("yearly" as const) : ("monthly" as const),
     preview: s.preview === "1" || s.preview === 1 ? true : undefined,
+    paid: s.paid === "1" || s.paid === 1 ? true : undefined,
+    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
   component: Checkout,
 });
 
 function Checkout() {
-  const { plan, preview } = Route.useSearch();
+  const { plan, preview, paid, session_id } = Route.useSearch();
   const mock = preview || isMemberWalk();
   const [printed, setPrinted] = useState(false);
   const [joinToken, setJoinToken] = useState("");
@@ -39,6 +41,18 @@ function Checkout() {
   const [busy, setBusy] = useState(false);
   const price = plan === "yearly" ? yearly : monthly;
   const guard = useFormGuard();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (!paid || !session_id) return;
+    void confirmStripeCheckout({ data: { sessionId: session_id } })
+      .then((row) => {
+        setJoinToken(row.token);
+        if (row.email) setEmail(row.email);
+        setPrinted(true);
+      })
+      .catch(() => toast.error("We could not confirm that Stripe payment yet."));
+  }, [paid, session_id]);
 
   useEffect(() => {
     void getPublicPricing()
@@ -70,8 +84,12 @@ function Checkout() {
           human: guard.human,
         },
       });
-      toast.success("Membership reserved. Create your account to enter.");
+      toast.success(res.stripeUrl ? "Opening Stripe…" : "Membership reserved.");
       setJoinToken(res.token);
+      if (res.stripeUrl) {
+        window.location.assign(res.stripeUrl);
+        return;
+      }
       setPrinted(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Checkout could not finish.");
@@ -108,7 +126,7 @@ function Checkout() {
             {plan === "yearly"
               ? ` (${formatCurrency(yearlySavings(monthly, yearly).perMonthCents)}/month, save ${yearlySavings(monthly, yearly).percent}%).`
               : "."}{" "}
-            Payment runs in demo mode here; the architecture is ready for a live processor.
+            Payment is taken by Stripe. After it clears, a receipt prints and you create your account.
           </p>
           <form onSubmit={submit} className="mt-8 space-y-4">
             <div>

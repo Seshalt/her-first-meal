@@ -4,6 +4,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 import { uid } from "@/lib/utils";
 import { ensureProfile } from "./profile";
 import { assertHuman, rateLimit } from "./abuse";
+import { createStripeCheckout, stripeConfigured, stripeSessionPaid } from "./stripe";
 
 export const startMembershipCheckout = createServerFn({ method: "POST" })
   .validator((input: {
@@ -43,13 +44,54 @@ export const startMembershipCheckout = createServerFn({ method: "POST" })
     else expiresAt.setMonth(expiresAt.getMonth() + 1);
     await sql`
       insert into memberships (email, plan, status, price_cents, checkout_token, expires_at)
-      values (${data.email}, ${data.plan}, 'active', ${price}, ${token}, ${expiresAt.toISOString()})
+      values (${data.email}, ${data.plan}, 'pending', ${price}, ${token}, ${expiresAt.toISOString()})
     `;
-    await sql`
-      insert into purchases (email, amount_cents, status)
-      values (${data.email}, ${price}, 'paid')
-    `;
-    return { token, email: data.email, name: data.name, plan: data.plan, priceCents: price };
+    const origin = (process.env.APP_URL || process.env.BETTER_AUTH_URL || "https://her-first-meal-now.vercel.app").replace(/\/$/, "");
+    if (stripeConfigured()) {
+      const session = await createStripeCheckout({
+        token,
+        email: data.email,
+        name: data.name,
+        plan: data.plan,
+        priceCents: price,
+        origin,
+      });
+      if ("url" in session) {
+        return { token, email: data.email, name: data.name, plan: data.plan, priceCents: price, stripeUrl: session.url };
+      }
+      throw new Error(session.error);
+    }
+    return { token, email: data.email, name: data.name, plan: data.plan, priceCents: price, stripeUrl: null as string | null };
+  });
+
+export const confirmStripeCheckout = createServerFn({ method: "POST" })
+  .validator((input: { sessionId: string }) => input)
+  .handler(async ({ data }) => {
+    const paid = await stripeSessionPaid(data.sessionId);
+    if (!paid.paid) throw new Error("Stripe has not marked this payment complete.");
+    const sql = await getSql();
+    if (paid.token) {
+      await sql`update memberships set status = 'active' where checkout_token = ${paid.token}`;
+    }
+    if (paid.email) {
+      await sql`
+        insert into purchases (email, amount_cents, status)
+        select email, price_cents, 'paid' from memberships
+        where lower(email) = ${paid.email.toLowerCase()}
+        order by id desc limit 1
+      `;
+    }
+    const row = paid.token
+      ? await sql<{ email: string; plan: string; price_cents: number; checkout_token: string }>`
+          select email, plan, price_cents, checkout_token from memberships where checkout_token = ${paid.token} limit 1
+        `
+      : [];
+    return {
+      token: row[0]?.checkout_token ?? paid.token ?? "",
+      email: row[0]?.email ?? paid.email ?? "",
+      plan: (row[0]?.plan === "yearly" ? "yearly" : "monthly") as "monthly" | "yearly",
+      priceCents: Number(row[0]?.price_cents ?? 0),
+    };
   });
 
 export const claimMembership = createServerFn({ method: "POST" })

@@ -18,8 +18,9 @@ export function ReceiptPrinter({
   const [stage, setStage] = useState<Stage>("processing");
 
   useEffect(() => {
-    const a = window.setTimeout(() => setStage("printing"), 700);
-    const b = window.setTimeout(() => setStage("complete"), 2800);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    const a = window.setTimeout(() => setStage("printing"), 500);
+    const b = window.setTimeout(() => setStage("complete"), 2200);
     return () => {
       window.clearTimeout(a);
       window.clearTimeout(b);

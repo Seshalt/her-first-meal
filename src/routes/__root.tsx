@@ -7,6 +7,7 @@ import { ThemePaint } from "@/components/theme-paint";
 import { ThemeProvider } from "@/lib/theme";
 import { CookieConsent } from "@/components/security/cookie-consent";
 import { ConsentTags } from "@/components/security/consent-tags";
+import { ScrollReset } from "@/components/layout/scroll-reset";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Her First Meal";
@@ -62,6 +63,7 @@ function RootDocument() {
         <AuthProvider>
           <ThemeProvider>
             <ThemePaint />
+            <ScrollReset />
             <Outlet />
             <CookieConsent />
             <ConsentTags />

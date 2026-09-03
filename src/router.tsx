@@ -9,5 +9,7 @@ export function getRouter() {
     routeTree,
     defaultErrorComponent: AppErrorComponent,
     defaultNotFoundComponent: NotFoundPage,
+    defaultPreload: "intent",
+    scrollRestoration: true,
   });
 }

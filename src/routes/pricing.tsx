@@ -193,7 +193,7 @@ function PlanCard({
               : "mt-8 h-12 w-full border border-white/15 text-paper hover:bg-white/10 hover:text-paper"
           }
         >
-          <Link to="/checkout" search={{ plan: toPlan, preview: undefined }}>
+          <Link to="/checkout" search={{ plan: toPlan, preview: undefined, paid: undefined, session_id: undefined }}>
             {cta}
           </Link>
         </Button>

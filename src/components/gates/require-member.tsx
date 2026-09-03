@@ -9,7 +9,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
   const [timedOut, setTimedOut] = useState(false);
   const [factorNeeded, setFactorNeeded] = useState<boolean | null>(null);
   useEffect(() => {
-    const t = window.setTimeout(() => setTimedOut(true), 7000);
+    const t = window.setTimeout(() => setTimedOut(true), 2500);
     return () => window.clearTimeout(t);
   }, []);
   useEffect(() => {
