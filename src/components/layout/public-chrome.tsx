@@ -44,7 +44,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
         "transition-[background-color,border-color,color] duration-300",
         onHero
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-white/10 bg-background/55 text-foreground shadow-[var(--shadow-border)] backdrop-blur-2xl",
+          : "nav-gold-glass border-b border-gold/20 text-foreground",
       )}
     >
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-4 md:h-[5.25rem] md:px-6">

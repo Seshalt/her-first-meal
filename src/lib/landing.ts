@@ -48,8 +48,8 @@ export type LandingCopy = {
 };
 
 export const DEFAULT_LANDING_COPY: LandingCopy = {
-  eyebrow: "The world celebrates the baby.",
-  headline: "Her First Meal",
+  eyebrow: "Her First Meal",
+  headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
     "A membership home for pregnancy and postpartum — meals for her body, a belly binding studio, movement, grocery intelligence, and Nouri. Not a course. Not a blog. A house you return to.",
