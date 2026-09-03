@@ -6,6 +6,7 @@ import { GlassDefs } from "@/components/layout/glass-defs";
 import { ThemePaint } from "@/components/theme-paint";
 import { ThemeProvider } from "@/lib/theme";
 import { CookieConsent } from "@/components/security/cookie-consent";
+import { ConsentTags } from "@/components/security/consent-tags";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Her First Meal";
@@ -63,6 +64,7 @@ function RootDocument() {
             <ThemePaint />
             <Outlet />
             <CookieConsent />
+            <ConsentTags />
             <Toaster
               position="top-center"
               toastOptions={{

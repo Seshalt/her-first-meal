@@ -20,6 +20,7 @@ function Analytics() {
         <Stat label="Nouri threads" value={dash?.nouriThreads} />
         <Stat label="Binding photos" value={dash?.bindingUploads} />
         <Stat label="Saved recipes" value={extra?.savedRecipes} />
+        <Stat label="Page visits" value={extra?.visits} />
         <Stat label="Workouts logged" value={extra?.workouts} />
       </div>
       <h2 className="mt-10 font-display text-2xl">By season</h2>
@@ -30,6 +31,18 @@ function Analytics() {
           </li>
         ))}
       </ul>
+      {(extra?.visitPaths ?? []).length ? (
+        <>
+          <h2 className="mt-10 font-display text-2xl">Public rooms</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {extra!.visitPaths.map((v) => (
+              <li key={v.path}>
+                {v.path} · {v.count}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
     </div>
   );
 }

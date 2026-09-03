@@ -447,5 +447,16 @@ export const adminAnalytics = createServerFn({ method: "GET" })
     `;
     const recipes = await sql<{ count: number }>`select count(*)::int as count from saved_recipes`;
     const workouts = await sql<{ count: number }>`select count(*)::int as count from workout_logs`;
-    return { byStage, savedRecipes: Number(recipes[0]?.count ?? 0), workouts: Number(workouts[0]?.count ?? 0) };
+    let visits = 0;
+    let visitPaths: { path: string; count: number }[] = [];
+    try {
+      const total = await sql<{ count: number }>`select count(*)::int as count from page_visits`;
+      visits = Number(total[0]?.count ?? 0);
+      visitPaths = await sql<{ path: string; count: number }>`
+        select path, count(*)::int as count from page_visits group by path order by count desc limit 8
+      `;
+    } catch {
+      visits = 0;
+    }
+    return { byStage, savedRecipes: Number(recipes[0]?.count ?? 0), workouts: Number(workouts[0]?.count ?? 0), visits, visitPaths };
   });

@@ -28,6 +28,11 @@ function Privacy() {
               binding uploads) in order to care for you. Owner notes are internal.
             </p>
             <p>You may delete your account from Settings. That removes your personal records from this house.</p>
+            <p>
+              Cookies: sign-in stays on so you can move through the rooms. Analytics counts visits if you allow it.
+              Ads cookies measure campaigns if you allow them. Preferences remember theme and this choice. You can
+              change that from Cookie choices in the footer.
+            </p>
           </div>
         </article>
       </PageCanvas>

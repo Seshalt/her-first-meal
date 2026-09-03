@@ -87,6 +87,21 @@ export const getPublicPricing = createServerFn({ method: "GET" }).handler(async 
   }
 });
 
+export const recordPublicVisit = createServerFn({ method: "POST" })
+  .validator((input: { path: string }) => input)
+  .handler(async ({ data }) => {
+    rateLimit("visit", 40, 60 * 1000);
+    const path = data.path.slice(0, 180) || "/";
+    if (path.startsWith("/admin") || path.startsWith("/api") || path === "/hearth") return { ok: true };
+    try {
+      const sql = await getSql();
+      await sql`insert into page_visits (path) values (${path})`;
+    } catch {
+      /* table may not exist yet */
+    }
+    return { ok: true };
+  });
+
 export const hasAdministrator = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const sql = await getSql();
