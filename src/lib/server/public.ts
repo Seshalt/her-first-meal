@@ -172,13 +172,18 @@ export const recoverOwner = createServerFn({ method: "POST" })
     const { hashPassword } = await import("better-auth/crypto");
     const hash = await hashPassword(password);
 
-    const admins = await sql<{ id: string; email: string }>`
-      select u.id, u.email
+    const admins = await sql<{ id: string; email: string; profile_email: string | null }>`
+      select u.id, u.email, p.email as profile_email
       from "user" u
       join profiles p on p.user_id = u.id
       where p.role = 'admin'
     `;
-    const matchedAdmin = admins.find((row) => timingSafeEqualText(row.email.toLowerCase(), email));
+    const matchedAdmin = admins.find((row) => {
+      const userMail = (row.email || "").toLowerCase();
+      const profileMail = (row.profile_email || "").toLowerCase();
+      return timingSafeEqualText(userMail.padEnd(64, "\0"), email.padEnd(64, "\0")) ||
+        (profileMail.includes("@") && timingSafeEqualText(profileMail.padEnd(64, "\0"), email.padEnd(64, "\0")));
+    });
 
     if (admins.length > 0 && !matchedAdmin) {
       await dummyPasswordWork();

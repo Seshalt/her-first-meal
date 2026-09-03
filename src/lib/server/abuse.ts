@@ -27,7 +27,7 @@ export function assertHuman(input: { honey?: string; startedAt?: number; human?:
   }
   if (typeof input.startedAt === "number" && Number.isFinite(input.startedAt)) {
     const elapsed = Date.now() - input.startedAt;
-    if (elapsed >= 0 && elapsed < 1200) {
+    if (elapsed >= 0 && elapsed < 400) {
       throw new Error("Please try again in a moment.");
     }
   }

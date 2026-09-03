@@ -15,5 +15,6 @@ Disallow: /api/
 Disallow: /login
 Disallow: /join
 Disallow: /checkout
+Disallow: /hearth
 
 # Member rooms and the atelier are not for crawlers.

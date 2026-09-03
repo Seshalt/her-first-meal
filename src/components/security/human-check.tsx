@@ -30,26 +30,31 @@ export function HumanCheck({
   onChecked,
   honey,
   onHoney,
+  tone = "light",
 }: {
   checked: boolean;
   onChecked: (next: boolean) => void;
   honey: string;
   onHoney: (next: string) => void;
+  tone?: "light" | "dark";
 }) {
   return (
     <div className="relative">
       <Honeypot value={honey} onChange={onHoney} />
-      <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-card/60 px-4 py-3 text-sm text-foreground shadow-[var(--shadow-border)]">
+      <label
+        className={
+          tone === "dark"
+            ? "flex cursor-pointer items-start gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-[#efe6d6]"
+            : "flex cursor-pointer items-start gap-3 rounded-2xl bg-card/60 px-4 py-3 text-sm text-foreground shadow-[var(--shadow-border)]"
+        }
+      >
         <input
           type="checkbox"
           className="mt-0.5 size-4 shrink-0 accent-current"
           checked={checked}
           onChange={(e) => onChecked(e.target.checked)}
-          required
         />
-        <span>
-          I am a person. Keep automated visitors out of this house.
-        </span>
+        <span>I am a person. Keep automated visitors out of this house.</span>
       </label>
     </div>
   );
