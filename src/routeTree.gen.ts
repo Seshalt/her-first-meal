@@ -16,6 +16,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as BellyBindingRouteImport } from './routes/belly-binding'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as HearthRouteImport } from './routes/hearth'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as NouriRouteImport } from './routes/nouri'
@@ -80,6 +81,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HearthRoute = HearthRouteImport.update({
+  id: '/hearth',
+  path: '/hearth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -318,6 +326,7 @@ export interface FileRoutesById {
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/nouri': typeof NouriRoute
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/hearth'
     | '/join'
     | '/login'
     | '/nouri'
@@ -396,6 +406,7 @@ export interface FileRouteTypes {
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/hearth'
     | '/join'
     | '/login'
     | '/nouri'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/hearth'
     | '/join'
     | '/login'
     | '/nouri'
@@ -475,6 +487,7 @@ export interface RootRouteChildren {
   BellyBindingRoute: typeof BellyBindingRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  HearthRoute: typeof HearthRoute
   JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   NouriRoute: typeof NouriRoute
@@ -532,6 +545,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hearth': {
+      id: '/hearth'
+      path: '/hearth'
+      fullPath: '/hearth'
+      preLoaderRoute: typeof HearthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -829,6 +849,7 @@ const rootRouteChildren: RootRouteChildren = {
   BellyBindingRoute: BellyBindingRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  HearthRoute: HearthRoute,
   JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   NouriRoute: NouriRoute,

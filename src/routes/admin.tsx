@@ -69,10 +69,10 @@ function AdminGate() {
   }
 
   if (!user) {
-    return <Navigate to="/login" search={{ next: "/admin" }} />;
+    return <Navigate to="/hearth" />;
   }
   if (factorNeeded) {
-    return <Navigate to="/login" search={{ next: "/admin" }} />;
+    return <Navigate to="/hearth" />;
   }
   if (denied || (role && role !== "admin")) {
     return (

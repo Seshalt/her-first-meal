@@ -158,11 +158,15 @@ export const recoverOwner = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
-    rateLimit("recover-owner", 8, 15 * 60 * 1000);
+    rateLimit("recover-owner", 5, 15 * 60 * 1000);
+    const started = Date.now();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
-    if (!email.includes("@") || password.length < 8) {
-      throw new Error("Use a real email and a password at least 8 characters.");
+    const { dummyPasswordWork, padAuthDuration, timingSafeEqualText } = await import("@/lib/auth/constant-time");
+    if (!email.includes("@") || password.length < 12) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("Use a real email and a password at least 12 characters.");
     }
     const sql = await getSql();
     const { hashPassword } = await import("better-auth/crypto");
@@ -174,13 +178,21 @@ export const recoverOwner = createServerFn({ method: "POST" })
       join profiles p on p.user_id = u.id
       where p.role = 'admin'
     `;
-    const matchedAdmin = admins.find((row) => row.email.toLowerCase() === email);
-    const onlyAdmin = admins.length === 1 ? admins[0] : undefined;
-    const byEmail = await sql<{ id: string; email: string }>`
-      select id, email from "user" where lower(email) = ${email} limit 1
-    `;
+    const matchedAdmin = admins.find((row) => timingSafeEqualText(row.email.toLowerCase(), email));
 
-    let target = matchedAdmin ?? onlyAdmin ?? byEmail[0];
+    if (admins.length > 0 && !matchedAdmin) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("That email or password does not match.");
+    }
+
+    const byEmail = matchedAdmin
+      ? []
+      : await sql<{ id: string; email: string }>`
+          select id, email from "user" where lower(email) = ${email} limit 1
+        `;
+
+    let target = matchedAdmin ?? byEmail[0];
 
     if (!target) {
       const id = crypto.randomUUID();
@@ -241,6 +253,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
       }
     }
 
+    await padAuthDuration(started);
     return { ok: true };
   });
 

@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { atelierReadyLocal, markAtelierReady } from "@/lib/atelier-ready";
-import { getMyRole } from "@/lib/server/admin";
-import { hasAdministrator, recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { usePublicSite } from "@/lib/use-public-site";
 import { getEmailFactorStatus, requestEmailFactor } from "@/lib/server/email-factor";
@@ -16,25 +13,18 @@ import { EmailFactorForm } from "@/components/security/email-factor";
 import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (s: Record<string, unknown>): { next?: "/admin" } =>
-    s.next === "/admin" ? { next: "/admin" } : {},
   component: Login,
 });
 
 function Login() {
-  const { next } = Route.useSearch();
-  const ownerDoor = next === "/admin";
   const { user, isPending } = useCurrentUserState();
   const { site, content } = usePublicSite();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [home, setHome] = useState<"/" | "/app" | "/admin" | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
+  const [home, setHome] = useState<"/" | "/app" | null>(null);
   const [formError, setFormError] = useState("");
-  const [recover, setRecover] = useState(ownerDoor);
-  const [newPassword, setNewPassword] = useState("");
   const [factor, setFactor] = useState<{
     needed: boolean;
     sent: boolean;
@@ -42,16 +32,6 @@ function Login() {
     emailMasked: string;
   } | null>(null);
   const guard = useFormGuard();
-
-  useEffect(() => {
-    if (atelierReadyLocal()) {
-      setShowCreate(false);
-      return;
-    }
-    void hasAdministrator()
-      .then((r) => setShowCreate(!r.hasAdmin))
-      .catch(() => setShowCreate(false));
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -65,18 +45,15 @@ function Login() {
           if (live) setFactor(sent);
           return;
         }
-        const r = await getMyRole();
-        if (!live) return;
-        if (r.role === "admin") markAtelierReady();
-        setHome(r.role === "admin" || ownerDoor ? "/admin" : "/app");
+        if (live) setHome("/app");
       } catch {
-        if (live) setHome(ownerDoor ? "/admin" : "/app");
+        if (live) setHome("/app");
       }
     })();
     return () => {
       live = false;
     };
-  }, [user, ownerDoor]);
+  }, [user]);
 
   if (!isPending && user && factor?.needed) {
     // stay on the door and collect the email code
@@ -97,7 +74,7 @@ function Login() {
       const { error } = await authClient.signIn.email({
         email,
         password,
-        callbackURL: ownerDoor ? "/login?next=/admin" : "/login",
+        callbackURL: "/login",
       });
       if (error) throw error;
       const status = await requestEmailFactor();
@@ -106,55 +83,9 @@ function Login() {
         toast.success(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in.");
         return;
       }
-      const r = await getMyRole();
-      if (r.role === "admin") markAtelierReady();
-      void navigate({ to: r.role === "admin" || ownerDoor ? "/admin" : "/app" });
+      void navigate({ to: "/app" });
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
-      setFormError(message);
-      toast.error(message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onRecover(e: FormEvent) {
-    e.preventDefault();
-    if (guard.honey.trim()) return;
-    if (!guard.human) {
-      const message = "Please confirm you are a person.";
-      setFormError(message);
-      toast.error(message);
-      return;
-    }
-    setBusy(true);
-    setFormError("");
-    try {
-      await recoverOwner({
-        data: {
-          email,
-          password: newPassword,
-          honey: guard.honey,
-          startedAt: guard.startedAt,
-          human: guard.human,
-        },
-      });
-      setPassword(newPassword);
-      setRecover(false);
-      const { error } = await authClient.signIn.email({
-        email,
-        password: newPassword,
-        callbackURL: "/login?next=/admin",
-      });
-      if (error) {
-        toast.success("Owner password saved. Sign in with it now.");
-        return;
-      }
-      markAtelierReady();
-      toast.success("Owner password saved. Entering the atelier.");
-      void navigate({ to: "/admin" });
-    } catch (err) {
-      const message = readableAuthError(err, "Could not update the owner password.");
       setFormError(message);
       toast.error(message);
     } finally {
@@ -181,17 +112,9 @@ function Login() {
           </div>
         </div>
         <div className="flex min-h-dvh flex-col justify-center bg-wash-linen px-5 py-28 md:px-16">
-          <p className="text-xs uppercase tracking-[0.32em] text-clay">
-            {ownerDoor ? "Owner atelier" : site.loginEyebrow}
-          </p>
-          <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">
-            {ownerDoor ? "Owner sign in." : site.loginTitle}
-          </h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">
-            {ownerDoor
-              ? "Use the owner email and password. The same door as members — your role opens the atelier."
-              : site.loginBody}
-          </p>
+          <p className="text-xs uppercase tracking-[0.32em] text-clay">{site.loginEyebrow}</p>
+          <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{site.loginTitle}</h1>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{site.loginBody}</p>
           <div className="editorial-rule mt-8" />
           {factor?.needed ? (
             <EmailFactorForm
@@ -200,12 +123,7 @@ function Login() {
               configured={factor.configured}
               onVerified={() => {
                 setFactor(null);
-                void getMyRole()
-                  .then((r) => {
-                    if (r.role === "admin") markAtelierReady();
-                    void navigate({ to: r.role === "admin" || ownerDoor ? "/admin" : "/app" });
-                  })
-                  .catch(() => void navigate({ to: ownerDoor ? "/admin" : "/app" }));
+                void navigate({ to: "/app" });
               }}
             />
           ) : (
@@ -263,78 +181,15 @@ function Login() {
               </p>
             ) : null}
             <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
-              {busy ? "Entering…" : ownerDoor ? "Enter the atelier" : "Enter the house"}
+              {busy ? "Entering…" : "Enter the house"}
             </Button>
           </form>
-          <div className="mt-6 max-w-md">
-              <button
-                type="button"
-                className="text-sm text-primary underline-offset-4 hover:underline"
-                onClick={() => setRecover((v) => !v)}
-              >
-                {recover ? "Hide owner password reset" : "Forgot the owner password? Set a new one"}
-              </button>
-              {recover ? (
-                <form onSubmit={(e) => void onRecover(e)} className="glass-panel mt-4 space-y-4 p-5">
-                  <p className="text-sm text-ink-soft">
-                    Enter Maat’s email and a new password. This replaces the old one and signs you into the atelier.
-                  </p>
-                  <div>
-                    <Label htmlFor="recover-email">Owner email</Label>
-                    <Input
-                      id="recover-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="new-password">New owner password</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      required
-                      minLength={8}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                  </div>
-                  <HumanCheck
-                    checked={guard.human}
-                    onChecked={guard.setHuman}
-                    honey={guard.honey}
-                    onHoney={guard.setHoney}
-                  />
-                  {formError ? (
-                    <p className="rounded-xl bg-clay px-4 py-3 text-sm text-paper" role="alert">
-                      {formError}
-                    </p>
-                  ) : null}
-                  <Button type="submit" className="w-full" disabled={busy || !guard.human}>
-                    {busy ? "Saving…" : "Save new owner password"}
-                  </Button>
-                </form>
-              ) : null}
-            </div>
           <p className="mt-8 max-w-md text-sm text-muted-foreground">
             New here?{" "}
             <Link to="/pricing" className="text-primary">
               Start your journey today
             </Link>
           </p>
-          {showCreate ? (
-            <p className="mt-3 max-w-md text-sm text-muted-foreground">
-              First time opening the house?{" "}
-              <Link to="/admin/setup" className="text-primary">
-                Create the owner account
-              </Link>
-            </p>
-          ) : (
-            <p className="mt-3 max-w-md text-sm text-muted-foreground">
-              Owner? Sign in with that email — you will land in the atelier.
-            </p>
-          )}
             </>
           )}
         </div>
