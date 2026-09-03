@@ -2,7 +2,7 @@
 
 export const DEFAULT_SITE_COPY = {
   brandName: "Her First Meal",
-  brandTagline: "We remember the mother",
+  brandTagline: "We remember the mother.",
   navAbout: "About",
   navBinding: "Belly binding",
   navNouri: "Nouri",

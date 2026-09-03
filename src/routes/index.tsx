@@ -9,6 +9,7 @@ import { yearlySavings } from "@/lib/pricing";
 import { getLanding } from "@/lib/server/public";
 import { lines } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
+import { BrandEmblem, BrandTitle } from "@/components/brand/logo";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -73,11 +74,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
     return (
       <section className="grid min-h-[100dvh] bg-wash-linen lg:grid-cols-2">
         <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
-          <p className="text-xs uppercase tracking-[0.38em] text-gold">{content.eyebrow}</p>
-          <h1 className="mt-6 font-display text-[clamp(2.4rem,6vw,5.2rem)] leading-[0.92]">
-            {content.headline}
-            <span className="mt-3 block italic text-gold">{content.headlineAccent}</span>
-          </h1>
+          <BrandTitle size="hero" className="block text-ink" />
           <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-soft">{content.subhead}</p>
           <div className="mt-12 flex flex-wrap items-center gap-6">
             <MagneticLink to="/pricing" className="bg-primary text-primary-foreground">
@@ -113,10 +110,10 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
         }
       >
         <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
+          <BrandEmblem className={`mb-8 h-28 w-28 rounded-[1.75rem] bg-paper/10 object-cover md:h-36 md:w-36 ${centered ? "mx-auto" : ""}`} />
           <p className="text-xs uppercase tracking-[0.38em] text-gold">{content.eyebrow}</p>
-          <h1 className="mt-6 font-display text-[clamp(2.8rem,8vw,6.75rem)] leading-[0.92]">
-            {content.headline}
-            <span className="mt-3 block italic text-gold">{content.headlineAccent}</span>
+          <h1 className="mt-5">
+            <BrandTitle size="hero" className="block text-paper" />
           </h1>
           <p className={`mt-8 max-w-lg text-lg leading-relaxed text-paper/88 md:text-xl ${centered ? "mx-auto" : ""}`}>
             {content.subhead}
