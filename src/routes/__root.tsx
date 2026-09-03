@@ -19,10 +19,13 @@ export const Route = createRootRoute({
         content:
           "The world celebrates the baby. We remember the mother. Pregnancy and postpartum wellness, meals, belly binding, and Nouri.",
       },
-      { name: "theme-color", content: "#2F7A70" },
+      { name: "theme-color", content: "#1F5F8A" },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg?v=mark3" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
+      { rel: "icon", type: "image/png", sizes: "180x180", href: "/icon-180.png" },
+      { rel: "apple-touch-icon", href: "/icon-180.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -31,7 +34,6 @@ export const Route = createRootRoute({
       },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
     ],
   }),
   component: RootDocument,
