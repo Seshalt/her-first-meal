@@ -1,9 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
-import { RECIPES, recipesFor, type Stage } from "@/lib/content/catalog";
+import { RECIPES, recipesFor, type Recipe, type Stage } from "@/lib/content/catalog";
 import { asJson } from "./json";
 import { ensureProfile } from "./profile";
+import { houseChat } from "./openai";
+import { uid } from "@/lib/utils";
 
 function startOfWeekISO() {
   const d = new Date();
@@ -40,8 +42,11 @@ export const getMealWeek = createServerFn({ method: "GET" })
         on conflict (user_id, week_start) do update set meals = excluded.meals
       `;
     }
-    const recipeMap = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
-    const detailed = meals.map((m) => ({ ...m, recipe: recipeMap[m.recipeId] ?? RECIPES[0] }));
+    const recipeMap: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
+    const detailed = meals.map((m) => {
+      const custom = (m as { recipe?: Recipe }).recipe;
+      return { ...m, recipe: custom ?? recipeMap[m.recipeId] ?? RECIPES[0] };
+    });
     const stores = asJson<string[]>(grocery[0]?.stores, []);
     return {
       weekStart,
@@ -70,6 +75,72 @@ export const swapMeal = createServerFn({ method: "POST" })
       on conflict (user_id, week_start) do update set meals = excluded.meals
     `;
     return { ok: true };
+  });
+
+export const cookAnotherPlate = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { day: string; want?: string }) => input)
+  .handler(async ({ context, data }) => {
+    const sql = await getSql();
+    const profile = await ensureProfile(context.userId);
+    const diet = await sql<{
+      diets: unknown;
+      allergies: unknown;
+      avoids: string | null;
+      loves: string | null;
+    }>`select diets, allergies, avoids, loves from dietary_profiles where user_id = ${context.userId}`;
+    const raw = await houseChat({
+      json: true,
+      maxTokens: 900,
+      system:
+        "Write one original pregnancy or postpartum recipe as JSON with keys: title, summary, minutes, servings, why, ingredients (array of {name, qty, dept}), steps (string array). Soft, maternal, practical. Never diagnose. Respect allergies. No alcohol. No raw fish or unpasteurized dairy.",
+      messages: [
+        {
+          role: "user",
+          content: [
+            `Stage: ${profile.stage ?? "unspecified"}`,
+            `Diets: ${asJson<string[]>(diet[0]?.diets, []).join(", ") || "none"}`,
+            `Allergies: ${asJson<string[]>(diet[0]?.allergies, []).join(", ") || "none"}`,
+            `Avoids: ${diet[0]?.avoids ?? "none"}`,
+            `Loves: ${diet[0]?.loves ?? "none"}`,
+            data.want ? `She asked for: ${data.want.slice(0, 240)}` : "Surprise her with a new plate for this day.",
+          ].join("\n"),
+        },
+      ],
+    });
+    if (!raw) throw new Error("The kitchen needs OPENAI_API_KEY in Vercel to cook new plates.");
+    let parsed: Partial<Recipe> = {};
+    try {
+      parsed = JSON.parse(raw) as Partial<Recipe>;
+    } catch {
+      throw new Error("The new plate did not come through clearly. Try again.");
+    }
+    const recipe: Recipe = {
+      id: uid("plate"),
+      title: parsed.title || "A quiet bowl",
+      summary: parsed.summary || "A simple plate for this hour.",
+      stage: profile.stage ? [profile.stage as Stage] : ["postpartum"],
+      diets: asJson(parsed.diets, []),
+      minutes: Number(parsed.minutes ?? 30),
+      servings: Number(parsed.servings ?? 2),
+      image: "/images/meal-bowl.jpg",
+      department: "kitchen",
+      ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients : [],
+      steps: Array.isArray(parsed.steps) ? parsed.steps : [],
+      why: parsed.why || "Made for her table today.",
+    };
+    const weekStart = startOfWeekISO();
+    const existing = await sql<{ meals: unknown }>`
+      select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
+    `;
+    const meals = asJson<{ day: string; recipeId: string; recipe?: Recipe }[]>(existing[0]?.meals, []);
+    const next = meals.map((m) => (m.day === data.day ? { day: data.day, recipeId: recipe.id, recipe } : m));
+    await sql`
+      insert into meal_plans (user_id, week_start, meals)
+      values (${context.userId}, ${weekStart}, ${JSON.stringify(next)}::jsonb)
+      on conflict (user_id, week_start) do update set meals = excluded.meals
+    `;
+    return { ok: true, recipe };
   });
 
 export const getGroceryList = createServerFn({ method: "GET" })

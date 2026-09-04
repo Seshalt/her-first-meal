@@ -3,6 +3,7 @@ import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { asJson } from "./json";
 import { ensureProfile } from "./profile";
+import { houseAiReady, houseChat } from "./openai";
 import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/utils";
 
 const SYSTEM = `You are Nouri, the companion inside Her First Meal, a pregnancy and postpartum wellness home.
@@ -79,37 +80,18 @@ export const askNouri = createServerFn({ method: "POST" })
       .filter(Boolean)
       .join("\n");
 
-    if (!apiKey) {
+    if (!houseAiReady()) {
       const fallback = fallbackNouri(data.message, profile.displayName);
       await persist(sql, context.userId, existing[0]?.id, history, data.message, fallback);
       return { ok: true as const, text: fallback, degraded: true };
     }
 
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "grok-4.5",
-        max_tokens: 700,
-        temperature: 0.7,
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "system", content: contextBlock },
-          ...history,
-          { role: "user", content: data.message },
-        ],
-      }),
-    });
-    if (!res.ok) {
-      const fallback = fallbackNouri(data.message, profile.displayName);
-      await persist(sql, context.userId, existing[0]?.id, history, data.message, fallback);
-      return { ok: true as const, text: fallback, degraded: true };
-    }
-    const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = body.choices?.[0]?.message?.content?.trim() || fallbackNouri(data.message, profile.displayName);
+    const text =
+      (await houseChat({
+        system: `${SYSTEM}\n\n${contextBlock}`,
+        messages: [...history, { role: "user", content: data.message }],
+        maxTokens: 700,
+      })) || fallbackNouri(data.message, profile.displayName);
     await persist(sql, context.userId, existing[0]?.id, history, data.message, text);
     return { ok: true as const, text, degraded: false };
   });
@@ -189,3 +171,21 @@ export const compareBindingPhotos = createServerFn({ method: "POST" })
     `;
     return { ok: true as const, feedback };
   });
+
+export const askAtelier = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { message: string }) => ({ message: input.message.trim().slice(0, 2000) }))
+  .handler(async ({ context, data }) => {
+    const sql = await getSql();
+    const rows = await sql<{ role: string }>`select role from profiles where user_id = ${context.userId}`;
+    if (rows[0]?.role !== "admin") throw new Error("Unauthorized");
+    if (!data.message) return { text: "Ask a question about the house, a recipe, or a member need." };
+    const notes = await sql<{ nouri_system_notes: string | null }>`select nouri_system_notes from business_settings where id = 1`;
+    const text =
+      (await houseChat({
+        system: `You are the atelier companion for the owner of Her First Meal. Help write recipes, member notes, replies, and house language. Never invent medical claims. Never diagnose. Flag anything that should go to a clinician. Owner notes: ${notes[0]?.nouri_system_notes ?? "none"}.`,
+        messages: [{ role: "user", content: data.message }],
+      })) || "Add OPENAI_API_KEY in Vercel to speak with ChatGPT from the atelier.";
+    return { text };
+  });
+

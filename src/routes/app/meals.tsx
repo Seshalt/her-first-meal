@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
-import { getMealWeek, swapMeal, toggleFavoriteRecipe } from "@/lib/server/meals";
+import { getMealWeek, swapMeal, toggleFavoriteRecipe, cookAnotherPlate } from "@/lib/server/meals";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/meals")({ component: Meals });
@@ -55,6 +55,18 @@ function Meals() {
                   }
                 >
                   Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() =>
+                    void cookAnotherPlate({ data: { day: m.day } })
+                      .then(() => getMealWeek().then(setData))
+                      .then(() => toast.success("A new plate is on the table."))
+                      .catch((err) => toast.error(err instanceof Error ? err.message : "Could not cook another plate."))
+                  }
+                >
+                  Cook another plate
                 </Button>
               </div>
               {swapDay === m.day ? (
