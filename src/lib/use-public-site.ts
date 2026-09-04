@@ -3,6 +3,7 @@ import { mergeLanding } from "@/lib/landing";
 import { mergeSite } from "@/lib/site";
 import { getLanding } from "@/lib/server/public";
 import { mergeStudio } from "@/lib/theme-studio";
+import { defaultBindingSteps } from "@/lib/binding-steps";
 
 const fallback = {
   content: mergeLanding(null),
@@ -12,6 +13,7 @@ const fallback = {
   tagline: "We remember the mother.",
   monthlyPriceCents: 4900,
   yearlyPriceCents: 49000,
+  bindingSteps: defaultBindingSteps(),
 };
 
 type PublicSite = Awaited<ReturnType<typeof getLanding>>;

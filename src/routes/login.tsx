@@ -74,6 +74,7 @@ function Login() {
       const { error } = await authClient.signIn.email({
         email,
         password,
+        rememberMe: true,
       });
       if (error) throw error;
       const status = await requestEmailFactor();

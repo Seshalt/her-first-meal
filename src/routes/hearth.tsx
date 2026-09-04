@@ -7,7 +7,7 @@ import { authClient, authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { markAtelierReady } from "@/lib/atelier-ready";
 import { getMyRole } from "@/lib/server/admin";
-import { recoverOwner } from "@/lib/server/public";
+import { hasAdministrator, recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { readableAuthError } from "@/lib/auth/errors";
 
@@ -21,6 +21,8 @@ function Hearth() {
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
   const [mode, setMode] = useState<"save" | "enter">("enter");
+  const [hasAdmin, setHasAdmin] = useState(true);
+  const [lastingStore, setLastingStore] = useState(true);
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -32,6 +34,16 @@ function Hearth() {
     return () => {
       robots.remove();
     };
+  }, []);
+
+  useEffect(() => {
+    void hasAdministrator()
+      .then((s) => {
+        setHasAdmin(s.hasAdmin);
+        setLastingStore(s.lastingStore !== false);
+        if (!s.hasAdmin) setMode("save");
+      })
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -60,7 +72,7 @@ function Hearth() {
       toast.error(message);
       return;
     }
-    if (password.length < 10) {
+    if (password.length < 12) {
       const message = "Use a password of at least 12 characters.";
       setFormError(message);
       toast.error(message);
@@ -76,7 +88,7 @@ function Hearth() {
     setFormError("");
     try {
       const nextPassword = password;
-      await recoverOwner({
+      const saved = await recoverOwner({
         data: {
           email,
           password: nextPassword,
@@ -85,13 +97,17 @@ function Hearth() {
           human: guard.human,
         },
       });
+      if (saved.lastingStore === false) {
+        toast.message("Password saved for this server only. Add a database on Vercel so it survives reloads.");
+      }
       const { error } = await authClient.signIn.email({
         email,
         password: nextPassword,
+        rememberMe: true,
       });
       if (error) {
-        toast.success("Password saved. Use Sign in on this page with it.");
-        setFormError("");
+        setMode("enter");
+        toast.success("Password is saved. Use Sign in with the same email and password.");
         return;
       }
       markAtelierReady();
@@ -118,7 +134,7 @@ function Hearth() {
     setBusy(true);
     setFormError("");
     try {
-      const { error } = await authClient.signIn.email({ email, password });
+      const { error } = await authClient.signIn.email({ email, password, rememberMe: true });
       if (error) throw error;
       markAtelierReady();
       toast.success("You are in.");
@@ -138,8 +154,16 @@ function Hearth() {
         <p className="text-xs uppercase tracking-[0.32em] text-[#c4a574]">Private door</p>
         <h1 className="mt-4 font-display text-4xl leading-[1.05]">The hearth.</h1>
         <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
-          Sign in with the owner email. Use Set password only when you need a new one.
+          {hasAdmin
+            ? "Sign in with the owner email and the password already saved. Use Reset password only when you want a new one."
+            : "Create the owner password once. After that, use Sign in — do not create it again unless you are resetting it."}
         </p>
+        {!lastingStore ? (
+          <p className="mt-4 rounded-2xl bg-[#8a4a3b]/80 px-4 py-3 text-sm">
+            This live site does not have a lasting database yet. Accounts vanish when the server sleeps. In Vercel, add
+            DATABASE_URL (Neon) to the production project so the owner login stays.
+          </p>
+        ) : null}
         {authEnabled ? (
           <form onSubmit={(e) => void (mode === "save" ? onSave(e) : onEnter(e))} className="mt-8 space-y-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
             <div className="flex gap-4 text-sm">
@@ -147,7 +171,7 @@ function Hearth() {
                 Sign in
               </button>
               <button type="button" className={mode === "save" ? "underline" : "text-[#efe6d6]/50"} onClick={() => setMode("save")}>
-                Set password
+                {hasAdmin ? "Reset password" : "Create password"}
               </button>
             </div>
             <div>
@@ -155,7 +179,7 @@ function Hearth() {
               <Input
                 id="hearth-email"
                 type="email"
-                autoComplete="off"
+                autoComplete="username"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -167,7 +191,7 @@ function Hearth() {
               <Input
                 id="hearth-new"
                 type="password"
-                autoComplete="off"
+                autoComplete={mode === "save" ? "new-password" : "current-password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -180,7 +204,7 @@ function Hearth() {
                 <Input
                   id="hearth-confirm"
                   type="password"
-                  autoComplete="off"
+                  autoComplete="new-password"
                   required
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}

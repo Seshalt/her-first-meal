@@ -21,9 +21,11 @@ import {
   type StudioColors,
   type StudioLayout,
 } from "@/lib/theme-studio";
-import { adminSaveLandingCopy, adminSaveLandingImage, adminSaveSiteCopy, adminSaveStudio } from "@/lib/server/admin";
+import { adminSaveBindingSteps, adminSaveLandingCopy, adminSaveLandingImage, adminSaveSiteCopy, adminSaveStudio } from "@/lib/server/admin";
 import { getLanding } from "@/lib/server/public";
 import { bustPublicSiteCache } from "@/lib/use-public-site";
+import { defaultBindingSteps, type BindingStep } from "@/lib/binding-steps";
+import { applyAtelierEdit } from "@/lib/server/atelier-ai";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/landing")({ component: WebsiteEditor });
@@ -54,6 +56,8 @@ const TABS = [
   { id: "home", label: "Home" },
   ...SITE_FIELD_GROUPS.map((g) => ({ id: g.id, label: g.label })),
   { id: "photos", label: "Photographs" },
+  { id: "steps", label: "Binding steps" },
+  { id: "ai", label: "House AI" },
   { id: "colors", label: "Colors" },
   { id: "layout", label: "Layout" },
 ] as const;
@@ -67,7 +71,9 @@ function WebsiteEditor() {
   const [images, setImages] = useState<Record<LandingImageSlot, string>>(mergeLanding(null).images);
   const [colors, setColors] = useState<StudioColors>(DEFAULT_COLORS);
   const [layout, setLayout] = useState<StudioLayout>(LAYOUT_DEFAULTS);
+  const [steps, setSteps] = useState<BindingStep[]>(defaultBindingSteps());
   const [saving, setSaving] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
 
   useEffect(() => {
     void getLanding().then((page) => {
@@ -76,6 +82,7 @@ function WebsiteEditor() {
       setImages(page.content.images);
       setColors(page.studio.colors);
       setLayout(page.studio.layout);
+      setSteps(page.bindingSteps?.length ? page.bindingSteps : defaultBindingSteps(page.site));
     });
   }, []);
 
@@ -196,6 +203,114 @@ function WebsiteEditor() {
               />
             ))}
           </ul>
+        </div>
+      ) : null}
+
+      {tab === "steps" ? (
+        <div className="mt-8 max-w-2xl space-y-6">
+          <p className="text-sm text-white/60">
+            Add as many belly binding steps as you want. They appear on the public studio page in this order.
+          </p>
+          {steps.map((step, index) => (
+            <div key={step.id} className="space-y-3 rounded-2xl bg-white/6 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-white/40">Step {index + 1}</p>
+                <button
+                  type="button"
+                  className="text-xs text-white/50 hover:text-white"
+                  onClick={() => setSteps((prev) => prev.filter((_, i) => i !== index))}
+                >
+                  Remove
+                </button>
+              </div>
+              <Field label="Title" value={step.title} onChange={(title) => setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, title } : s)))} />
+              <Field
+                label="Body"
+                multiline
+                value={step.body}
+                onChange={(body) => setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, body } : s)))}
+              />
+              <Field
+                label="Photo URL"
+                value={step.image}
+                onChange={(image) => setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, image } : s)))}
+              />
+            </div>
+          ))}
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                setSteps((prev) => [
+                  ...prev,
+                  {
+                    id: `step-${Date.now()}`,
+                    title: `Step ${prev.length + 1}`,
+                    body: "",
+                    image: "/images/binding-hands.jpg",
+                  },
+                ])
+              }
+            >
+              Add a step
+            </Button>
+            <Button
+              type="button"
+              disabled={saving}
+              onClick={() => {
+                setSaving(true);
+                void adminSaveBindingSteps({ data: { steps } })
+                  .then((r) => {
+                    setSteps(r.steps);
+                    bustPublicSiteCache();
+                    toast.success("Binding steps are live.");
+                  })
+                  .catch((err) => toast.error(err instanceof Error ? err.message : "Could not save steps."))
+                  .finally(() => setSaving(false));
+              }}
+            >
+              {saving ? "Saving…" : "Save steps"}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {tab === "ai" ? (
+        <div className="mt-8 max-w-2xl space-y-4">
+          <p className="text-sm text-white/60">
+            Tell ChatGPT what to change. It writes onto the public pages immediately — including extra binding steps.
+          </p>
+          <Textarea
+            className="min-h-36 bg-white/8 text-[#efe6d6]"
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+            placeholder="Add a fifth wrapping step about loosening the cloth to feed. Soften the contact email line."
+          />
+          <Button
+            type="button"
+            disabled={saving || !aiPrompt.trim()}
+            onClick={() => {
+              setSaving(true);
+              void applyAtelierEdit({ data: { message: aiPrompt } })
+                .then((r) => {
+                  toast[r.ok ? "success" : "error"](r.text);
+                  if (r.ok) {
+                    setAiPrompt("");
+                    bustPublicSiteCache();
+                    void getLanding().then((page) => {
+                      setCopy(page.content);
+                      setSite(page.site);
+                      setSteps(page.bindingSteps);
+                    });
+                  }
+                })
+                .catch((err) => toast.error(err instanceof Error ? err.message : "ChatGPT could not edit."))
+                .finally(() => setSaving(false));
+            }}
+          >
+            {saving ? "Editing…" : "Apply to the public site"}
+          </Button>
         </div>
       ) : null}
 

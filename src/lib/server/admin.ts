@@ -7,6 +7,8 @@ import { ensureProfile } from "./profile";
 import { DEFAULT_LANDING_COPY, isLandingSlot, type LandingCopy } from "@/lib/landing";
 import { DEFAULT_SITE_COPY, type SiteCopy } from "@/lib/site";
 import { DEFAULT_COLORS, LAYOUT_DEFAULTS, type StudioColors, type StudioLayout } from "@/lib/theme-studio";
+import { mergeBindingSteps, type BindingStep } from "@/lib/binding-steps";
+import { bustLandingCache } from "./public";
 
 function deny() {
   const err = new Error("Unauthorized");
@@ -261,6 +263,7 @@ export const adminSaveLandingCopy = createServerFn({ method: "POST" })
       set branding = ${JSON.stringify(branding)}::jsonb, updated_at = now()
       where id = 1
     `;
+    bustLandingCache();
     return { ok: true };
   });
 
@@ -284,6 +287,7 @@ export const adminSaveSiteCopy = createServerFn({ method: "POST" })
       set branding = ${JSON.stringify(branding)}::jsonb, updated_at = now()
       where id = 1
     `;
+    bustLandingCache();
     return { ok: true };
   });
 
@@ -316,6 +320,7 @@ export const adminSaveStudio = createServerFn({ method: "POST" })
       set branding = ${JSON.stringify(branding)}::jsonb, updated_at = now()
       where id = 1
     `;
+    bustLandingCache();
     return { ok: true };
   });
 
@@ -331,6 +336,7 @@ export const adminSaveLandingImage = createServerFn({ method: "POST" })
     const kind = `landing-${data.slot}`;
     if (data.reset) {
       await sql`delete from cms_items where kind = ${kind}`;
+      bustLandingCache();
       return { ok: true };
     }
     const imageData = data.imageData?.trim() || null;
@@ -354,7 +360,28 @@ export const adminSaveLandingImage = createServerFn({ method: "POST" })
         values (${kind}, ${data.slot}, ${url}, ${imageData})
       `;
     }
+    bustLandingCache();
     return { ok: true };
+  });
+
+export const adminSaveBindingSteps = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { steps: BindingStep[] }) => input)
+  .handler(async ({ context, data }) => {
+    await requireAdmin(context.userId);
+    const sql = await getSql();
+    const rows = await sql<{ branding: unknown }>`select branding from business_settings where id = 1`;
+    const branding = asJson<Record<string, unknown>>(rows[0]?.branding, {});
+    const site = { ...DEFAULT_SITE_COPY, ...asJson<Partial<SiteCopy>>(branding.site, {}) };
+    const nextSteps = mergeBindingSteps(data.steps, site);
+    branding.bindingSteps = nextSteps;
+    await sql`
+      update business_settings
+      set branding = ${JSON.stringify(branding)}::jsonb, updated_at = now()
+      where id = 1
+    `;
+    bustLandingCache();
+    return { ok: true as const, steps: nextSteps };
   });
 
 export const adminAddDiscount = createServerFn({ method: "POST" })

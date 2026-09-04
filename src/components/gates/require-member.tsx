@@ -1,17 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Navigate } from "@tanstack/react-router";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getEmailFactorStatus } from "@/lib/server/email-factor";
 
 export function RequireMember({ children }: { children: ReactNode }) {
   const { user, isPending } = useCurrentUserState();
-  const [timedOut, setTimedOut] = useState(false);
   const [factorNeeded, setFactorNeeded] = useState<boolean | null>(null);
-  useEffect(() => {
-    const t = window.setTimeout(() => setTimedOut(true), 2500);
-    return () => window.clearTimeout(t);
-  }, []);
   useEffect(() => {
     if (!user) return;
     let live = true;
@@ -26,7 +20,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
       live = false;
     };
   }, [user]);
-  if ((isPending || (user && factorNeeded === null)) && !timedOut) {
+  if (isPending || (user && factorNeeded === null)) {
     return (
       <div className="grid min-h-dvh place-items-center">
         <p className="font-display text-2xl text-muted-foreground">Gathering your table…</p>

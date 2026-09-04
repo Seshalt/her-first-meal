@@ -13,12 +13,6 @@ function AdminGate() {
   const { user, isPending } = useCurrentUserState();
   const [role, setRole] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
-  const [timedOut, setTimedOut] = useState(false);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => setTimedOut(true), 2500);
-    return () => window.clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     if (isPending || !user) return;
@@ -42,7 +36,7 @@ function AdminGate() {
   if (pathname.startsWith("/admin/setup")) return <Outlet />;
 
   const stillWaiting = isPending || (Boolean(user) && !role && !denied);
-  if (stillWaiting && !timedOut) {
+  if (stillWaiting) {
     return <div className="grid min-h-dvh place-items-center bg-[#101918] text-[#efe6d6]">Opening the atelier…</div>;
   }
 

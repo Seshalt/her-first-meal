@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSql } from "@/lib/db";
+import { dbSource, getSql } from "@/lib/db";
 import { asJson } from "./json";
 import type { BusinessSettings } from "./types";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/lib/landing";
 import { DEFAULT_SITE_COPY, mergeSite, type SiteCopy } from "@/lib/site";
 import { mergeStudio, type StudioTheme } from "@/lib/theme-studio";
+import { mergeBindingSteps, type BindingStep } from "@/lib/binding-steps";
 import { assertHuman, rateLimit } from "./abuse";
 
 type SettingsRow = {
@@ -107,13 +108,46 @@ export const hasAdministrator = createServerFn({ method: "GET" }).handler(async 
     const sql = await getSql();
     const rows = await sql<{ count: number }>`select count(*)::int as count from profiles where role = 'admin'`;
     const setup = await sql<{ completed: boolean }>`select completed from setup_state where id = 1`;
-    return { hasAdmin: Number(rows[0]?.count ?? 0) > 0, setupCompleted: Boolean(setup[0]?.completed) };
+    return {
+      hasAdmin: Number(rows[0]?.count ?? 0) > 0,
+      setupCompleted: Boolean(setup[0]?.completed),
+      lastingStore: dbSource === "neon",
+    };
   } catch {
-    return { hasAdmin: false, setupCompleted: false };
+    return { hasAdmin: false, setupCompleted: false, lastingStore: dbSource === "neon" };
   }
 });
 
+type PublicLanding = {
+  content: ReturnType<typeof mergeLanding>;
+  site: SiteCopy;
+  studio: ReturnType<typeof mergeStudio>;
+  businessName: string;
+  tagline: string;
+  monthlyPriceCents: number;
+  yearlyPriceCents: number;
+  bindingSteps: BindingStep[];
+};
+
+let landingCache: { at: number; data: PublicLanding } | null = null;
+
+export function bustLandingCache() {
+  landingCache = null;
+}
+
+const FALLBACK_LANDING: PublicLanding = {
+  content: mergeLanding(null),
+  site: mergeSite(null),
+  studio: mergeStudio(null),
+  businessName: "Her First Meal",
+  tagline: DEFAULT_LANDING_COPY.headlineAccent,
+  monthlyPriceCents: 4900,
+  yearlyPriceCents: 49000,
+  bindingSteps: mergeBindingSteps(null, DEFAULT_SITE_COPY),
+};
+
 export const getLanding = createServerFn({ method: "GET" }).handler(async () => {
+  if (landingCache && Date.now() - landingCache.at < 12_000) return landingCache.data;
   try {
     const sql = await getSql();
     const rows = await sql<{
@@ -128,6 +162,7 @@ export const getLanding = createServerFn({ method: "GET" }).handler(async () => 
       landing?: Partial<LandingCopy>;
       site?: Partial<SiteCopy>;
       studio?: { colors?: StudioTheme["colors"]; layout?: StudioTheme["layout"] };
+      bindingSteps?: unknown;
     }>(row?.branding, {});
     const assets = await sql<{ kind: string; url: string | null; image_data: string | null }>`
       select kind, url, image_data from cms_items where kind like ${"landing-%"}
@@ -136,28 +171,24 @@ export const getLanding = createServerFn({ method: "GET" }).handler(async () => 
     for (const asset of assets) {
       const slot = asset.kind.replace(/^landing-/, "");
       if (!isLandingSlot(slot)) continue;
-      const src = asset.image_data || asset.url;
+      const src = asset.url || asset.image_data;
       if (src) images[slot] = src;
     }
-    return {
+    const site = mergeSite(branding.site);
+    const data: PublicLanding = {
       content: mergeLanding(branding.landing, images),
-      site: mergeSite(branding.site),
+      site,
       studio: mergeStudio(branding.studio),
       businessName: row?.business_name ?? "Her First Meal",
       tagline: row?.tagline ?? DEFAULT_LANDING_COPY.headlineAccent,
       monthlyPriceCents: Number(row?.monthly_price_cents ?? 4900),
       yearlyPriceCents: Number(row?.yearly_price_cents ?? 49000),
+      bindingSteps: mergeBindingSteps(branding.bindingSteps, site, images),
     };
+    landingCache = { at: Date.now(), data };
+    return data;
   } catch {
-    return {
-      content: mergeLanding(null),
-      site: mergeSite(null),
-      studio: mergeStudio(null),
-      businessName: "Her First Meal",
-      tagline: DEFAULT_LANDING_COPY.headlineAccent,
-      monthlyPriceCents: 4900,
-      yearlyPriceCents: 49000,
-    };
+    return FALLBACK_LANDING;
   }
 });
 
@@ -184,7 +215,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
       throw new Error("Use a real email and a password of at least 12 characters.");
     }
     const sql = await getSql();
-    const { hashPassword } = await import("better-auth/crypto");
+    const { hashPassword, verifyPassword } = await import("better-auth/crypto");
     const hash = await hashPassword(password);
 
     const byEmail = await sql<{ id: string; email: string }>`
@@ -227,6 +258,17 @@ export const recoverOwner = createServerFn({ method: "POST" })
     }
 
     await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
+    const stored = await sql<{ password: string | null }>`
+      select password from account where "userId" = ${target.id} and "providerId" = 'credential' limit 1
+    `;
+    const matches = stored[0]?.password
+      ? await verifyPassword({ hash: stored[0].password, password })
+      : false;
+    if (!matches) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("The password did not save. Try Set password again.");
+    }
     await sql`delete from session where "userId" = ${target.id}`;
     await sql`update profiles set role = 'member' where role = 'admin' and user_id <> ${target.id}`;
 
@@ -262,6 +304,6 @@ export const recoverOwner = createServerFn({ method: "POST" })
     }
 
     await padAuthDuration(started);
-    return { ok: true };
+    return { ok: true, lastingStore: dbSource === "neon" };
   });
 

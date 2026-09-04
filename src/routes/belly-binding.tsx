@@ -18,13 +18,16 @@ export const Route = createFileRoute("/belly-binding")({
 });
 
 function BindingPage() {
-  const { site, content } = usePublicSite();
-  const steps = [
-    { title: site.bindStep1Title, body: site.bindStep1Body, image: content.images.bindStep1 },
-    { title: site.bindStep2Title, body: site.bindStep2Body, image: content.images.bindStep2 },
-    { title: site.bindStep3Title, body: site.bindStep3Body, image: content.images.bindStep3 },
-    { title: site.bindStep4Title, body: site.bindStep4Body, image: content.images.bindStep4 },
-  ];
+  const { site, content, bindingSteps } = usePublicSite();
+  const steps =
+    bindingSteps?.length > 0
+      ? bindingSteps
+      : [
+          { title: site.bindStep1Title, body: site.bindStep1Body, image: content.images.bindStep1 },
+          { title: site.bindStep2Title, body: site.bindStep2Body, image: content.images.bindStep2 },
+          { title: site.bindStep3Title, body: site.bindStep3Body, image: content.images.bindStep3 },
+          { title: site.bindStep4Title, body: site.bindStep4Body, image: content.images.bindStep4 },
+        ];
   const faqs = [
     { q: site.faq1q, a: site.faq1a },
     { q: site.faq2q, a: site.faq2a },
@@ -49,9 +52,9 @@ function BindingPage() {
         </div>
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-2">
-        {steps.map((s) => (
-          <article key={s.title} className="glass-panel overflow-hidden">
-            <img src={s.image} alt="" className="media h-44 w-full object-cover" />
+        {steps.map((s, i) => (
+          <article key={s.title + String(i)} className="glass-panel overflow-hidden">
+            <img src={s.image} alt="" className="media h-44 w-full object-cover" loading="lazy" decoding="async" />
             <div className="p-6">
               <h2 className="font-display text-2xl">{s.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
