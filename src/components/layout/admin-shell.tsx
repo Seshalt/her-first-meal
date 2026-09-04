@@ -16,6 +16,7 @@ const NAV = [
   { to: "/admin/business", label: "Business" },
   { to: "/admin/analytics", label: "Analytics" },
   { to: "/admin/preview", label: "Member trail" },
+  { to: "/admin/launch", label: "Launch list" },
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {

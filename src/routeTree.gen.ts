@@ -30,6 +30,7 @@ import { Route as AdminCalendarRouteImport } from './routes/admin/calendar'
 import { Route as AdminClientsRouteImport } from './routes/admin/clients'
 import { Route as AdminContentRouteImport } from './routes/admin/content'
 import { Route as AdminLandingRouteImport } from './routes/admin/landing'
+import { Route as AdminLaunchRouteImport } from './routes/admin/launch'
 import { Route as AdminNouriRouteImport } from './routes/admin/nouri'
 import { Route as AdminPreviewRouteImport } from './routes/admin/preview'
 import { Route as AdminSetupRouteImport } from './routes/admin/setup'
@@ -155,6 +156,11 @@ const AdminLandingRoute = AdminLandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLaunchRoute = AdminLaunchRouteImport.update({
+  id: '/launch',
+  path: '/launch',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNouriRoute = AdminNouriRouteImport.update({
   id: '/nouri',
   path: '/nouri',
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/admin/clients': typeof AdminClientsRouteWithChildren
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
+  '/admin/launch': typeof AdminLaunchRoute
   '/admin/nouri': typeof AdminNouriRoute
   '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByTo {
   '/admin/clients': typeof AdminClientsRouteWithChildren
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
+  '/admin/launch': typeof AdminLaunchRoute
   '/admin/nouri': typeof AdminNouriRoute
   '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
@@ -355,6 +363,7 @@ export interface FileRoutesById {
   '/admin/clients': typeof AdminClientsRouteWithChildren
   '/admin/content': typeof AdminContentRoute
   '/admin/landing': typeof AdminLandingRoute
+  '/admin/launch': typeof AdminLaunchRoute
   '/admin/nouri': typeof AdminNouriRoute
   '/admin/preview': typeof AdminPreviewRoute
   '/admin/setup': typeof AdminSetupRoute
@@ -399,6 +408,7 @@ export interface FileRouteTypes {
     | '/admin/clients'
     | '/admin/content'
     | '/admin/landing'
+    | '/admin/launch'
     | '/admin/nouri'
     | '/admin/preview'
     | '/admin/setup'
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/admin/clients'
     | '/admin/content'
     | '/admin/landing'
+    | '/admin/launch'
     | '/admin/nouri'
     | '/admin/preview'
     | '/admin/setup'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/admin/clients'
     | '/admin/content'
     | '/admin/landing'
+    | '/admin/launch'
     | '/admin/nouri'
     | '/admin/preview'
     | '/admin/setup'
@@ -670,6 +682,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLandingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/launch': {
+      id: '/admin/launch'
+      path: '/launch'
+      fullPath: '/admin/launch'
+      preLoaderRoute: typeof AdminLaunchRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/nouri': {
       id: '/admin/nouri'
       path: '/nouri'
@@ -825,6 +844,7 @@ interface AdminRouteChildren {
   AdminClientsRoute: typeof AdminClientsRouteWithChildren
   AdminContentRoute: typeof AdminContentRoute
   AdminLandingRoute: typeof AdminLandingRoute
+  AdminLaunchRoute: typeof AdminLaunchRoute
   AdminNouriRoute: typeof AdminNouriRoute
   AdminPreviewRoute: typeof AdminPreviewRoute
   AdminSetupRoute: typeof AdminSetupRoute
@@ -838,6 +858,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminClientsRoute: AdminClientsRouteWithChildren,
   AdminContentRoute: AdminContentRoute,
   AdminLandingRoute: AdminLandingRoute,
+  AdminLaunchRoute: AdminLaunchRoute,
   AdminNouriRoute: AdminNouriRoute,
   AdminPreviewRoute: AdminPreviewRoute,
   AdminSetupRoute: AdminSetupRoute,
