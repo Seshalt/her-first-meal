@@ -13,6 +13,7 @@ import { DEFAULT_SITE_COPY, mergeSite, type SiteCopy } from "@/lib/site";
 import { mergeStudio, type StudioTheme } from "@/lib/theme-studio";
 import { mergeBindingSteps, type BindingStep } from "@/lib/binding-steps";
 import { assertHuman, rateLimit } from "./abuse";
+import { cookieNoticeSeen, markCookieNotice } from "./cookie-notice";
 
 type SettingsRow = {
   business_name: string;
@@ -102,6 +103,20 @@ export const recordPublicVisit = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const hasCookieNotice = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    return { remembered: await cookieNoticeSeen() };
+  } catch {
+    return { remembered: false };
+  }
+});
+
+export const rememberCookieNotice = createServerFn({ method: "POST" }).handler(async () => {
+  rateLimit("cookie-notice", 20, 60 * 1000);
+  await markCookieNotice();
+  return { ok: true };
+});
 
 export const hasAdministrator = createServerFn({ method: "GET" }).handler(async () => {
   try {

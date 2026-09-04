@@ -248,11 +248,6 @@ export function PublicFooter() {
             <li>
               <Link to="/terms">Terms</Link>
             </li>
-            <li>
-              <button type="button" className="text-left" onClick={() => window.dispatchEvent(new Event("hfm-cookies-open"))}>
-                Cookie choices
-              </button>
-            </li>
           </ul>
         </div>
       </div>
