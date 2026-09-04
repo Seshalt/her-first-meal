@@ -158,7 +158,15 @@ function Checkout() {
               {busy ? "Reserving…" : `Complete membership · ${formatCurrency(price)}`}
             </Button>
             <p className="text-xs text-muted-foreground">
-              No card number is stored. After this, you will create an account with the same email.
+              Payment is taken by Stripe. Completing checkout means you agree to the{" "}
+              <Link to="/terms" className="underline">
+                terms
+              </Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="underline">
+                privacy
+              </Link>{" "}
+              pages. This house uses AI. It is not medical care.
             </p>
           </form>
         </div>
