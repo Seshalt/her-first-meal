@@ -18,10 +18,9 @@ function Hearth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
-  const [mode, setMode] = useState<"save" | "enter">("enter");
+  const [mode, setMode] = useState<"save" | "enter">("save");
   const [hasAdmin, setHasAdmin] = useState(true);
   const [lastingStore, setLastingStore] = useState(true);
   const guard = useFormGuard();
@@ -93,7 +92,6 @@ function Hearth() {
         data: {
           email,
           password: nextPassword,
-          currentPassword: hasAdmin ? currentPassword : undefined,
           honey: guard.honey,
           startedAt: guard.startedAt,
           human: guard.human,
@@ -156,9 +154,7 @@ function Hearth() {
         <p className="text-xs uppercase tracking-[0.32em] text-[#c4a574]">Private door</p>
         <h1 className="mt-4 font-display text-4xl leading-[1.05]">The hearth.</h1>
         <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
-          {hasAdmin
-            ? "Sign in with the owner email and the password already saved. Use Reset password only when you want a new one."
-            : "Create the owner password once. After that, use Sign in — do not create it again unless you are resetting it."}
+          Use Set new password to start over with a new email and password. After it saves, use Sign in next time.
         </p>
         {!lastingStore ? (
           <p className="mt-4 rounded-2xl bg-[#8a4a3b]/80 px-4 py-3 text-sm">
@@ -173,7 +169,7 @@ function Hearth() {
                 Sign in
               </button>
               <button type="button" className={mode === "save" ? "underline" : "text-[#efe6d6]/50"} onClick={() => setMode("save")}>
-                {hasAdmin ? "Reset password" : "Create password"}
+                Set new password
               </button>
             </div>
             <div>
@@ -200,20 +196,6 @@ function Hearth() {
                 className="bg-[#efe6d6] text-[#101918]"
               />
             </div>
-            {mode === "save" && hasAdmin ? (
-              <div>
-                <Label htmlFor="hearth-current">Current password</Label>
-                <Input
-                  id="hearth-current"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="bg-[#efe6d6] text-[#101918]"
-                />
-              </div>
-            ) : null}
             {mode === "save" ? (
               <div>
                 <Label htmlFor="hearth-confirm">Type it again</Label>

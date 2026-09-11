@@ -212,7 +212,6 @@ export const recoverOwner = createServerFn({ method: "POST" })
     (input: {
       email: string;
       password: string;
-      currentPassword?: string;
       honey?: string;
       startedAt?: number;
       human?: boolean;
@@ -231,7 +230,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
       throw new Error("Use a real email and a password of at least 12 characters.");
     }
     const sql = await getSql();
-    const { hashPassword, verifyPassword } = await import("better-auth/crypto");
+    const { hashPassword } = await import("better-auth/crypto");
 
     const anyAdmin = await sql<{ id: string; email: string }>`
       select u.id, u.email
@@ -243,22 +242,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
     `;
 
     let target = anyAdmin[0];
-
-    if (target) {
-      const current = (data.currentPassword ?? "").trim();
-      const account = await sql<{ password: string | null }>`
-        select password from account where "userId" = ${target.id} and "providerId" = 'credential' limit 1
-      `;
-      const currentOk = account[0]?.password
-        ? await verifyPassword({ hash: account[0].password, password: current })
-        : false;
-      const emailOk = target.email.trim().toLowerCase() === email;
-      if (!currentOk || !emailOk) {
-        await dummyPasswordWork();
-        await padAuthDuration(started);
-        throw new Error("That email or current password does not match. Sign in, or reset with the password you already use.");
-      }
-    } else {
+    if (!target) {
       const byEmail = await sql<{ id: string; email: string }>`
         select id, email from "user" where lower(email) = ${email} limit 1
       `;
