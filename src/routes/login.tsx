@@ -58,7 +58,7 @@ function Login() {
   if (!isPending && user && factor?.needed) {
     // stay on the door and collect the email code
   } else if (!isPending && user && home) {
-    return <Navigate to={home} />;
+    return <Navigate to={home} replace />;
   }
 
   async function onEmail(e: FormEvent) {
@@ -83,7 +83,7 @@ function Login() {
         toast.success(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in.");
         return;
       }
-      window.location.assign("/app");
+      window.location.replace("/app");
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);

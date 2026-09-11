@@ -10,6 +10,7 @@ import { getMyRole } from "@/lib/server/admin";
 import { hasAdministrator, recoverOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { readableAuthError } from "@/lib/auth/errors";
+import { waitForSignedInUser } from "@/lib/session-ready";
 
 export const Route = createFileRoute("/hearth")({ component: Hearth });
 
@@ -47,21 +48,18 @@ function Hearth() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || isPending) return;
     let live = true;
     void getMyRole()
       .then((r) => {
         if (!live) return;
-        if (r.role === "admin") {
-          markAtelierReady();
-          window.location.assign("/admin");
-        }
+        if (r.role === "admin") markAtelierReady();
       })
       .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [user]);
+  }, [user, isPending]);
 
   async function onSave(e: FormEvent) {
     e.preventDefault();
@@ -110,9 +108,15 @@ function Hearth() {
         toast.success("Password is saved. Use Sign in with the same email and password.");
         return;
       }
+      const sessionUser = await waitForSignedInUser();
+      if (!sessionUser) {
+        setMode("enter");
+        toast.success("Password is saved. Use Sign in.");
+        return;
+      }
       markAtelierReady();
       toast.success("You are in.");
-      window.location.assign("/admin");
+      window.location.replace("/admin");
     } catch (err) {
       const message = readableAuthError(err, "Could not save that password.");
       setFormError(message);
@@ -136,9 +140,11 @@ function Hearth() {
     try {
       const { error } = await authClient.signIn.email({ email, password, rememberMe: true });
       if (error) throw error;
+      const sessionUser = await waitForSignedInUser();
+      if (!sessionUser) throw new Error("Signed in, but the session did not stick. Try Sign in once more.");
       markAtelierReady();
       toast.success("You are in.");
-      window.location.assign("/admin");
+      window.location.replace("/admin");
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);
@@ -231,7 +237,19 @@ function Hearth() {
           <p className="mt-6 text-sm">Sign-in is disabled.</p>
         )}
         {!isPending && user ? (
-          <p className="mt-6 text-xs text-[#efe6d6]/40">A session is already open in this browser.</p>
+          <div className="mt-6 space-y-3">
+            <p className="text-xs text-[#efe6d6]/40">A session is already open in this browser.</p>
+            <Button
+              type="button"
+              className="w-full"
+              variant="secondary"
+              onClick={() => {
+                window.location.replace("/admin");
+              }}
+            >
+              Continue to the atelier
+            </Button>
+          </div>
         ) : null}
       </div>
     </div>

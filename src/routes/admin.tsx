@@ -17,13 +17,23 @@ function AdminGate() {
   useEffect(() => {
     if (isPending || !user) return;
     let live = true;
-    void getMyRole()
-      .then((r) => {
-        if (live) setRole(r.role);
-      })
-      .catch(() => {
-        if (live) setDenied(true);
-      });
+    let tries = 0;
+    const run = () => {
+      void getMyRole()
+        .then((r) => {
+          if (live) setRole(r.role);
+        })
+        .catch(() => {
+          tries += 1;
+          if (!live) return;
+          if (tries < 4) {
+            window.setTimeout(run, 180 * tries);
+            return;
+          }
+          setDenied(true);
+        });
+    };
+    run();
     return () => {
       live = false;
     };
@@ -41,7 +51,7 @@ function AdminGate() {
   }
 
   if (!user) {
-    return <Navigate to="/hearth" />;
+    return <Navigate to="/hearth" replace />;
   }
   if (role === "admin") {
     return (

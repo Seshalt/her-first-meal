@@ -24,7 +24,7 @@ function NouriMarketing() {
       <PublicNav />
       <PageCanvas tone="plum">
       <section>
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 md:grid-cols-2 md:pt-16">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-plum">{site.nouriPageKicker}</p>
             <h1 className="mt-3 font-display text-5xl">{site.nouriPageTitle}</h1>

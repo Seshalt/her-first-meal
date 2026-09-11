@@ -22,7 +22,7 @@ function About() {
     <div>
       <PublicNav />
       <PageCanvas tone="linen">
-        <article className="mx-auto max-w-3xl px-4 py-16">
+        <article className="mx-auto max-w-3xl px-4 pb-24 pt-12 md:pt-16">
           <p className="text-xs uppercase tracking-[0.28em] text-clay">{site.aboutKicker}</p>
           <h1 className="mt-3 font-display text-5xl">{site.aboutTitle}</h1>
           <img

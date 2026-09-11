@@ -39,7 +39,7 @@ function BindingPage() {
       <PublicNav />
       <PageCanvas tone="blush">
       <section>
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 md:grid-cols-2 md:pt-16">
           <div>
             <Badge tone="blush">{site.bindPageKicker}</Badge>
             <h1 className="mt-4 font-display text-5xl">{site.bindPageTitle}</h1>

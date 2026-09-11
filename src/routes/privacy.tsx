@@ -12,7 +12,7 @@ function Privacy() {
     <div>
       <PublicNav />
       <PageCanvas>
-        <article className="mx-auto max-w-2xl px-4 py-16">
+        <article className="mx-auto max-w-2xl px-4 pb-24 pt-12 md:pt-16">
           <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 11, 2026</p>
           <h1 className="mt-3 font-display text-5xl">Privacy</h1>
           <div className="glass-panel mt-8 space-y-8 p-6 text-sm leading-relaxed text-muted-foreground md:p-8">
