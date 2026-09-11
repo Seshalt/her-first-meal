@@ -5,7 +5,7 @@ export type CookieChoices = {
   preferences: boolean;
 };
 
-const STORAGE_KEY = "hfm-cookie-choices";
+const STORAGE_KEY = "hfm-cookie-ok";
 const COOKIE_NAME = "hfm-cookie-ok";
 
 export const DEFAULT_CHOICES: CookieChoices = {
@@ -22,22 +22,14 @@ function readBrowserCookie(): boolean {
 
 function writeBrowserCookie() {
   if (typeof document === "undefined") return;
-  document.cookie = `${COOKIE_NAME}=1; Path=/; Max-Age=31536000; SameSite=Lax`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${COOKIE_NAME}=1; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
 }
 
 export function readCookieChoices(): CookieChoices | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<CookieChoices>;
-      return {
-        necessary: true,
-        analytics: Boolean(parsed.analytics),
-        ads: Boolean(parsed.ads),
-        preferences: parsed.preferences !== false,
-      };
-    }
+    if (window.localStorage.getItem(STORAGE_KEY) === "1") return DEFAULT_CHOICES;
   } catch {
     /* ignore */
   }
@@ -45,13 +37,11 @@ export function readCookieChoices(): CookieChoices | null {
   return null;
 }
 
-export function writeCookieChoices(choices: CookieChoices = DEFAULT_CHOICES) {
-  const next = { ...choices, necessary: true as const, preferences: true };
+export function writeCookieChoices(_choices: CookieChoices = DEFAULT_CHOICES) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(STORAGE_KEY, "1");
   } catch {
     /* private mode */
   }
   writeBrowserCookie();
-  window.dispatchEvent(new Event("hfm-cookies"));
 }

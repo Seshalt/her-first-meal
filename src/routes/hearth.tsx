@@ -18,6 +18,7 @@ function Hearth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
   const [mode, setMode] = useState<"save" | "enter">("enter");
@@ -92,6 +93,7 @@ function Hearth() {
         data: {
           email,
           password: nextPassword,
+          currentPassword: hasAdmin ? currentPassword : undefined,
           honey: guard.honey,
           startedAt: guard.startedAt,
           human: guard.human,
@@ -198,6 +200,20 @@ function Hearth() {
                 className="bg-[#efe6d6] text-[#101918]"
               />
             </div>
+            {mode === "save" && hasAdmin ? (
+              <div>
+                <Label htmlFor="hearth-current">Current password</Label>
+                <Input
+                  id="hearth-current"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="bg-[#efe6d6] text-[#101918]"
+                />
+              </div>
+            ) : null}
             {mode === "save" ? (
               <div>
                 <Label htmlFor="hearth-confirm">Type it again</Label>

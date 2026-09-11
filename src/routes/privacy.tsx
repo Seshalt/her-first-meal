@@ -13,7 +13,7 @@ function Privacy() {
       <PublicNav />
       <PageCanvas>
         <article className="mx-auto max-w-2xl px-4 py-16">
-          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 4, 2026</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 11, 2026</p>
           <h1 className="mt-3 font-display text-5xl">Privacy</h1>
           <div className="glass-panel mt-8 space-y-8 p-6 text-sm leading-relaxed text-muted-foreground md:p-8">
             <section>
@@ -64,15 +64,10 @@ function Privacy() {
             <section>
               <h2 className="font-display text-2xl text-ink">Cookies</h2>
               <p className="mt-2">
-                Necessary cookies keep you signed in and keep the house working. When you tap Got it on the cookie
-                notice, we store that choice on your device (a cookie and local storage) so the bar does not return
-                every time you open a page.
-              </p>
-              <p className="mt-2">
-                We also remember that you have already seen the notice by keeping a one-way hash of your network
-                address (IP). We do not keep the raw address for this purpose. Shared networks can mean someone else
-                on the same connection will not see the bar again. The full explanation of cookies lives on the Terms
-                page. There are no switches in the banner.
+                We use cookies to keep you signed in and to remember that you have already seen the cookie notice, so
+                the bar does not return every time you open a page. When you tap OK, that choice is stored on your
+                device. Sign-in cookies are required for the member rooms and the owner atelier. We do not use
+                advertising cookies. For the rest of how we handle information, keep reading this page and Terms.
               </p>
             </section>
             <section>

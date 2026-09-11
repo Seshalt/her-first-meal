@@ -41,17 +41,6 @@ export const getMyRole = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const profile = await ensureProfile(context.userId);
-    const sql = await getSql();
-    if (profile.role === "admin") return { role: "admin" as const, setupNeeded: false };
-    const existing = await sql<{ count: number }>`select count(*)::int as count from profiles where role = 'admin'`;
-    if (Number(existing[0]?.count ?? 0) === 0) {
-      await sql`
-        update profiles
-        set role = 'admin', onboarding_completed = true, updated_at = now()
-        where user_id = ${context.userId}
-      `;
-      return { role: "admin" as const, setupNeeded: false };
-    }
     return { role: profile.role, setupNeeded: false };
   });
 

@@ -212,6 +212,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
     (input: {
       email: string;
       password: string;
+      currentPassword?: string;
       honey?: string;
       startedAt?: number;
       human?: boolean;
@@ -219,23 +220,19 @@ export const recoverOwner = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
-    rateLimit("recover-owner", 5, 15 * 60 * 1000);
+    rateLimit("recover-owner", 8, 15 * 60 * 1000);
     const started = Date.now();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
     const { dummyPasswordWork, padAuthDuration } = await import("@/lib/auth/constant-time");
-    if (!email.includes("@") || password.length < 10) {
+    if (!email.includes("@") || password.length < 12) {
       await dummyPasswordWork();
       await padAuthDuration(started);
       throw new Error("Use a real email and a password of at least 12 characters.");
     }
     const sql = await getSql();
     const { hashPassword, verifyPassword } = await import("better-auth/crypto");
-    const hash = await hashPassword(password);
 
-    const byEmail = await sql<{ id: string; email: string }>`
-      select id, email from "user" where lower(email) = ${email} limit 1
-    `;
     const anyAdmin = await sql<{ id: string; email: string }>`
       select u.id, u.email
       from "user" u
@@ -245,17 +242,39 @@ export const recoverOwner = createServerFn({ method: "POST" })
       limit 1
     `;
 
-    let target = byEmail[0] ?? anyAdmin[0];
+    let target = anyAdmin[0];
 
-    if (!target) {
-      const id = crypto.randomUUID();
-      await sql`
-        insert into "user" (id, name, email, "emailVerified", "createdAt", "updatedAt")
-        values (${id}, 'Maat', ${email}, true, now(), now())
+    if (target) {
+      const current = (data.currentPassword ?? "").trim();
+      const account = await sql<{ password: string | null }>`
+        select password from account where "userId" = ${target.id} and "providerId" = 'credential' limit 1
       `;
-      target = { id, email };
+      const currentOk = account[0]?.password
+        ? await verifyPassword({ hash: account[0].password, password: current })
+        : false;
+      const emailOk = target.email.trim().toLowerCase() === email;
+      if (!currentOk || !emailOk) {
+        await dummyPasswordWork();
+        await padAuthDuration(started);
+        throw new Error("That email or current password does not match. Sign in, or reset with the password you already use.");
+      }
+    } else {
+      const byEmail = await sql<{ id: string; email: string }>`
+        select id, email from "user" where lower(email) = ${email} limit 1
+      `;
+      if (byEmail[0]) {
+        target = byEmail[0];
+      } else {
+        const id = crypto.randomUUID();
+        await sql`
+          insert into "user" (id, name, email, "emailVerified", "createdAt", "updatedAt")
+          values (${id}, 'Maat', ${email}, true, now(), now())
+        `;
+        target = { id, email };
+      }
     }
 
+    const hash = await hashPassword(password);
     const accounts = await sql<{ id: string }>`
       select id from account where "userId" = ${target.id} and "providerId" = 'credential'
     `;
@@ -273,19 +292,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
     }
 
     await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
-    const stored = await sql<{ password: string | null }>`
-      select password from account where "userId" = ${target.id} and "providerId" = 'credential' limit 1
-    `;
-    const matches = stored[0]?.password
-      ? await verifyPassword({ hash: stored[0].password, password })
-      : false;
-    if (!matches) {
-      await dummyPasswordWork();
-      await padAuthDuration(started);
-      throw new Error("The password did not save. Try Set password again.");
-    }
     await sql`delete from session where "userId" = ${target.id}`;
-    await sql`update profiles set role = 'member' where role = 'admin' and user_id <> ${target.id}`;
 
     const existing = await sql<{ user_id: string }>`select user_id from profiles where user_id = ${target.id}`;
     try {

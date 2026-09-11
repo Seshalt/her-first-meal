@@ -10,7 +10,7 @@ function Terms() {
       <PublicNav />
       <PageCanvas>
         <article className="mx-auto max-w-2xl px-4 py-16">
-          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 4, 2026</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 11, 2026</p>
           <h1 className="mt-3 font-display text-5xl">Terms of use</h1>
           <p className="mt-4 text-sm text-muted-foreground">
             By creating an account, joining a membership, or using this website, you agree to these terms. If you do
@@ -121,12 +121,10 @@ function Terms() {
                 disclaim.
               </p>
               <p className="mt-2">
-                Cookies: a small sign-in cookie keeps a member in the rooms. A separate notice cookie (and a matching
-                note in the browser) remembers that you already read the cookie bar, so it does not open on every
-                visit. We may also store a hashed copy of your IP address for that same purpose — so the bar stays
-                away if you come back from the same network. We do not use that hash to advertise to you. Details of
-                what we collect are on the Privacy page. There is no cookie-toggles panel in the footer; this page is
-                the record.
+                Cookies: a small sign-in cookie keeps a member in the rooms. A separate notice cookie remembers that
+                you already tapped OK on the cookie bar, so it does not open on every visit. We do not use advertising
+                cookies. What we collect is on the Privacy page. This page is the record — there is no cookie-toggles
+                panel.
               </p>
             </section>
             <section>
