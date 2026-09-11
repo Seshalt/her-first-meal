@@ -4,6 +4,7 @@ import { Wordmark } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NoIndex } from "@/components/security/noindex";
 import { signOut } from "@/lib/auth/client";
+import { clearOwnerToken } from "@/lib/session-ready";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -52,7 +53,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               className="mt-4 text-xs text-white/50 hover:text-white"
-              onClick={() => void signOut("/")}
+              onClick={() => {
+                clearOwnerToken();
+                void signOut("/");
+              }}
             >
               Sign out
             </button>

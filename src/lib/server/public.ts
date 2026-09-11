@@ -337,10 +337,54 @@ export const recoverOwner = createServerFn({ method: "POST" })
         headers,
       });
     } catch {
-      /* client will sign in with the same email and password we just stored */
+      /* session token below is the path that actually gets them in */
     }
 
+    const session = await ctx.internalAdapter.createSession(targetId, false);
+    if (!session?.token) {
+      await padAuthDuration(started);
+      throw new Error("Password is saved, but the session did not open. Wait a moment and tap Enter.");
+    }
     await padAuthDuration(started);
-    return { ok: true, lastingStore: dbSource === "neon" };
+    return { ok: true, lastingStore: dbSource === "neon", token: session.token };
+  });
+
+export const enterOwner = createServerFn({ method: "POST" })
+  .validator(
+    (input: {
+      email: string;
+      password: string;
+      honey?: string;
+      startedAt?: number;
+      human?: boolean;
+    }) => input,
+  )
+  .handler(async ({ data }) => {
+    assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
+    rateLimit("enter-owner", 12, 15 * 60 * 1000);
+    const started = Date.now();
+    const email = data.email.trim().toLowerCase();
+    const password = data.password;
+    const { dummyPasswordWork, padAuthDuration } = await import("@/lib/auth/constant-time");
+    const { auth } = await import("@/lib/auth/server");
+    const ctx = await auth.$context;
+
+    const found = await ctx.internalAdapter.findUserByEmail(email, { includeAccounts: true });
+    const credential = found?.accounts?.find((a) => a.providerId === "credential");
+    const hash = credential?.password;
+    const ok = hash ? await ctx.password.verify({ hash, password }) : false;
+    if (!found?.user?.id || !ok) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("That email or password does not match.");
+    }
+
+    const session = await ctx.internalAdapter.createSession(found.user.id, false);
+    if (!session?.token) {
+      await padAuthDuration(started);
+      throw new Error("Could not open a session. Try Set new password.");
+    }
+    await padAuthDuration(started);
+    return { ok: true, token: session.token };
   });
 

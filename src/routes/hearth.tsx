@@ -3,14 +3,13 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { authClient, authEnabled } from "@/lib/auth/client";
+import { authEnabled } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { markAtelierReady } from "@/lib/atelier-ready";
 import { getMyRole } from "@/lib/server/admin";
-import { hasAdministrator, recoverOwner } from "@/lib/server/public";
+import { hasAdministrator, recoverOwner, enterOwner } from "@/lib/server/public";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
-import { readableAuthError } from "@/lib/auth/errors";
-import { waitForSignedInUser } from "@/lib/session-ready";
+import { persistOwnerToken, restoreOwnerToken, waitForSignedInUser } from "@/lib/session-ready";
 
 export const Route = createFileRoute("/hearth")({ component: Hearth });
 
@@ -38,6 +37,7 @@ function Hearth() {
   }, []);
 
   useEffect(() => {
+    restoreOwnerToken();
     void hasAdministrator()
       .then((s) => {
         setHasAdmin(s.hasAdmin);
@@ -99,24 +99,15 @@ function Hearth() {
       if (saved.lastingStore === false) {
         toast.message("Password saved for this server only. Add a database on Vercel so it survives reloads.");
       }
-      let sessionUser = await waitForSignedInUser(8);
-      if (!sessionUser) {
-        const { error } = await authClient.signIn.email({
-          email: nextEmail,
-          password: nextPassword,
-          rememberMe: true,
-        });
-        if (error) throw error;
-        sessionUser = await waitForSignedInUser(8);
-      }
-      if (!sessionUser) {
-        throw new Error("Password is saved. Wait a moment, then tap Enter.");
-      }
+      if (!saved.token) throw new Error("Password is saved, but the session did not open. Wait one minute and tap Enter.");
+      persistOwnerToken(saved.token);
+      const sessionUser = await waitForSignedInUser(8);
+      if (!sessionUser) throw new Error("Password is saved. Refresh this page, then tap Continue to the atelier.");
       markAtelierReady();
       toast.success("You are in.");
       window.location.replace("/admin");
     } catch (err) {
-      const message = readableAuthError(err, "Could not save that password.");
+      const message = err instanceof Error && err.message ? err.message : "Could not save that password.";
       setFormError(message);
       toast.error(message);
     } finally {
@@ -136,19 +127,24 @@ function Hearth() {
     setBusy(true);
     setFormError("");
     try {
-      const { error } = await authClient.signIn.email({
-        email: email.trim().toLowerCase(),
-        password,
-        rememberMe: true,
+      const entered = await enterOwner({
+        data: {
+          email: email.trim().toLowerCase(),
+          password,
+          honey: guard.honey,
+          startedAt: guard.startedAt,
+          human: guard.human,
+        },
       });
-      if (error) throw error;
-      const sessionUser = await waitForSignedInUser();
-      if (!sessionUser) throw new Error("Signed in, but the session did not stick. Try Sign in once more.");
+      if (!entered.token) throw new Error("Could not open a session. Try Set new password.");
+      persistOwnerToken(entered.token);
+      const sessionUser = await waitForSignedInUser(8);
+      if (!sessionUser) throw new Error("Session did not stick. Refresh, then tap Continue to the atelier.");
       markAtelierReady();
       toast.success("You are in.");
       window.location.replace("/admin");
     } catch (err) {
-      const message = readableAuthError(err, "That email or password does not match.");
+      const message = err instanceof Error && err.message ? err.message : "That email or password does not match.";
       setFormError(message);
       toast.error(message);
     } finally {

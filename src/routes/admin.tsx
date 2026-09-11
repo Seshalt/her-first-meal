@@ -5,6 +5,7 @@ import { markAtelierReady } from "@/lib/atelier-ready";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getMyRole } from "@/lib/server/admin";
 import { signOut } from "@/lib/auth/client";
+import { restoreOwnerToken, clearOwnerToken } from "@/lib/session-ready";
 
 export const Route = createFileRoute("/admin")({ component: AdminGate });
 
@@ -13,6 +14,10 @@ function AdminGate() {
   const { user, isPending } = useCurrentUserState();
   const [role, setRole] = useState<string | null>(null);
   const [denied, setDenied] = useState(false);
+
+  useEffect(() => {
+    restoreOwnerToken();
+  }, []);
 
   useEffect(() => {
     if (isPending || !user) return;
@@ -72,6 +77,7 @@ function AdminGate() {
             type="button"
             className="rounded-full bg-[#efe6d6] px-5 py-3 text-sm text-[#101918]"
             onClick={() => {
+              clearOwnerToken();
               void signOut("/hearth");
             }}
           >

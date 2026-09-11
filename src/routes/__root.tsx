@@ -8,7 +8,10 @@ import { ThemeProvider } from "@/lib/theme";
 import { CookieConsent } from "@/components/security/cookie-consent";
 import { ConsentTags } from "@/components/security/consent-tags";
 import { ScrollReset } from "@/components/layout/scroll-reset";
+import { restoreOwnerToken } from "@/lib/session-ready";
 import appCss from "../styles.css?url";
+
+restoreOwnerToken();
 
 const APP_NAME = "Her First Meal";
 
