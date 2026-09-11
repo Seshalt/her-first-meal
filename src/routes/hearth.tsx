@@ -85,10 +85,11 @@ function Hearth() {
     setBusy(true);
     setFormError("");
     try {
+      const nextEmail = email.trim().toLowerCase();
       const nextPassword = password;
       const saved = await recoverOwner({
         data: {
-          email,
+          email: nextEmail,
           password: nextPassword,
           honey: guard.honey,
           startedAt: guard.startedAt,
@@ -98,21 +99,18 @@ function Hearth() {
       if (saved.lastingStore === false) {
         toast.message("Password saved for this server only. Add a database on Vercel so it survives reloads.");
       }
-      const { error } = await authClient.signIn.email({
-        email,
-        password: nextPassword,
-        rememberMe: true,
-      });
-      if (error) {
-        setMode("enter");
-        toast.success("Password is saved. Use Sign in with the same email and password.");
-        return;
-      }
-      const sessionUser = await waitForSignedInUser();
+      let sessionUser = await waitForSignedInUser(8);
       if (!sessionUser) {
-        setMode("enter");
-        toast.success("Password is saved. Use Sign in.");
-        return;
+        const { error } = await authClient.signIn.email({
+          email: nextEmail,
+          password: nextPassword,
+          rememberMe: true,
+        });
+        if (error) throw error;
+        sessionUser = await waitForSignedInUser(8);
+      }
+      if (!sessionUser) {
+        throw new Error("Password is saved. Wait a moment, then tap Enter.");
       }
       markAtelierReady();
       toast.success("You are in.");
@@ -138,7 +136,11 @@ function Hearth() {
     setBusy(true);
     setFormError("");
     try {
-      const { error } = await authClient.signIn.email({ email, password, rememberMe: true });
+      const { error } = await authClient.signIn.email({
+        email: email.trim().toLowerCase(),
+        password,
+        rememberMe: true,
+      });
       if (error) throw error;
       const sessionUser = await waitForSignedInUser();
       if (!sessionUser) throw new Error("Signed in, but the session did not stick. Try Sign in once more.");
@@ -160,7 +162,7 @@ function Hearth() {
         <p className="text-xs uppercase tracking-[0.32em] text-[#c4a574]">Private door</p>
         <h1 className="mt-4 font-display text-4xl leading-[1.05]">The hearth.</h1>
         <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
-          Use Set new password to start over with a new email and password. After it saves, use Sign in next time.
+          Set a new email and password, then you should go straight into the atelier. You should not have to sign in a second time.
         </p>
         {!lastingStore ? (
           <p className="mt-4 rounded-2xl bg-[#8a4a3b]/80 px-4 py-3 text-sm">
@@ -242,7 +244,7 @@ function Hearth() {
             <Button
               type="button"
               className="w-full"
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 window.location.replace("/admin");
               }}

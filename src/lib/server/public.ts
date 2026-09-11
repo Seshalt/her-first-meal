@@ -230,67 +230,78 @@ export const recoverOwner = createServerFn({ method: "POST" })
       throw new Error("Use a real email and a password of at least 12 characters.");
     }
     const sql = await getSql();
-    const { hashPassword } = await import("better-auth/crypto");
+    const { auth } = await import("@/lib/auth/server");
+    const { getRequestHeaders } = await import("@tanstack/react-start/server");
+    const ctx = await auth.$context;
 
-    const anyAdmin = await sql<{ id: string; email: string }>`
-      select u.id, u.email
-      from "user" u
-      join profiles p on p.user_id = u.id
-      where p.role = 'admin'
-      order by p.updated_at asc
-      limit 1
-    `;
+    const found = await ctx.internalAdapter.findUserByEmail(email, { includeAccounts: true });
+    let targetId = found?.user?.id as string | undefined;
 
-    let target = anyAdmin[0];
-    if (!target) {
-      const byEmail = await sql<{ id: string; email: string }>`
-        select id, email from "user" where lower(email) = ${email} limit 1
+    if (!targetId) {
+      const anyAdmin = await sql<{ id: string }>`
+        select u.id
+        from "user" u
+        join profiles p on p.user_id = u.id
+        where p.role = 'admin'
+        order by p.updated_at asc
+        limit 1
       `;
-      if (byEmail[0]) {
-        target = byEmail[0];
+      if (anyAdmin[0]) {
+        targetId = anyAdmin[0].id;
+        await ctx.internalAdapter.updateUser(targetId, { email, emailVerified: true, name: "Maat" });
       } else {
-        const id = crypto.randomUUID();
-        await sql`
-          insert into "user" (id, name, email, "emailVerified", "createdAt", "updatedAt")
-          values (${id}, 'Maat', ${email}, true, now(), now())
-        `;
-        target = { id, email };
+        const created = await ctx.internalAdapter.createUser({
+          name: "Maat",
+          email,
+          emailVerified: true,
+        });
+        targetId = created.id;
       }
     }
 
-    const hash = await hashPassword(password);
-    const accounts = await sql<{ id: string }>`
-      select id from account where "userId" = ${target.id} and "providerId" = 'credential'
-    `;
-    if (accounts[0]) {
-      await sql`update account set password = ${hash}, "updatedAt" = now() where id = ${accounts[0].id}`;
-    } else {
-      const accountId = crypto.randomUUID();
-      await sql`
-        insert into account (
-          id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt"
-        ) values (
-          ${accountId}, ${target.id}, 'credential', ${target.id}, ${hash}, now(), now()
-        )
-      `;
+    if (!targetId) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("Could not create the owner account.");
     }
 
-    await sql`update "user" set email = ${email}, "updatedAt" = now() where id = ${target.id}`;
-    await sql`delete from session where "userId" = ${target.id}`;
+    const hash = await ctx.password.hash(password);
+    const matches = await ctx.password.verify({ hash, password });
+    if (!matches) {
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("Could not store that password. Try again.");
+    }
 
-    const existing = await sql<{ user_id: string }>`select user_id from profiles where user_id = ${target.id}`;
+    const accounts = await ctx.internalAdapter.findAccounts(targetId);
+    const credential = accounts.find((a) => a.providerId === "credential");
+    if (credential) {
+      await ctx.internalAdapter.updateAccount(credential.id, { password: hash });
+    } else {
+      await ctx.internalAdapter.createAccount({
+        userId: targetId,
+        accountId: targetId,
+        providerId: "credential",
+        password: hash,
+      });
+    }
+
+    await sql`update "user" set email = ${email}, "emailVerified" = true, "updatedAt" = now() where id = ${targetId}`;
+    await sql`update profiles set role = 'member' where role = 'admin' and user_id <> ${targetId}`;
+
+    const existing = await sql<{ user_id: string }>`select user_id from profiles where user_id = ${targetId}`;
     try {
       if (existing[0]) {
         await sql`
           update profiles
           set role = 'admin', email = ${email}, display_name = coalesce(display_name, 'Maat'),
               email_factor_ok = true, onboarding_completed = true, updated_at = now()
-          where user_id = ${target.id}
+          where user_id = ${targetId}
         `;
       } else {
         await sql`
           insert into profiles (user_id, role, email, display_name, email_factor_ok, onboarding_completed)
-          values (${target.id}, 'admin', ${email}, 'Maat', true, true)
+          values (${targetId}, 'admin', ${email}, 'Maat', true, true)
         `;
       }
     } catch {
@@ -299,14 +310,34 @@ export const recoverOwner = createServerFn({ method: "POST" })
           update profiles
           set role = 'admin', email = ${email}, display_name = coalesce(display_name, 'Maat'),
               onboarding_completed = true, updated_at = now()
-          where user_id = ${target.id}
+          where user_id = ${targetId}
         `;
       } else {
         await sql`
           insert into profiles (user_id, role, email, display_name, onboarding_completed)
-          values (${target.id}, 'admin', ${email}, 'Maat', true)
+          values (${targetId}, 'admin', ${email}, 'Maat', true)
         `;
       }
+    }
+
+    try {
+      const incoming = getRequestHeaders();
+      const headers = new Headers();
+      incoming.forEach((value, key) => headers.set(key, value));
+      const origin =
+        headers.get("origin") ||
+        (process.env.BETTER_AUTH_URL || "").replace(/\/$/, "") ||
+        (process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/^https?:\/\//, "")}`
+          : "https://her-first-meal-now.vercel.app");
+      headers.set("origin", origin);
+      headers.set("content-type", "application/json");
+      await auth.api.signInEmail({
+        body: { email, password, rememberMe: true },
+        headers,
+      });
+    } catch {
+      /* client will sign in with the same email and password we just stored */
     }
 
     await padAuthDuration(started);
