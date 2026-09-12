@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { LiquidArt } from "@/components/layout/liquid-art";
 import { MagneticLink } from "@/components/motion/magnetic-button";
@@ -40,7 +40,7 @@ function Home() {
       <div className="relative z-[1]">
       <PublicNav overlay={overlayNav} />
       <Hero content={content} variant={layout?.hero ?? "cinematic"} />
-      <Ticker items={ticker} />
+      <Ticker content={content} items={ticker} />
       <Manifesto content={content} />
       <SplitStory
         kicker={content.mealsKicker}
@@ -154,77 +154,33 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
   );
 }
 
-const OFFER_COPY: Record<string, string> = {
-  "Personalized meals":
-    "Meal plans written for her body, culture, store, pantry, and season — so she is not starting from a blank page each morning.",
-  "Belly Binding Studio":
-    "Wrap education after birth: studio video, wrap comparison, a private journal, and optional review with Maat. Teaching first, never spectacle.",
-  Nouri:
-    "An AI companion inside the membership. Ask what to eat this week, where a wrap lesson lives, or what the house holds next. Not a clinician.",
-  Movement:
-    "Recovery movement matched to trying, pregnancy, or postpartum — walks, rest, and gentle work for the body she is in, not a generic gym plan.",
-  "Grocery lists":
-    "The week’s meals turned into a list for the kitchen she already has and the market she actually walks into.",
-  "Partner lane":
-    "A private place for the person beside her: what to cook, what to buy, and how to help today — without reading her medical chart.",
-  "Week-by-week journey":
-    "Meals, movement, and questions change as the weeks change. The house does not freeze at week twelve.",
-  "Fourth trimester care":
-    "The months after birth stay open: binding studio, recovery plates, and rest that treats postpartum as a season, not a discharge paper.",
-};
-
-function Ticker({ items }: { items: string[] }) {
-  const source = items.length ? items : Object.keys(OFFER_COPY);
-  const shown = source.slice(0, 4);
-  const rootRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const cards = [...root.querySelectorAll<HTMLElement>("[data-card]")];
-    let frame = 0;
-    const update = () => {
-      const rect = root.getBoundingClientRect();
-      const travel = Math.max(1, root.offsetHeight - window.innerHeight);
-      const passed = Math.min(travel, Math.max(0, -rect.top));
-      const p = (passed / travel) * (cards.length - 0.001);
-      cards.forEach((card, i) => {
-        const d = Math.abs(p - i);
-        const opacity = Math.max(0, 1 - d * 1.15);
-        card.style.opacity = String(opacity);
-        card.style.transform = `translate3d(0, ${(p - i) * 18}px, 0)`;
-        card.style.pointerEvents = opacity > 0.4 ? "auto" : "none";
-      });
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [shown.join("|")]);
+function Ticker({ content, items }: { content: LandingContent; items: string[] }) {
+  const tiles = [
+    { title: "Personalized meals", line: "Plates for her kitchen, culture, and week.", img: content.images.meals, alt: content.alts.meals },
+    { title: "Belly Binding Studio", line: "Wrap education, held with care.", img: content.images.binding, alt: content.alts.binding },
+    { title: "Nouri", line: "Ask what to eat, where a lesson lives, what comes next.", img: content.images.nouri, alt: content.alts.nouri },
+    { title: "Movement", line: "Gentle work for the body she is in.", img: content.images.movement, alt: content.alts.movement },
+  ];
+  const named = items.length ? items.slice(0, 4) : tiles.map((t) => t.title);
+  const shown = named.map((title, i) => ({
+    ...tiles[i % tiles.length],
+    title,
+  }));
 
   return (
-    <section ref={rootRef} className="offer-reel">
-      <div className="offer-reel-pin">
-        <p className="text-xs uppercase tracking-[0.28em] text-ink/45">What the house holds</p>
-        <div className="offer-reel-stage">
-          {shown.map((item, i) => (
-            <article key={item} data-card className="offer-sheet-card offer-reel-card">
-              <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
-              <p className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.02]">{item}</p>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft md:text-lg">
-                {OFFER_COPY[item] ?? "Part of the membership house — meals, binding, movement, and care that stay with her."}
-              </p>
-            </article>
-          ))}
-        </div>
+    <section className="offer-grid-wrap">
+      <p className="px-5 pt-16 text-xs uppercase tracking-[0.28em] text-ink/45 md:px-8">What the house holds</p>
+      <div className="offer-grid">
+        {shown.map((tile) => (
+          <article key={tile.title} className="offer-tile">
+            <ParallaxFrame src={tile.img} alt={tile.alt} speed={0.22} className="absolute inset-0" />
+            <div className="offer-tile-veil" />
+            <div className="offer-tile-copy">
+              <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">{tile.title}</h2>
+              <p className="mt-2 max-w-sm text-sm text-paper/85 md:text-base">{tile.line}</p>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -232,14 +188,18 @@ function Ticker({ items }: { items: string[] }) {
 
 function Manifesto({ content }: { content: LandingContent }) {
   return (
-    <section className="bg-transparent">
-      <div className="section-air mx-auto max-w-5xl px-4 md:px-6">
-      <Reveal className="glass-panel p-8 md:p-12">
-        <p className="text-xs uppercase tracking-[0.32em] text-clay">A membership, not a feed</p>
-        <h2 className="mt-8 font-display text-[clamp(2.2rem,5.4vw,4.6rem)] leading-[1.05]">{content.manifesto}</h2>
-        <div className="editorial-rule editorial-rule-clay mt-12" />
-        <p className="mt-12 max-w-2xl text-xl leading-relaxed text-ink-soft">{content.offerLine}</p>
-      </Reveal>
+    <section className="split-board grid lg:grid-cols-2">
+      <div className="split-photo relative">
+        <ParallaxFrame src={content.images.family} alt={content.alts.family} speed={0.32} className="absolute inset-0" />
+      </div>
+      <div className="split-copy flex items-center px-1 py-10">
+        <Reveal className="glass-panel w-full max-w-xl p-7 md:p-10">
+          <p className="text-xs uppercase tracking-[0.32em] text-clay">A membership, not a feed</p>
+          <h2 className="mt-6 font-display text-[clamp(2.2rem,4.4vw,3.6rem)] leading-[1.05]">
+            We remember the mother.
+          </h2>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{content.offerLine}</p>
+        </Reveal>
       </div>
     </section>
   );
@@ -300,7 +260,7 @@ function SplitStory({
   );
   const picture = (
     <div className="split-photo relative">
-      <ParallaxFrame src={src} alt={alt} speed={0.34} className="absolute inset-0" />
+      <ParallaxFrame src={src} alt={alt} speed={0.48} className="absolute inset-0" />
       {extraSrc ? (
         <img
           src={extraSrc}

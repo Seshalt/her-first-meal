@@ -4,25 +4,25 @@ export const LANDING_IMAGE_SLOTS = [
     id: "hero",
     label: "Home · full-screen opening",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+    alt: "African American pregnant woman in a white top, both hands on her belly",
   },
   {
     id: "meals",
     label: "Home · meals",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Bowl of golden soup with herbs on a wooden table",
+    alt: "Colorful grain bowl with avocado, tomatoes, and greens",
   },
   {
     id: "binding",
     label: "Home · belly binding",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
   },
   {
     id: "bindingStill",
     label: "Home · wrap still life",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded cream linen cloth laid on a bed",
+    alt: "Close-up of hands resting on a pregnant belly",
   },
   {
     id: "rest",
@@ -52,7 +52,7 @@ export const LANDING_IMAGE_SLOTS = [
     id: "grocery",
     label: "Home · grocery / partner",
     fallback: "/images/grocery-partner.jpg",
-    alt: "Hands holding a bag of fresh produce at a market",
+    alt: "Couple cooking together at a kitchen counter",
   },
   {
     id: "hydration",
@@ -70,7 +70,7 @@ export const LANDING_IMAGE_SLOTS = [
     id: "login",
     label: "Sign in · photograph",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+    alt: "African American pregnant woman in a white top, both hands on her belly",
   },
   {
     id: "join",
@@ -82,37 +82,37 @@ export const LANDING_IMAGE_SLOTS = [
     id: "pricing",
     label: "Membership · background",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+    alt: "African American pregnant woman in a white top, both hands on her belly",
   },
   {
     id: "checkout",
     label: "Checkout · side photograph",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Bowl of golden soup with herbs on a wooden table",
+    alt: "Colorful grain bowl with avocado, tomatoes, and greens",
   },
   {
     id: "bindHero",
     label: "Belly binding page · hero",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded cream linen cloth laid on a bed",
+    alt: "Close-up of hands resting on a pregnant belly",
   },
   {
     id: "bindStep1",
     label: "Binding step 1",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded cream linen cloth laid on a bed",
+    alt: "Close-up of hands resting on a pregnant belly",
   },
   {
     id: "bindStep2",
     label: "Binding step 2",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
   },
   {
     id: "bindStep3",
     label: "Binding step 3",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
   },
   {
     id: "bindStep4",
@@ -132,7 +132,7 @@ export type LandingImageSlot = (typeof LANDING_IMAGE_SLOTS)[number]["id"];
 
 /** Alt text keyed to the photo file, so every page uses the same words. */
 export const IMAGE_ALT: Record<string, string> = Object.fromEntries(
-  LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback, s.alt]),
+  LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback.split("?")[0], s.alt]),
 );
 
 export function altFor(src: string, fallback = ""): string {
@@ -202,10 +202,9 @@ export type LandingContent = LandingCopy & {
 };
 
 export function defaultImages(): Record<LandingImageSlot, string> {
-  return Object.fromEntries(LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback])) as Record<
-    LandingImageSlot,
-    string
-  >;
+  return Object.fromEntries(
+    LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback ? `${s.fallback.split("?")[0]}?v=6` : s.fallback]),
+  ) as Record<LandingImageSlot, string>;
 }
 
 export function defaultAlts(): Record<LandingImageSlot, string> {
