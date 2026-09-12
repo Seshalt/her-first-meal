@@ -18,6 +18,16 @@ export function rateLimit(key: string, max = 8, windowMs = 10 * 60 * 1000) {
   }
 }
 
+export async function rateLimitClient(kind: string, max: number, windowMs: number) {
+  const { getRequestHeader, getRequestIP } = await import("@tanstack/react-start/server");
+  const ip =
+    getRequestIP({ xForwardedFor: true }) ||
+    getRequestHeader("x-real-ip") ||
+    getRequestHeader("cf-connecting-ip") ||
+    "unknown";
+  rateLimit(`${kind}:${ip}`, max, windowMs);
+}
+
 export function assertHuman(input: { honey?: string; startedAt?: number; human?: boolean }) {
   if (input.honey && input.honey.trim()) {
     throw new Error("Please try again.");

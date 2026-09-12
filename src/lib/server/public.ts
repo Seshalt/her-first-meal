@@ -12,7 +12,7 @@ import {
 import { DEFAULT_SITE_COPY, mergeSite, type SiteCopy } from "@/lib/site";
 import { mergeStudio, type StudioTheme } from "@/lib/theme-studio";
 import { mergeBindingSteps, type BindingStep } from "@/lib/binding-steps";
-import { assertHuman, rateLimit } from "./abuse";
+import { assertHuman, rateLimit, rateLimitClient } from "./abuse";
 import { cookieNoticeSeen, markCookieNotice } from "./cookie-notice";
 
 type SettingsRow = {
@@ -219,7 +219,8 @@ export const recoverOwner = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
-    rateLimit("recover-owner", 8, 15 * 60 * 1000);
+    await rateLimitClient("recover-owner", 3, 15 * 60 * 1000);
+    rateLimit("recover-owner", 10, 15 * 60 * 1000);
     const started = Date.now();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
@@ -237,26 +238,29 @@ export const recoverOwner = createServerFn({ method: "POST" })
     const found = await ctx.internalAdapter.findUserByEmail(email, { includeAccounts: true });
     let targetId = found?.user?.id as string | undefined;
 
-    if (!targetId) {
-      const anyAdmin = await sql<{ id: string }>`
-        select u.id
-        from "user" u
-        join profiles p on p.user_id = u.id
-        where p.role = 'admin'
-        order by p.updated_at asc
-        limit 1
-      `;
-      if (anyAdmin[0]) {
-        targetId = anyAdmin[0].id;
-        await ctx.internalAdapter.updateUser(targetId, { email, emailVerified: true, name: "Maat" });
-      } else {
-        const created = await ctx.internalAdapter.createUser({
-          name: "Maat",
-          email,
-          emailVerified: true,
-        });
-        targetId = created.id;
+    const anyAdmin = await sql<{ id: string; email: string }>`
+      select u.id, u.email
+      from "user" u
+      join profiles p on p.user_id = u.id
+      where p.role = 'admin'
+      order by p.updated_at asc
+      limit 1
+    `;
+    if (anyAdmin[0]) {
+      const ownerEmail = anyAdmin[0].email.trim().toLowerCase();
+      if (ownerEmail && ownerEmail !== email) {
+        await dummyPasswordWork();
+        await padAuthDuration(started);
+        throw new Error("Use the owner email already on this house.");
       }
+      targetId = anyAdmin[0].id;
+    } else if (!targetId) {
+      const created = await ctx.internalAdapter.createUser({
+        name: "Maat",
+        email,
+        emailVerified: true,
+      });
+      targetId = created.id;
     }
 
     if (!targetId) {
@@ -361,7 +365,8 @@ export const enterOwner = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
-    rateLimit("enter-owner", 12, 15 * 60 * 1000);
+    await rateLimitClient("enter-owner", 8, 15 * 60 * 1000);
+    rateLimit("enter-owner", 20, 15 * 60 * 1000);
     const started = Date.now();
     const email = data.email.trim().toLowerCase();
     const password = data.password;
