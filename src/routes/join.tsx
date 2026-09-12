@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/client";
+import { GROK_PROVIDERS, authClient, authEnabled, rememberSessionToken, signIn } from "@/lib/auth/client";
 import { claimMembership, getCheckoutByToken } from "@/lib/server/checkout";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
@@ -59,13 +59,15 @@ function Join() {
     }
     setBusy(true);
     try {
-      const { error } = await authClient.signUp.email({
+      const { data, error } = await authClient.signUp.email({
         email,
         password,
         name,
+        rememberMe: true,
         callbackURL: token ? `/join?token=${encodeURIComponent(token)}` : "/app/onboarding",
-      });
+      } as Parameters<typeof authClient.signUp.email>[0]);
       if (error) throw new Error(error.message);
+      rememberSessionToken((data as { token?: string } | null)?.token);
       toast.success("Account created.");
       await claimMembership({ data: { token: token || undefined } });
       const status = await requestEmailFactor();

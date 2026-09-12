@@ -1,11 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getSql } from "@/lib/db";
+import { getSql, type Sql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
-import { RECIPES, recipesFor, type Recipe, type Stage } from "@/lib/content/catalog";
+import {
+  PANTRY_STAPLES,
+  RECIPES,
+  SEASONAL_PRODUCE,
+  recipesFor,
+  type Recipe,
+  type Stage,
+} from "@/lib/content/catalog";
 import { asJson } from "./json";
 import { ensureProfile } from "./profile";
-import { houseChat } from "./openai";
+import { houseAiReady, houseChat } from "./openai";
 import { uid } from "@/lib/utils";
+import type { Profile } from "./types";
 
 function startOfWeekISO() {
   const d = new Date();
@@ -16,45 +24,81 @@ function startOfWeekISO() {
   return monday.toISOString().slice(0, 10);
 }
 
+type MealSlot = { day: string; recipeId: string; recipe?: Recipe };
+
+function recipeFromSlot(m: MealSlot, recipeMap: Record<string, Recipe>): Recipe | null {
+  if (m.recipe && Array.isArray(m.recipe.ingredients)) return m.recipe;
+  return recipeMap[m.recipeId] ?? null;
+}
+
+function placeLine(profile: Profile) {
+  return [profile.city, profile.location, profile.zipCode].filter(Boolean).join(" · ") || "";
+}
+
+async function ensureMealWeek(sql: Sql, userId: string) {
+  const profile = await ensureProfile(userId);
+  const diet = await sql<{ diets: unknown; dislikes: string | null; allergies: unknown }>`
+    select diets, dislikes, allergies from dietary_profiles where user_id = ${userId}
+  `;
+  const grocery = await sql<{ stores: unknown }>`select stores from grocery_preferences where user_id = ${userId}`;
+  const weekStart = startOfWeekISO();
+  const existing = await sql<{ meals: unknown }>`
+    select meals from meal_plans where user_id = ${userId} and week_start = ${weekStart}
+  `;
+  const diets = asJson<string[]>(diet[0]?.diets, []);
+  const pool = recipesFor(profile.stage as Stage | null, diets, diet[0]?.dislikes ?? "");
+  const source = pool.length ? pool : RECIPES;
+  let meals = asJson<MealSlot[]>(existing[0]?.meals, []);
+  if (!meals.length) {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    meals = days.map((day, i) => ({ day, recipeId: source[i % source.length].id }));
+    await sql`
+      insert into meal_plans (user_id, week_start, meals)
+      values (${userId}, ${weekStart}, ${JSON.stringify(meals)}::jsonb)
+      on conflict (user_id, week_start) do update set meals = excluded.meals
+    `;
+  }
+  const recipeMap: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
+  const detailed = meals.map((m) => {
+    const recipe = recipeFromSlot(m, recipeMap) ?? RECIPES[0];
+    return { ...m, recipe };
+  });
+  const stores = asJson<string[]>(grocery[0]?.stores, []);
+  return {
+    weekStart,
+    meals: detailed,
+    stores,
+    diets,
+    allergies: asJson<string[]>(diet[0]?.allergies, []),
+    catalog: RECIPES,
+    profile,
+    aiReady: houseAiReady(),
+    place: placeLine(profile),
+  };
+}
+
+function kitchenNotes(profile: Profile, extras: string[]) {
+  return [
+    `Stage: ${profile.stage ?? "unspecified"}`,
+    `Location: ${placeLine(profile) || "not shared"}`,
+    ...extras,
+  ].join("\n");
+}
+
 export const getMealWeek = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
-    const profile = await ensureProfile(context.userId);
-    const diet = await sql<{ diets: unknown; dislikes: string | null; allergies: unknown }>`
-      select diets, dislikes, allergies from dietary_profiles where user_id = ${context.userId}
-    `;
-    const grocery = await sql<{ stores: unknown }>`select stores from grocery_preferences where user_id = ${context.userId}`;
-    const weekStart = startOfWeekISO();
-    const existing = await sql<{ meals: unknown }>`
-      select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
-    `;
-    const diets = asJson<string[]>(diet[0]?.diets, []);
-    const pool = recipesFor(profile.stage as Stage | null, diets, diet[0]?.dislikes ?? "");
-    const source = pool.length ? pool : RECIPES;
-    let meals = asJson<{ day: string; recipeId: string }[]>(existing[0]?.meals, []);
-    if (!meals.length) {
-      const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      meals = days.map((day, i) => ({ day, recipeId: source[i % source.length].id }));
-      await sql`
-        insert into meal_plans (user_id, week_start, meals)
-        values (${context.userId}, ${weekStart}, ${JSON.stringify(meals)}::jsonb)
-        on conflict (user_id, week_start) do update set meals = excluded.meals
-      `;
-    }
-    const recipeMap: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
-    const detailed = meals.map((m) => {
-      const custom = (m as { recipe?: Recipe }).recipe;
-      return { ...m, recipe: custom ?? recipeMap[m.recipeId] ?? RECIPES[0] };
-    });
-    const stores = asJson<string[]>(grocery[0]?.stores, []);
+    const week = await ensureMealWeek(sql, context.userId);
     return {
-      weekStart,
-      meals: detailed,
-      stores,
-      diets,
-      allergies: asJson<string[]>(diet[0]?.allergies, []),
-      catalog: RECIPES,
+      weekStart: week.weekStart,
+      meals: week.meals,
+      stores: week.stores,
+      diets: week.diets,
+      allergies: week.allergies,
+      catalog: week.catalog,
+      aiReady: week.aiReady,
+      place: week.place,
     };
   });
 
@@ -67,8 +111,8 @@ export const swapMeal = createServerFn({ method: "POST" })
     const existing = await sql<{ meals: unknown }>`
       select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
     `;
-    const meals = asJson<{ day: string; recipeId: string }[]>(existing[0]?.meals, []);
-    const next = meals.map((m) => (m.day === data.day ? { ...m, recipeId: data.recipeId } : m));
+    const meals = asJson<MealSlot[]>(existing[0]?.meals, []);
+    const next = meals.map((m) => (m.day === data.day ? { day: m.day, recipeId: data.recipeId } : m));
     await sql`
       insert into meal_plans (user_id, week_start, meals)
       values (${context.userId}, ${weekStart}, ${JSON.stringify(next)}::jsonb)
@@ -76,6 +120,25 @@ export const swapMeal = createServerFn({ method: "POST" })
     `;
     return { ok: true };
   });
+
+function fallbackPlate(profile: Profile, usedIds: string[], want?: string): Recipe {
+  const unused = RECIPES.filter((r) => !usedIds.includes(r.id));
+  const pool = unused.length ? unused : RECIPES;
+  const stagePool = profile.stage
+    ? pool.filter((r) => r.stage.includes(profile.stage as Stage))
+    : pool;
+  const source = stagePool.length ? stagePool : pool;
+  const pick = source[Math.floor(Math.random() * source.length)] ?? RECIPES[0];
+  return {
+    ...pick,
+    id: uid("plate"),
+    title: want ? `${pick.title}` : pick.title,
+    summary: want
+      ? `A house plate close to “${want.slice(0, 80)}.” The kitchen will write originals once ChatGPT is connected.`
+      : pick.summary,
+    why: want ? `Built from the house catalog while we wait on a ChatGPT key.` : pick.why,
+  };
+}
 
 export const cookAnotherPlate = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -89,97 +152,131 @@ export const cookAnotherPlate = createServerFn({ method: "POST" })
       avoids: string | null;
       loves: string | null;
     }>`select diets, allergies, avoids, loves from dietary_profiles where user_id = ${context.userId}`;
+    const weekStart = startOfWeekISO();
+    const existing = await sql<{ meals: unknown }>`
+      select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
+    `;
+    const meals = asJson<MealSlot[]>(existing[0]?.meals, []);
+    const usedIds = meals.map((m) => m.recipeId);
     const raw = await houseChat({
       json: true,
       maxTokens: 900,
       system:
-        "Write one original pregnancy or postpartum recipe as JSON with keys: title, summary, minutes, servings, why, ingredients (array of {name, qty, dept}), steps (string array). Soft, maternal, practical. Never diagnose. Respect allergies. No alcohol. No raw fish or unpasteurized dairy.",
+        "Write one original pregnancy or postpartum recipe as JSON with keys: title, summary, minutes, servings, why, ingredients (array of {name, qty, dept}), steps (string array). Soft, maternal, practical. Never diagnose. Respect allergies. No alcohol. No raw fish or unpasteurized dairy. Prefer ingredients she can find at ordinary grocery stores near the given location.",
       messages: [
         {
           role: "user",
-          content: [
-            `Stage: ${profile.stage ?? "unspecified"}`,
+          content: kitchenNotes(profile, [
             `Diets: ${asJson<string[]>(diet[0]?.diets, []).join(", ") || "none"}`,
             `Allergies: ${asJson<string[]>(diet[0]?.allergies, []).join(", ") || "none"}`,
             `Avoids: ${diet[0]?.avoids ?? "none"}`,
             `Loves: ${diet[0]?.loves ?? "none"}`,
             data.want ? `She asked for: ${data.want.slice(0, 240)}` : "Surprise her with a new plate for this day.",
-          ].join("\n"),
+          ]),
         },
       ],
     });
-    if (!raw) throw new Error("The kitchen needs OPENAI_API_KEY in Vercel to cook new plates.");
-    let parsed: Partial<Recipe> = {};
-    try {
-      parsed = JSON.parse(raw) as Partial<Recipe>;
-    } catch {
-      throw new Error("The new plate did not come through clearly. Try again.");
+    let recipe: Recipe;
+    if (raw) {
+      let parsed: Partial<Recipe> = {};
+      try {
+        parsed = JSON.parse(raw) as Partial<Recipe>;
+      } catch {
+        parsed = {};
+      }
+      recipe = {
+        id: uid("plate"),
+        title: parsed.title || "A quiet bowl",
+        summary: parsed.summary || "A simple plate for this hour.",
+        stage: profile.stage ? [profile.stage as Stage] : ["postpartum"],
+        diets: asJson<Recipe["diets"]>(parsed.diets, []),
+        minutes: Number(parsed.minutes ?? 30),
+        servings: Number(parsed.servings ?? 2),
+        image: "/images/meal-bowl.jpg",
+        department: "kitchen",
+        ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients : [],
+        steps: Array.isArray(parsed.steps) ? parsed.steps : [],
+        why: parsed.why || "Made for her table today.",
+      };
+    } else {
+      recipe = fallbackPlate(profile, usedIds, data.want);
     }
-    const recipe: Recipe = {
-      id: uid("plate"),
-      title: parsed.title || "A quiet bowl",
-      summary: parsed.summary || "A simple plate for this hour.",
-      stage: profile.stage ? [profile.stage as Stage] : ["postpartum"],
-      diets: asJson(parsed.diets, []),
-      minutes: Number(parsed.minutes ?? 30),
-      servings: Number(parsed.servings ?? 2),
-      image: "/images/meal-bowl.jpg",
-      department: "kitchen",
-      ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients : [],
-      steps: Array.isArray(parsed.steps) ? parsed.steps : [],
-      why: parsed.why || "Made for her table today.",
-    };
-    const weekStart = startOfWeekISO();
-    const existing = await sql<{ meals: unknown }>`
-      select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
-    `;
-    const meals = asJson<{ day: string; recipeId: string; recipe?: Recipe }[]>(existing[0]?.meals, []);
     const next = meals.map((m) => (m.day === data.day ? { day: data.day, recipeId: recipe.id, recipe } : m));
     await sql`
       insert into meal_plans (user_id, week_start, meals)
       values (${context.userId}, ${weekStart}, ${JSON.stringify(next)}::jsonb)
       on conflict (user_id, week_start) do update set meals = excluded.meals
     `;
-    return { ok: true, recipe };
+    return { ok: true, recipe, original: Boolean(raw) };
   });
+
+type GroceryItem = { name: string; qty: string; dept: string; checked: boolean; from?: string };
+
+function listFromMeals(meals: MealSlot[], pantryNames: Set<string>): GroceryItem[] {
+  const recipeMap = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
+  const items: GroceryItem[] = [];
+  for (const m of meals) {
+    const recipe = recipeFromSlot(m, recipeMap);
+    if (!recipe) continue;
+    for (const ing of recipe.ingredients) {
+      const key = ing.name.trim().toLowerCase();
+      if (pantryNames.has(key)) continue;
+      const found = items.find((i) => i.name.toLowerCase() === key);
+      if (found) continue;
+      items.push({ name: ing.name, qty: ing.qty, dept: ing.dept || "Other", checked: false, from: recipe.title });
+    }
+  }
+  return items;
+}
+
+async function persistGrocery(sql: Sql, userId: string, weekStart: string, items: GroceryItem[]) {
+  await sql`
+    insert into grocery_lists (user_id, week_start, items)
+    values (${userId}, ${weekStart}, ${JSON.stringify(items)}::jsonb)
+    on conflict (user_id, week_start) do update set items = excluded.items
+  `;
+}
 
 export const getGroceryList = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
-    const weekStart = startOfWeekISO();
-    const plan = await sql<{ meals: unknown }>`
-      select meals from meal_plans where user_id = ${context.userId} and week_start = ${weekStart}
-    `;
-    const meals = asJson<{ day: string; recipeId: string }[]>(plan[0]?.meals, []);
-    const recipeMap = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
-    const items: { name: string; qty: string; dept: string; checked: boolean }[] = [];
-    for (const m of meals) {
-      const recipe = recipeMap[m.recipeId];
-      if (!recipe) continue;
-      for (const ing of recipe.ingredients) {
-        const found = items.find((i) => i.name === ing.name);
-        if (found) continue;
-        items.push({ name: ing.name, qty: ing.qty, dept: ing.dept, checked: false });
-      }
-    }
+    const week = await ensureMealWeek(sql, context.userId);
+    const pantry = await sql<{ name: string }>`select name from pantry_items where user_id = ${context.userId}`;
+    const pantryNames = new Set(pantry.map((p) => p.name.trim().toLowerCase()));
+    const built = listFromMeals(week.meals, pantryNames);
     const saved = await sql<{ items: unknown }>`
-      select items from grocery_lists where user_id = ${context.userId} and week_start = ${weekStart}
+      select items from grocery_lists where user_id = ${context.userId} and week_start = ${week.weekStart}
     `;
-    const prev = asJson<typeof items>(saved[0]?.items, []);
-    const merged = items.map((item) => ({
-      ...item,
-      checked: prev.find((p) => p.name === item.name)?.checked ?? false,
-    }));
-    if (!saved[0]) {
-      await sql`
-        insert into grocery_lists (user_id, week_start, items)
-        values (${context.userId}, ${weekStart}, ${JSON.stringify(merged)}::jsonb)
-        on conflict (user_id, week_start) do nothing
-      `;
-    }
-    const stores = await sql<{ stores: unknown }>`select stores from grocery_preferences where user_id = ${context.userId}`;
-    return { weekStart, items: merged, stores: asJson<string[]>(stores[0]?.stores, []) };
+    const prev = asJson<GroceryItem[]>(saved[0]?.items, []);
+    const extras = prev.filter(
+      (p) => p.from === "added" || p.from === "market" || !built.some((b) => b.name.toLowerCase() === p.name.toLowerCase()),
+    );
+    const keptExtras = extras.filter((p) => p.from === "added" || p.from === "market");
+    const merged: GroceryItem[] = [
+      ...built.map((item) => ({
+        ...item,
+        checked: prev.find((p) => p.name.toLowerCase() === item.name.toLowerCase())?.checked ?? false,
+      })),
+      ...keptExtras.map((item) => ({
+        ...item,
+        checked: item.checked ?? false,
+      })),
+    ];
+    await persistGrocery(sql, context.userId, week.weekStart, merged);
+    return {
+      weekStart: week.weekStart,
+      items: merged,
+      stores: week.stores,
+      place: week.place,
+      permission: week.profile.locationPermission,
+      city: week.profile.city,
+      zipCode: week.profile.zipCode,
+      location: week.profile.location,
+      skippedPantry: pantry.length,
+      meals: week.meals.map((m) => ({ day: m.day, title: m.recipe.title })),
+      aiReady: week.aiReady,
+    };
   });
 
 export const toggleGroceryItem = createServerFn({ method: "POST" })
@@ -191,14 +288,91 @@ export const toggleGroceryItem = createServerFn({ method: "POST" })
     const saved = await sql<{ items: unknown }>`
       select items from grocery_lists where user_id = ${context.userId} and week_start = ${weekStart}
     `;
-    const items = asJson<{ name: string; qty: string; dept: string; checked: boolean }[]>(saved[0]?.items, []);
+    const items = asJson<GroceryItem[]>(saved[0]?.items, []);
     const next = items.map((i) => (i.name === data.name ? { ...i, checked: data.checked } : i));
-    await sql`
-      insert into grocery_lists (user_id, week_start, items)
-      values (${context.userId}, ${weekStart}, ${JSON.stringify(next)}::jsonb)
-      on conflict (user_id, week_start) do update set items = excluded.items
-    `;
+    await persistGrocery(sql, context.userId, weekStart, next);
     return { ok: true };
+  });
+
+export const addGroceryItem = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { name: string; qty?: string; dept?: string }) => ({
+    name: input.name.trim().slice(0, 80),
+    qty: (input.qty ?? "1").trim().slice(0, 24),
+    dept: (input.dept ?? "Other").trim().slice(0, 32),
+  }))
+  .handler(async ({ context, data }) => {
+    if (!data.name) throw new Error("Name the item first.");
+    const sql = await getSql();
+    const weekStart = startOfWeekISO();
+    const saved = await sql<{ items: unknown }>`
+      select items from grocery_lists where user_id = ${context.userId} and week_start = ${weekStart}
+    `;
+    const items = asJson<GroceryItem[]>(saved[0]?.items, []);
+    if (items.some((i) => i.name.toLowerCase() === data.name.toLowerCase())) return { ok: true };
+    const next = [...items, { name: data.name, qty: data.qty || "1", dept: data.dept || "Other", checked: false, from: "added" }];
+    await persistGrocery(sql, context.userId, weekStart, next);
+    return { ok: true };
+  });
+
+export const composeLocalGrocery = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const sql = await getSql();
+    const week = await ensureMealWeek(sql, context.userId);
+    const pantry = await sql<{ name: string }>`select name from pantry_items where user_id = ${context.userId}`;
+    const pantryNames = new Set(pantry.map((p) => p.name.trim().toLowerCase()));
+    const saved = await sql<{ items: unknown }>`
+      select items from grocery_lists where user_id = ${context.userId} and week_start = ${week.weekStart}
+    `;
+    const current = asJson<GroceryItem[]>(saved[0]?.items, listFromMeals(week.meals, pantryNames));
+    const month = new Date().getMonth();
+    const seasonal = SEASONAL_PRODUCE[month] ?? SEASONAL_PRODUCE[0];
+    let extras: GroceryItem[] = seasonal.map((s) => ({ ...s, checked: false, from: "market" }));
+    const raw = await houseChat({
+      json: true,
+      maxTokens: 700,
+      system:
+        "Return JSON {items:[{name, qty, dept}]} with 6 to 10 grocery items a pregnant or postpartum mother should pick up this week. Prefer seasonal produce for the given city and ordinary aisles at the named stores. Skip anything already on the list or in the pantry. No alcohol. Never diagnose.",
+      messages: [
+        {
+          role: "user",
+          content: kitchenNotes(week.profile, [
+            `Stores: ${week.stores.join(", ") || "unspecified"}`,
+            `Already on the list: ${current.map((i) => i.name).join(", ") || "none"}`,
+            `Pantry: ${pantry.map((p) => p.name).join(", ") || "none"}`,
+            `This week's plates: ${week.meals.map((m) => m.recipe.title).join("; ")}`,
+          ]),
+        },
+      ],
+    });
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as { items?: { name?: string; qty?: string; dept?: string }[] };
+        if (Array.isArray(parsed.items) && parsed.items.length) {
+          extras = parsed.items
+            .filter((i) => i.name)
+            .map((i) => ({
+              name: String(i.name).slice(0, 80),
+              qty: String(i.qty || "1").slice(0, 24),
+              dept: String(i.dept || "Produce").slice(0, 32),
+              checked: false,
+              from: "market",
+            }));
+        }
+      } catch {
+        /* keep seasonal */
+      }
+    }
+    const names = new Set(current.map((i) => i.name.toLowerCase()));
+    const next = [...current];
+    for (const extra of extras) {
+      if (names.has(extra.name.toLowerCase()) || pantryNames.has(extra.name.toLowerCase())) continue;
+      names.add(extra.name.toLowerCase());
+      next.push(extra);
+    }
+    await persistGrocery(sql, context.userId, week.weekStart, next);
+    return { ok: true, added: next.length - current.length, original: Boolean(raw) };
   });
 
 export const listPantry = createServerFn({ method: "GET" })
@@ -213,6 +387,24 @@ export const listPantry = createServerFn({ method: "GET" })
       estimated: boolean;
       low: boolean;
     }>`select id, name, quantity::text as quantity, unit, estimated, low from pantry_items where user_id = ${context.userId} order by name`;
+  });
+
+export const stockPantryStaples = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const sql = await getSql();
+    const existing = await sql<{ name: string }>`select name from pantry_items where user_id = ${context.userId}`;
+    const have = new Set(existing.map((e) => e.name.toLowerCase()));
+    let added = 0;
+    for (const staple of PANTRY_STAPLES) {
+      if (have.has(staple.name.toLowerCase())) continue;
+      await sql`
+        insert into pantry_items (user_id, name, quantity, unit, estimated, low)
+        values (${context.userId}, ${staple.name}, ${staple.quantity}, ${staple.unit}, true, false)
+      `;
+      added += 1;
+    }
+    return { ok: true, added };
   });
 
 export const upsertPantry = createServerFn({ method: "POST" })

@@ -20,8 +20,9 @@ function AdminNouri() {
     <div className="max-w-2xl">
       <h1 className="font-display text-4xl">Nouri</h1>
       <p className="mt-2 text-sm text-white/60">
-        ChatGPT writes with the house voice here and in the member rooms. Add OPENAI_API_KEY in Vercel. Knowledge
-        below is what Nouri may use. She never diagnoses.
+        ChatGPT writes with the house voice here and in the member rooms. Paste OPENAI_API_KEY in Vercel — you can
+        reuse a key you already use on another site. A new key is only needed if you want this house billed separately.
+        Knowledge below is what Nouri may use. She never diagnoses.
       </p>
       <Textarea className="mt-6 min-h-48 bg-white/8 text-[#efe6d6]" value={notes} onChange={(e) => setNotes(e.target.value)} />
       <Button

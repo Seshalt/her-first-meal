@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 const KEY = "hfm-launch-todo";
 
 const ITEMS: { id: string; label: string; href?: string }[] = [
+  { id: "openai", label: "Paste OPENAI_API_KEY in Vercel — you can reuse a key from another site" },
   { id: "stripe", label: "Add STRIPE_SECRET_KEY in Vercel and run one test charge" },
   { id: "hearth", label: "Sign in at /hearth and confirm /admin opens" },
   { id: "contact", label: "Put a real email and business name on Contact" },

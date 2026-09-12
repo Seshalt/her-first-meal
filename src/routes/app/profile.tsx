@@ -9,6 +9,7 @@ import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
 import { altFor } from "@/lib/landing";
 import { deleteAccount, getMyHome, saveProfile } from "@/lib/server/profile";
 import { listNotifications, markNotificationsRead } from "@/lib/server/profile";
+import { PlaceAsk } from "@/components/house/place";
 
 export const Route = createFileRoute("/app/profile")({ component: Profile });
 
@@ -68,8 +69,26 @@ function Profile() {
           />
           <Label>Location</Label>
           <Input value={p.location ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, location: e.target.value } })} />
+          <Label>City</Label>
+          <Input value={p.city ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, city: e.target.value } })} />
           <Label>ZIP</Label>
           <Input value={p.zipCode ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, zipCode: e.target.value } })} />
+          <PlaceAsk
+            label={[p.city, p.location, p.zipCode].filter(Boolean).join(" · ")}
+            permission={p.locationPermission}
+            onSaved={(place) =>
+              setHome({
+                ...home,
+                profile: {
+                  ...p,
+                  city: place.city || p.city,
+                  location: place.location || p.location,
+                  zipCode: place.zipCode || p.zipCode,
+                  locationPermission: place.locationPermission,
+                },
+              })
+            }
+          />
           <p className="text-xs uppercase tracking-[0.28em] text-earth">Season</p>
           <div className="flex flex-wrap gap-2">
             {(Object.keys(STAGE_LABEL) as Stage[]).map((s) => (

@@ -56,7 +56,7 @@ export const applyAtelierEdit = createServerFn({ method: "POST" })
     if (!houseAiReady()) {
       return {
         ok: false as const,
-        text: "Add OPENAI_API_KEY in the Vercel project so ChatGPT can edit the public site from here.",
+        text: "Paste OPENAI_API_KEY in Vercel so ChatGPT can edit the public site. You can reuse a key from another website.",
       };
     }
     const sql = await getSql();

@@ -1601,9 +1601,82 @@ html:has(.landing-cinematic) body {
 .swap-plate-title { font-family: var(--font-display); font-size: 1.15rem; line-height: 1.15; }
 .swap-plate-meta { font-size: 0.75rem; color: var(--color-earth); }
 
+.place-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.1rem 1.4rem;
+  border-radius: 28px;
+  padding: 1.35rem 1.4rem;
+  background: color-mix(in oklab, var(--color-linen) 55%, white);
+  box-shadow: var(--shadow-border);
+}
+.place-card.is-known {
+  background: color-mix(in oklab, var(--color-gold) 12%, var(--color-paper));
+}
+.place-pin {
+  position: relative;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--color-gold);
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--color-gold) 35%, transparent);
+  animation: pin-drop 900ms var(--ease-out-soft) both;
+}
+.place-pin::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 999px;
+  background: var(--color-paper);
+}
+@keyframes pin-drop {
+  from { transform: rotate(-45deg) translateY(-12px); opacity: 0; }
+  to { transform: rotate(-45deg) translateY(0); opacity: 1; }
+}
+
+.kitchen-ask {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  .kitchen-ask { grid-template-columns: 1fr auto; align-items: center; }
+}
+.kitchen-grid {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .kitchen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) {
+  .kitchen-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.kitchen-card {
+  border-radius: 24px;
+  padding: 1.15rem 1.2rem 1.25rem;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-border);
+}
+.recipe-sheet {
+  border-radius: 22px;
+  padding: 1.15rem 1.2rem;
+  background: color-mix(in oklab, var(--color-paper) 78%, transparent);
+  box-shadow: var(--shadow-border);
+}
+.market-add {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  .market-add { grid-template-columns: 1fr 110px auto; align-items: center; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .carafe.is-pouring { transform: none; }
-  .pour-stream, .nouri-drop-bead { animation: none; }
+  .pour-stream, .nouri-drop-bead, .place-pin { animation: none; }
   .tumbler-water, .tick-mark, .jar-fill, .house-dock-pill, .house-nav-dot {
     transition: none;
   }

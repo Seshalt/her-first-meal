@@ -101,6 +101,20 @@ function Today() {
               tone="clay"
             />
             <RoomCard
+              to="/app/grocery"
+              photo="/images/grocery-partner.jpg"
+              alt={altFor("/images/grocery-partner.jpg")}
+              kicker="The market"
+              title="Grocery list"
+              body={
+                home.profile.city || home.profile.location || home.profile.zipCode
+                  ? `Built for ${home.profile.city || home.profile.location || home.profile.zipCode}. Tick what you gather.`
+                  : "Share a place so the list knows your market. Built from this week's plates."
+              }
+              label="Open the list"
+              tone="gold"
+            />
+            <RoomCard
               to="/app/binding"
               photo="/images/binding-hands.jpg"
               alt={altFor("/images/binding-hands.jpg")}
@@ -200,18 +214,26 @@ function RoomCard({
   tone,
   extra,
 }: {
-  to: "/app/meals" | "/app/binding" | "/app/nouri" | "/app/move";
+  to: "/app/meals" | "/app/grocery" | "/app/binding" | "/app/nouri" | "/app/move";
   photo: string;
   alt: string;
   kicker: string;
   title: string;
   body: string;
   label: string;
-  tone: "clay" | "blush" | "plum" | "sea";
+  tone: "clay" | "blush" | "plum" | "sea" | "gold";
   extra?: ReactNode;
 }) {
   const kickerClass =
-    tone === "clay" ? "text-clay" : tone === "blush" ? "text-blush" : tone === "plum" ? "text-plum" : "text-sea";
+    tone === "clay"
+      ? "text-clay"
+      : tone === "blush"
+        ? "text-blush"
+        : tone === "plum"
+          ? "text-plum"
+          : tone === "gold"
+            ? "text-gold"
+            : "text-sea";
   return (
     <article className="house-room">
       <Link to={to} className="house-room-link">

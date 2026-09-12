@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
-import { listPantry, removePantry, upsertPantry } from "@/lib/server/meals";
+import { listPantry, removePantry, stockPantryStaples, upsertPantry } from "@/lib/server/meals";
 import { altFor } from "@/lib/landing";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
@@ -14,6 +15,7 @@ function Pantry() {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState("item");
+  const [busy, setBusy] = useState(false);
 
   function reload() {
     void listPantry().then(setItems);
@@ -27,7 +29,7 @@ function Pantry() {
       <RoomHero
         kicker="The cupboard"
         title="Virtual pantry"
-        body="Estimated quantities, never confirmed inventory. Edit anything. Data stays on your signed-in account."
+        body="Jars you already keep. Grocery lists skip what is on this shelf. Estimated quantities, never confirmed inventory."
         src="/images/family-table.jpg"
         alt={altFor("/images/family-table.jpg")}
         tone="clay"
@@ -61,7 +63,29 @@ function Pantry() {
         </form>
 
         {items.length === 0 ? (
-          <p className="mt-12 font-display text-2xl text-ink-soft">Your pantry is empty. Add staples you already keep.</p>
+          <div className="mt-12">
+            <p className="font-display text-3xl leading-snug">The shelf is bare.</p>
+            <p className="mt-4 max-w-lg text-lg text-ink-soft">
+              Stock the usual jars — oil, salt, oats, rice, beans — so the grocery list does not buy what you already have.
+            </p>
+            <Button
+              type="button"
+              className="mt-6"
+              variant="clay"
+              disabled={busy}
+              onClick={() => {
+                setBusy(true);
+                void stockPantryStaples()
+                  .then((r) => {
+                    toast.success(r.added ? `${r.added} jars on the shelf.` : "Those jars were already here.");
+                    reload();
+                  })
+                  .finally(() => setBusy(false));
+              }}
+            >
+              {busy ? "Setting jars…" : "Stock the usual jars"}
+            </Button>
+          </div>
         ) : (
           <ul className="jar-shelf mt-12">
             {items.map((item) => {

@@ -12,6 +12,8 @@ export async function houseChat(input: {
 }): Promise<string | null> {
   const openai = process.env.OPENAI_API_KEY?.trim();
   const xai = process.env.XAI_API_KEY?.trim();
+  const jsonHint = input.json ? "\nReply with a single JSON object only." : "";
+  const system = `${input.system}${jsonHint}`;
   if (openai) {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -24,7 +26,7 @@ export async function houseChat(input: {
         max_tokens: input.maxTokens ?? 900,
         temperature: 0.7,
         response_format: input.json ? { type: "json_object" } : undefined,
-        messages: [{ role: "system", content: input.system }, ...input.messages.filter((m) => m.role !== "system")],
+        messages: [{ role: "system", content: system }, ...input.messages.filter((m) => m.role !== "system")],
       }),
     });
     if (!res.ok) return null;
@@ -42,7 +44,8 @@ export async function houseChat(input: {
         model: "grok-4.5",
         max_tokens: input.maxTokens ?? 900,
         temperature: 0.7,
-        messages: [{ role: "system", content: input.system }, ...input.messages.filter((m) => m.role !== "system")],
+        response_format: input.json ? { type: "json_object" } : undefined,
+        messages: [{ role: "system", content: system }, ...input.messages.filter((m) => m.role !== "system")],
       }),
     });
     if (!res.ok) return null;

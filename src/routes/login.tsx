@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/client";
+import { GROK_PROVIDERS, authClient, authEnabled, rememberSessionToken, signIn } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -71,12 +71,13 @@ function Login() {
     setBusy(true);
     setFormError("");
     try {
-      const { error } = await authClient.signIn.email({
+      const { data, error } = await authClient.signIn.email({
         email,
         password,
         rememberMe: true,
       });
       if (error) throw error;
+      rememberSessionToken((data as { token?: string } | null)?.token);
       const status = await requestEmailFactor();
       if (status.needed) {
         setFactor(status);

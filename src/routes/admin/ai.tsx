@@ -18,7 +18,8 @@ function HouseAi() {
       <h1 className="font-display text-4xl">House AI</h1>
       <p className="mt-3 text-sm text-white/60">
         Speak to ChatGPT here and it writes straight onto the public site — headlines, belly binding steps, contact
-        lines, footer links. You do not need to open each field.
+        lines, footer links. You do not need to open each field. Paste OPENAI_API_KEY in Vercel; you can reuse a key
+        from another website. A new key is only needed if you want this house billed on its own.
       </p>
       <Textarea
         className="mt-8 min-h-36 bg-white/8 text-[#efe6d6]"

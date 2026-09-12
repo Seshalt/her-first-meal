@@ -66,7 +66,7 @@ export const askNouri = createServerFn({ method: "POST" })
       `Stage: ${profile.stage ?? "unknown"}`,
       `Week estimate: ${week ?? "unknown"}`,
       `Household size: ${profile.householdSize}`,
-      `Location: ${profile.city || profile.location || profile.zipCode || "not shared"}`,
+      `Location: ${[profile.city, profile.location, profile.zipCode].filter(Boolean).join(" · ") || "not shared"}`,
       `Diets: ${asJson<string[]>(diet[0]?.diets, []).join(", ") || "none stated"}`,
       `Allergies: ${asJson<string[]>(diet[0]?.allergies, []).join(", ") || "none stated"}`,
       `Avoids: ${diet[0]?.avoids ?? "none"}`,

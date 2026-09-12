@@ -9,6 +9,7 @@ import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
 import { altFor } from "@/lib/landing";
 import { saveOnboarding } from "@/lib/server/profile";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
+import { PlaceAsk } from "@/components/house/place";
 
 export const Route = createFileRoute("/app/onboarding")({ component: Onboarding });
 
@@ -41,7 +42,7 @@ const STEPS = [
     label: "Market",
     kicker: "The list",
     title: "Where do you shop?",
-    body: "Choose as many stores as you like. Location is never required.",
+    body: "Choose stores, then share a place so Nouri can build grocery lists from your market — not a generic aisle.",
     src: "/images/grocery-partner.jpg",
     alt: altFor("/images/grocery-partner.jpg"),
   },
@@ -71,6 +72,8 @@ function Onboarding() {
   const [householdSize, setHouseholdSize] = useState(2);
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [zipCode, setZipCode] = useState("");
+  const [city, setCity] = useState("");
+  const [placePermission, setPlacePermission] = useState("");
   const [busy, setBusy] = useState(false);
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
@@ -108,6 +111,7 @@ function Onboarding() {
           householdSize,
           weeklyBudget,
           zipCode,
+          city,
           complete,
           step: nextStep,
         },
@@ -154,6 +158,16 @@ function Onboarding() {
           <div className="mt-8 space-y-4">
             <Field label="Name" value={displayName} onChange={setDisplayName} />
             <Field label="Location" value={location} onChange={setLocation} optional />
+            <PlaceAsk
+              label={[city, location, zipCode].filter(Boolean).join(" · ")}
+              permission={placePermission}
+              onSaved={(place) => {
+                setCity(place.city);
+                setLocation(place.location || location);
+                setZipCode(place.zipCode || zipCode);
+                setPlacePermission(place.locationPermission);
+              }}
+            />
             <Field label="Time zone" value={timezone} onChange={setTimezone} />
             <Field label="Language" value={language} onChange={setLanguage} />
           </div>
@@ -226,7 +240,18 @@ function Onboarding() {
                 </Pill>
               ))}
             </div>
+            <PlaceAsk
+              label={[city, location, zipCode].filter(Boolean).join(" · ")}
+              permission={placePermission}
+              onSaved={(place) => {
+                setCity(place.city);
+                setLocation(place.location || location);
+                setZipCode(place.zipCode || zipCode);
+                setPlacePermission(place.locationPermission);
+              }}
+            />
             <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
+            <Field label="City" value={city} onChange={setCity} optional />
             <Field
               label="Household size"
               value={String(householdSize)}
