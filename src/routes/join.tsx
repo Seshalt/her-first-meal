@@ -11,6 +11,8 @@ import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { EmailFactorForm } from "@/components/security/email-factor";
 import { requestEmailFactor } from "@/lib/server/email-factor";
 import { usePublicSite } from "@/lib/use-public-site";
+import { DietPicks, readJoinDiets, rememberJoinDiets } from "@/components/house/diet-picks";
+import { saveJoinDiets } from "@/lib/server/profile";
 
 export const Route = createFileRoute("/join")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -27,6 +29,7 @@ function Join() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [diets, setDiets] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [factor, setFactor] = useState<{
     needed: boolean;
@@ -37,6 +40,10 @@ function Join() {
   const guard = useFormGuard();
 
   useEffect(() => {
+    setDiets(readJoinDiets());
+  }, []);
+
+  useEffect(() => {
     if (!token) return;
     void getCheckoutByToken({ data: { token } }).then((row) => {
       if (row?.email) setEmail(row.email);
@@ -45,10 +52,18 @@ function Join() {
 
   useEffect(() => {
     if (isPending || !user || factor?.needed) return;
-    void claimMembership({ data: { token: token || undefined } }).then(() => {
-      void navigate({ to: "/app/onboarding" });
-    });
-  }, [isPending, user, token, navigate, factor?.needed]);
+    const picked = diets.length ? diets : readJoinDiets();
+    void saveJoinDiets({ data: { diets: picked } }).then(() =>
+      claimMembership({ data: { token: token || undefined } }).then(() => {
+        void navigate({ to: "/app/onboarding" });
+      }),
+    );
+  }, [isPending, user, token, navigate, factor?.needed, diets]);
+
+  function pickDiets(next: string[]) {
+    setDiets(next);
+    rememberJoinDiets(next);
+  }
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
@@ -58,6 +73,7 @@ function Join() {
       return;
     }
     setBusy(true);
+    rememberJoinDiets(diets);
     try {
       const { data, error } = await authClient.signUp.email({
         email,
@@ -69,6 +85,7 @@ function Join() {
       if (error) throw new Error(error.message);
       rememberSessionToken((data as { token?: string } | null)?.token);
       toast.success("Account created.");
+      await saveJoinDiets({ data: { diets } });
       await claimMembership({ data: { token: token || undefined } });
       const status = await requestEmailFactor();
       if (status.needed) {
@@ -108,25 +125,6 @@ function Join() {
             {site.joinBody}
           </p>
           <div className="editorial-rule mt-8" />
-          {authEnabled ? (
-            <div className="mt-10 space-y-3">
-              {GROK_PROVIDERS.map((p) => (
-                <Button
-                  key={p.providerId}
-                  type="button"
-                  variant="outline"
-                  className="w-full max-w-md"
-                  onClick={() =>
-                    void signIn(p.providerId, {
-                      callbackURL: token ? `/join?token=${encodeURIComponent(token)}` : "/app/onboarding",
-                    })
-                  }
-                >
-                  Continue with {p.label}
-                </Button>
-              ))}
-            </div>
-          ) : null}
           {factor?.needed ? (
             <EmailFactorForm
               emailMasked={factor.emailMasked}
@@ -138,36 +136,67 @@ function Join() {
               }}
             />
           ) : (
-          <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                minLength={10}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <HumanCheck
-              checked={guard.human}
-              onChecked={guard.setHuman}
-              honey={guard.honey}
-              onHoney={guard.setHoney}
-            />
-            <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
-              {busy ? "Creating…" : "Enter the house"}
-            </Button>
-          </form>
+            <>
+              <div className="mt-10 max-w-lg">
+                <p className="text-xs uppercase tracking-[0.28em] text-earth">How she eats</p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                  Vegan, pescatarian, gluten-free — tap every way that fits. Skip if she eats everything. The kitchen cooks from this.
+                </p>
+                <div className="mt-4">
+                  <DietPicks value={diets} onChange={pickDiets} tone="clay" />
+                </div>
+              </div>
+              {authEnabled ? (
+                <div className="mt-8 space-y-3">
+                  {GROK_PROVIDERS.map((p) => (
+                    <Button
+                      key={p.providerId}
+                      type="button"
+                      variant="outline"
+                      className="w-full max-w-md"
+                      onClick={() => {
+                        rememberJoinDiets(diets);
+                        void signIn(p.providerId, {
+                          callbackURL: token ? `/join?token=${encodeURIComponent(token)}` : "/app/onboarding",
+                        });
+                      }}
+                    >
+                      Continue with {p.label}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
+              <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
+                <div>
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    minLength={10}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <HumanCheck
+                  checked={guard.human}
+                  onChecked={guard.setHuman}
+                  honey={guard.honey}
+                  onHoney={guard.setHoney}
+                />
+                <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
+                  {busy ? "Creating…" : "Enter the house"}
+                </Button>
+              </form>
+            </>
           )}
         </div>
       </section>

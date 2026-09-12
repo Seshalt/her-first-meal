@@ -1586,11 +1586,11 @@ html:has(.landing-cinematic) body {
 .swap-plate {
   display: flex;
   min-height: 4.5rem;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.2rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
   border-radius: 18px;
-  padding: 0.85rem 1rem;
+  padding: 0.55rem 0.7rem 0.55rem 0.55rem;
   background: color-mix(in oklab, var(--color-paper) 80%, transparent);
   text-align: left;
   box-shadow: var(--shadow-border);
@@ -1598,6 +1598,14 @@ html:has(.landing-cinematic) body {
 }
 .swap-plate:hover { background: var(--color-paper); }
 .swap-plate:active { transform: scale(0.98); }
+.swap-plate-photo {
+  width: 3.4rem;
+  height: 3.4rem;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+}
+.swap-plate-copy { display: flex; min-width: 0; flex-direction: column; gap: 0.15rem; }
 .swap-plate-title { font-family: var(--font-display); font-size: 1.15rem; line-height: 1.15; }
 .swap-plate-meta { font-size: 0.75rem; color: var(--color-earth); }
 
@@ -1655,10 +1663,24 @@ html:has(.landing-cinematic) body {
   .kitchen-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .kitchen-card {
+  overflow: hidden;
   border-radius: 24px;
-  padding: 1.15rem 1.2rem 1.25rem;
   background: var(--color-paper);
   box-shadow: var(--shadow-border);
+}
+.kitchen-card-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+.kitchen-card-photo img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.kitchen-card-body {
+  padding: 1.15rem 1.2rem 1.25rem;
 }
 .recipe-sheet {
   border-radius: 22px;

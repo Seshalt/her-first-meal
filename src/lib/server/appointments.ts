@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { asJson } from "./json";
+import { createStripeMeetingCheckout, publicOrigin, stripeConfigured, stripeSessionPaid } from "./stripe";
 
 const TYPES = [
   { id: "consultation", label: "Wellness consultation", minutes: 45 },
@@ -36,7 +37,7 @@ export const listMyAppointments = createServerFn({ method: "GET" })
 export const listOpenSlots = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .validator((input?: { day?: string }) => input ?? {})
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const sql = await getSql();
     const settings = await sql<{
       business_hours: unknown;
@@ -84,7 +85,20 @@ export const listOpenSlots = createServerFn({ method: "GET" })
     const meeting = await sql<{ price_cents: number }>`
       select price_cents from products where slug = 'consultation' and active = true limit 1
     `;
-    return { slots: slots.slice(0, 40), types: TYPES, meetingPriceCents: Number(meeting[0]?.price_cents ?? 12000) };
+    const credits = await sql<{ count: number }>`
+      select count(*)::int as count from purchases
+      where user_id = ${context.userId}
+        and status = 'paid'
+        and appointment_id is null
+        and product_id in (select id from products where slug = 'consultation' or kind = 'consultation')
+    `;
+    return {
+      slots: slots.slice(0, 40),
+      types: TYPES,
+      meetingPriceCents: Number(meeting[0]?.price_cents ?? 12000),
+      stripeReady: stripeConfigured(),
+      credits: Number(credits[0]?.count ?? 0),
+    };
   });
 
 export const bookAppointment = createServerFn({ method: "POST" })
@@ -97,6 +111,44 @@ export const bookAppointment = createServerFn({ method: "POST" })
     `;
     const duration = Number(settings[0]?.appointment_duration_minutes ?? 45);
     const endsAt = addMinutes(data.startsAt, duration);
+    const credit = await sql<{ id: number }>`
+      select id from purchases
+      where user_id = ${context.userId}
+        and status = 'paid'
+        and appointment_id is null
+        and product_id in (select id from products where slug = 'consultation' or kind = 'consultation')
+      order by created_at asc
+      limit 1
+    `;
+    if (!credit[0]) {
+      if (!stripeConfigured()) {
+        return {
+          ok: false as const,
+          error: "Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel, then pay to hold a time.",
+        };
+      }
+      const meeting = await sql<{ id: number; price_cents: number }>`
+        select id, price_cents from products where slug = 'consultation' and active = true limit 1
+      `;
+      if (!meeting[0]) return { ok: false as const, error: "No meeting is priced yet." };
+      const profile = await sql<{ email: string | null; display_name: string | null }>`
+        select email, display_name from profiles where user_id = ${context.userId}
+      `;
+      const email = profile[0]?.email?.trim();
+      if (!email) return { ok: false as const, error: "Add an email on your profile before Stripe can bill this meeting." };
+      const session = await createStripeMeetingCheckout({
+        email,
+        name: profile[0]?.display_name || "Member",
+        priceCents: meeting[0].price_cents,
+        origin: publicOrigin(),
+        productId: meeting[0].id,
+        userId: context.userId,
+        startsAt: data.startsAt,
+        type: data.type,
+      });
+      if ("error" in session) return { ok: false as const, error: session.error };
+      return { ok: false as const, needsCheckout: true as const, url: session.url };
+    }
     try {
       const inserted = await sql<{ id: number }>`
         insert into appointments (user_id, type, starts_at, ends_at, status, zoom_link, client_notes)
@@ -111,21 +163,9 @@ export const bookAppointment = createServerFn({ method: "POST" })
         )
         returning id
       `;
-      const meeting = await sql<{ id: number; price_cents: number }>`
-        select id, price_cents from products where slug = 'consultation' and active = true limit 1
-      `;
-      if (meeting[0]) {
-        const profile = await sql<{ email: string | null }>`select email from profiles where user_id = ${context.userId}`;
-        await sql`
-          insert into purchases (user_id, email, product_id, amount_cents, status)
-          values (
-            ${context.userId},
-            ${profile[0]?.email ?? "member"},
-            ${meeting[0].id},
-            ${meeting[0].price_cents},
-            'paid'
-          )
-        `;
+      const appointmentId = inserted[0]?.id;
+      if (appointmentId) {
+        await sql`update purchases set appointment_id = ${appointmentId}, starts_at = ${data.startsAt} where id = ${credit[0].id}`;
       }
       await sql`
         insert into notifications (user_id, kind, title, body)
@@ -136,10 +176,89 @@ export const bookAppointment = createServerFn({ method: "POST" })
           ${`Your ${data.type} is held. It is no longer available to anyone else.`}
         )
       `;
-      return { ok: true as const, id: inserted[0]?.id, chargedCents: meeting[0]?.price_cents ?? 0 };
+      return { ok: true as const, id: appointmentId, chargedCents: 0, usedCredit: true as const };
     } catch {
       return { ok: false as const, error: "That time was just taken. Please choose another." };
     }
+  });
+
+export const confirmMeetingCheckout = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { sessionId: string }) => ({ sessionId: input.sessionId.trim() }))
+  .handler(async ({ context, data }) => {
+    if (!data.sessionId) return { ok: false as const, error: "Missing Stripe session." };
+    const paid = await stripeSessionPaid(data.sessionId);
+    if (!paid.paid) return { ok: false as const, error: "Stripe has not marked this payment complete." };
+    if (paid.kind && paid.kind !== "meeting") return { ok: false as const, error: "That checkout was not a meeting." };
+    if (paid.userId && paid.userId !== context.userId) {
+      return { ok: false as const, error: "This payment belongs to another member." };
+    }
+    const sql = await getSql();
+    const existing = await sql<{ id: number; appointment_id: number | null }>`
+      select id, appointment_id from purchases where stripe_session = ${data.sessionId}
+    `;
+    if (existing[0]) {
+      return { ok: true as const, appointmentId: existing[0].appointment_id, already: true as const };
+    }
+    const meeting = await sql<{ id: number; price_cents: number }>`
+      select id, price_cents from products
+      where id = ${paid.productId ?? 0} or slug = 'consultation'
+      order by case when id = ${paid.productId ?? 0} then 0 else 1 end
+      limit 1
+    `;
+    if (!meeting[0]) return { ok: false as const, error: "No meeting product is priced." };
+    const profile = await sql<{ email: string | null }>`select email from profiles where user_id = ${context.userId}`;
+    const inserted = await sql<{ id: number }>`
+      insert into purchases (user_id, email, product_id, amount_cents, status, stripe_session, starts_at)
+      values (
+        ${context.userId},
+        ${profile[0]?.email ?? paid.email ?? "member"},
+        ${meeting[0].id},
+        ${meeting[0].price_cents},
+        'paid',
+        ${data.sessionId},
+        ${paid.startsAt ?? null}
+      )
+      returning id
+    `;
+    let appointmentId: number | null = null;
+    if (paid.startsAt) {
+      const settings = await sql<{ appointment_duration_minutes: number; zoom_default_link: string | null }>`
+        select appointment_duration_minutes, zoom_default_link from business_settings where id = 1
+      `;
+      const duration = Number(settings[0]?.appointment_duration_minutes ?? 45);
+      const type = paid.type || "consultation";
+      try {
+        const booked = await sql<{ id: number }>`
+          insert into appointments (user_id, type, starts_at, ends_at, status, zoom_link)
+          values (
+            ${context.userId},
+            ${type},
+            ${paid.startsAt},
+            ${addMinutes(paid.startsAt, duration)},
+            'confirmed',
+            ${settings[0]?.zoom_default_link ?? null}
+          )
+          returning id
+        `;
+        appointmentId = booked[0]?.id ?? null;
+        if (appointmentId) {
+          await sql`update purchases set appointment_id = ${appointmentId} where id = ${inserted[0].id}`;
+        }
+        await sql`
+          insert into notifications (user_id, kind, title, body)
+          values (
+            ${context.userId},
+            'booking',
+            'Appointment confirmed',
+            ${`Your ${type} is held after Stripe. It is no longer available to anyone else.`}
+          )
+        `;
+      } catch {
+        /* payment stands as unused credit if the slot was taken */
+      }
+    }
+    return { ok: true as const, appointmentId, already: false as const };
   });
 
 export const cancelAppointment = createServerFn({ method: "POST" })

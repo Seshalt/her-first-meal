@@ -1,15 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand/logo";
 import { Pill } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Textarea } from "@/components/ui/input";
-import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
 import { altFor } from "@/lib/landing";
-import { saveOnboarding } from "@/lib/server/profile";
+import { getMyHome, saveJoinDiets, saveOnboarding } from "@/lib/server/profile";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { PlaceAsk } from "@/components/house/place";
+import { DietPicks, readJoinDiets, rememberJoinDiets } from "@/components/house/diet-picks";
 
 export const Route = createFileRoute("/app/onboarding")({ component: Onboarding });
 
@@ -18,7 +19,7 @@ const STEPS = [
     label: "You",
     kicker: "Welcome",
     title: "What shall we call you?",
-    body: "A name, a place, a language. Nothing else is required yet.",
+    body: "A name, and how she eats. Vegan, pescatarian, gluten-free — the kitchen starts here.",
     src: "/images/hero-kitchen.jpg",
     alt: altFor("/images/hero-kitchen.jpg"),
   },
@@ -33,8 +34,8 @@ const STEPS = [
   {
     label: "Plate",
     kicker: "Nourish",
-    title: "What does her plate need?",
-    body: "Loves, avoids, allergies. We cook from this, not a generic week.",
+    title: "Vegan, pescatarian, or something else?",
+    body: "Tap every way she eats. Loves, avoids, allergies. We cook from this, not a generic week.",
     src: "/images/meal-bowl.jpg",
     alt: altFor("/images/meal-bowl.jpg"),
   },
@@ -75,6 +76,52 @@ function Onboarding() {
   const [city, setCity] = useState("");
   const [placePermission, setPlacePermission] = useState("");
   const [busy, setBusy] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getMyHome()
+      .then((home) => {
+        if (cancelled) return;
+        if (home.profile.displayName) setDisplayName(home.profile.displayName);
+        if (home.profile.location) setLocation(home.profile.location);
+        if (home.profile.timezone) setTimezone(home.profile.timezone);
+        if (home.profile.language) setLanguage(home.profile.language);
+        if (home.profile.stage) setStage(home.profile.stage);
+        if (home.profile.city) setCity(home.profile.city);
+        if (home.profile.zipCode) setZipCode(home.profile.zipCode);
+        setPlacePermission(home.profile.locationPermission || "");
+        const stored = readJoinDiets();
+        const fromHome = home.diet.diets;
+        const next = fromHome.length ? fromHome : stored;
+        setDiets(next);
+        if (home.diet.allergies.length) setAllergies(home.diet.allergies.join(", "));
+        if (home.diet.avoids) setAvoids(home.diet.avoids);
+        if (home.diet.dislikes) setDislikes(home.diet.dislikes);
+        if (home.diet.loves) setLoves(home.diet.loves);
+        if (home.diet.cuisines.length) setCuisines(home.diet.cuisines.join(", "));
+        if (home.grocery.stores.length) setStores(home.grocery.stores);
+        if (next.length && !fromHome.length) {
+          rememberJoinDiets(next);
+          void saveJoinDiets({ data: { diets: next } });
+        }
+      })
+      .catch(() => {
+        const stored = readJoinDiets();
+        if (stored.length) setDiets(stored);
+      })
+      .finally(() => {
+        if (!cancelled) setDraftReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function pickDiets(next: string[]) {
+    setDiets(next);
+    rememberJoinDiets(next);
+  }
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
     set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
@@ -157,6 +204,15 @@ function Onboarding() {
         {step === 0 ? (
           <div className="mt-8 space-y-4">
             <Field label="Name" value={displayName} onChange={setDisplayName} />
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-earth">How she eats</p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Vegan, vegetarian, pescatarian, gluten-free — tap every way that fits. Skip if she eats everything.
+              </p>
+              <div className="mt-3">
+                <DietPicks value={diets} onChange={pickDiets} tone="clay" />
+              </div>
+            </div>
             <Field label="Location" value={location} onChange={setLocation} optional />
             <PlaceAsk
               label={[city, location, zipCode].filter(Boolean).join(" · ")}
@@ -207,13 +263,8 @@ function Onboarding() {
 
         {step === 2 ? (
           <div className="mt-8 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {DIETS.map((d) => (
-                <Pill key={d.id} active={diets.includes(d.id)} onClick={() => toggle(diets, d.id, setDiets)}>
-                  {d.label}
-                </Pill>
-              ))}
-            </div>
+            <p className="text-xs uppercase tracking-[0.28em] text-earth">Diet</p>
+            <DietPicks value={diets} onChange={pickDiets} tone="clay" />
             <Field label="Allergies (comma separated)" value={allergies} onChange={setAllergies} optional />
             <div>
               <Label>What foods do you avoid?</Label>
@@ -269,7 +320,7 @@ function Onboarding() {
             </Button>
           ) : null}
           {step < STEPS.length - 1 ? (
-            <Button type="button" disabled={busy || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
+            <Button type="button" disabled={busy || !draftReady || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
               Continue
             </Button>
           ) : (

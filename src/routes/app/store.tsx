@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
-import { buyProduct, listStore } from "@/lib/server/binding";
+import { listStore, startMeetingCheckout } from "@/lib/server/binding";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { altFor } from "@/lib/landing";
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/app/store")({ component: Store });
 
 function Store() {
   const [data, setData] = useState<Awaited<ReturnType<typeof listStore>> | null>(null);
+  const [paying, setPaying] = useState<number | null>(null);
   useEffect(() => {
     void listStore().then(setData);
   }, []);
@@ -21,7 +22,7 @@ function Store() {
       <RoomHero
         kicker="The only extra"
         title="A meeting with Maat"
-        body="Membership already holds the table, the studio, Nouri, and the pantry. The only thing billed beyond that is time with Maat."
+        body="Membership already holds the table, the studio, Nouri, and the pantry. The only thing billed beyond that is time with Maat — paid on Stripe, not with a pretend click."
         src="/images/binding-hands.jpg"
         alt={altFor("/images/binding-hands.jpg")}
         tone="gold"
@@ -46,24 +47,35 @@ function Store() {
                 <h2 className="mt-4 font-display text-[clamp(2.2rem,4vw,3.8rem)]">{p.name}</h2>
                 <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{p.description}</p>
                 <p className="mt-6 font-display text-4xl tabular-nums">{formatCurrency(p.price_cents)}</p>
-                <p className="mt-2 text-sm text-ink-soft">Per session. Not included in membership.</p>
+                <p className="mt-2 text-sm text-ink-soft">Per session. Not included in membership. Stripe opens so you can pay for real.</p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button
                     variant="blush"
-                    onClick={() =>
-                      void buyProduct({ data: { productId: p.id } }).then((r) => {
-                        if (r.ok) toast.success("Held. Choose a time on the calendar.");
-                        else toast.error(r.error);
-                        void listStore().then(setData);
-                      })
-                    }
+                    disabled={paying === p.id}
+                    onClick={() => {
+                      setPaying(p.id);
+                      void startMeetingCheckout({ data: { productId: p.id } })
+                        .then((r) => {
+                          if (r.ok && r.url) {
+                            window.location.assign(r.url);
+                            return;
+                          }
+                          toast.error("error" in r ? r.error : "Stripe could not open checkout.");
+                        })
+                        .finally(() => setPaying(null));
+                    }}
                   >
-                    Pay for a session
+                    {paying === p.id ? "Opening Stripe…" : "Pay on Stripe"}
                   </Button>
                   <Button asChild variant="outline">
                     <Link to="/app/appointments">Pick a time</Link>
                   </Button>
                 </div>
+                {!data.stripeReady ? (
+                  <p className="mt-4 max-w-md text-sm text-ink-soft">
+                    Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel — we will not pretend this is paid.
+                  </p>
+                ) : null}
               </div>
             </article>
           ))

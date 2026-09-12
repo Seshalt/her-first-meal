@@ -1,3 +1,5 @@
+import { RECIPE_IMAGE_ALT } from "@/lib/content/catalog";
+
 export const LANDING_IMAGE_SLOTS = [
   { id: "logo", label: "Logo (header mark)", fallback: "", alt: "" },
   {
@@ -131,9 +133,10 @@ export const LANDING_IMAGE_SLOTS = [
 export type LandingImageSlot = (typeof LANDING_IMAGE_SLOTS)[number]["id"];
 
 /** Alt text keyed to the photo file, so every page uses the same words. */
-export const IMAGE_ALT: Record<string, string> = Object.fromEntries(
-  LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback.split("?")[0], s.alt]),
-);
+export const IMAGE_ALT: Record<string, string> = {
+  ...Object.fromEntries(LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback.split("?")[0], s.alt])),
+  ...RECIPE_IMAGE_ALT,
+};
 
 export function altFor(src: string, fallback = ""): string {
   if (!src) return fallback;

@@ -2,17 +2,36 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
-import { bookAppointment, cancelAppointment, listMyAppointments, listOpenSlots } from "@/lib/server/appointments";
+import {
+  bookAppointment,
+  cancelAppointment,
+  confirmMeetingCheckout,
+  listMyAppointments,
+  listOpenSlots,
+} from "@/lib/server/appointments";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { altFor } from "@/lib/landing";
 
-export const Route = createFileRoute("/app/appointments")({ component: Appointments });
+type AppointmentsSearch = {
+  paid?: string;
+  session_id?: string;
+};
+
+export const Route = createFileRoute("/app/appointments")({
+  validateSearch: (s: Record<string, unknown>): AppointmentsSearch => ({
+    paid: s.paid === "1" || s.paid === 1 ? "1" : undefined,
+    session_id: typeof s.session_id === "string" && s.session_id ? s.session_id : undefined,
+  }),
+  component: Appointments,
+});
 
 function Appointments() {
+  const { paid, session_id: sessionId } = Route.useSearch();
   const [mine, setMine] = useState<Awaited<ReturnType<typeof listMyAppointments>> | null>(null);
   const [open, setOpen] = useState<Awaited<ReturnType<typeof listOpenSlots>> | null>(null);
   const [type, setType] = useState("consultation");
+  const [holding, setHolding] = useState<string | null>(null);
 
   function reload() {
     void listMyAppointments().then(setMine);
@@ -22,21 +41,45 @@ function Appointments() {
     reload();
   }, []);
 
+  useEffect(() => {
+    if (paid !== "1" || !sessionId) return;
+    void confirmMeetingCheckout({ data: { sessionId } }).then((res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(
+        res.appointmentId
+          ? "Stripe is paid. That time is held."
+          : "Stripe is paid. Pick a time below — it will use this session.",
+      );
+      reload();
+    });
+  }, [paid, sessionId]);
+
   return (
     <div>
       <RoomHero
         kicker="The only extra"
         title="A time with Maat"
-        body="Membership already includes the house. Holding a live session is the only additional charge — it is billed when you take the time."
+        body="Membership already includes the house. Holding a live session opens Stripe so you pay for real — we will not mark it paid on a click."
         src="/images/family-table.jpg"
         alt={altFor("/images/family-table.jpg")}
         tone="gold"
       />
       <RoomBody>
         <p className="rounded-2xl bg-wash-blush px-5 py-4 text-sm leading-relaxed text-blush-deep">
-          {formatCurrency(open?.meetingPriceCents ?? 12000)} per session. Nothing else in the house is billed on top
-          of membership.
+          {formatCurrency(open?.meetingPriceCents ?? 12000)} per session. Nothing else in the house is billed on top of
+          membership.
+          {(open?.credits ?? 0) > 0
+            ? ` You have ${open?.credits} unused paid session${open?.credits === 1 ? "" : "s"} ready to hold a time.`
+            : ""}
         </p>
+        {!open?.stripeReady && !(open?.credits ?? 0) ? (
+          <p className="mt-4 text-sm text-ink-soft">
+            Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel before a meeting can be billed.
+          </p>
+        ) : null}
         <div className="mt-8 flex flex-wrap gap-2">
           {(open?.types ?? mine?.types ?? []).map((t) => (
             <Pill key={t.id} active={type === t.id} onClick={() => setType(t.id)}>
@@ -54,17 +97,36 @@ function Appointments() {
               <li key={s.startsAt} className="border-b border-border">
                 <button
                   type="button"
-                  className="flex min-h-16 w-full items-center justify-between py-5 text-left"
-                  onClick={() =>
-                    void bookAppointment({ data: { type, startsAt: s.startsAt } }).then((res) => {
-                      if (!res.ok) toast.error(res.error);
-                      else toast.success(`Held for ${formatCurrency(res.chargedCents || open?.meetingPriceCents || 12000)}. That time is no longer open.`);
-                      reload();
-                    })
-                  }
+                  disabled={holding === s.startsAt}
+                  className="flex min-h-16 w-full items-center justify-between py-5 text-left disabled:opacity-60"
+                  onClick={() => {
+                    setHolding(s.startsAt);
+                    void bookAppointment({ data: { type, startsAt: s.startsAt } })
+                      .then((res) => {
+                        if ("needsCheckout" in res && res.needsCheckout && res.url) {
+                          window.location.assign(res.url);
+                          return;
+                        }
+                        if (!res.ok) toast.error(res.error);
+                        else
+                          toast.success(
+                            res.usedCredit
+                              ? "Held with the session you already paid for. That time is no longer open."
+                              : "Held. That time is no longer open.",
+                          );
+                        reload();
+                      })
+                      .finally(() => setHolding(null));
+                  }}
                 >
                   <span className="font-display text-2xl">{new Date(s.startsAt).toLocaleString()}</span>
-                  <span className="text-sm text-primary">Hold this time</span>
+                  <span className="text-sm text-primary">
+                    {holding === s.startsAt
+                      ? "Opening…"
+                      : (open?.credits ?? 0) > 0
+                        ? "Hold this time"
+                        : "Pay on Stripe to hold"}
+                  </span>
                 </button>
               </li>
             ))

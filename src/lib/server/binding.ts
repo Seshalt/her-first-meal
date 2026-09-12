@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
+import { createStripeMeetingCheckout, publicOrigin, stripeConfigured } from "./stripe";
 
 export const listBindingUploads = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -66,22 +67,39 @@ export const listStore = createServerFn({ method: "GET" })
       created_at: string;
       product_id: number | null;
     }>`select id, amount_cents, status, created_at, product_id from purchases where user_id = ${context.userId} order by created_at desc`;
-    return { products, history };
+    return { products, history, stripeReady: stripeConfigured() };
   });
 
-export const buyProduct = createServerFn({ method: "POST" })
+export const startMeetingCheckout = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator((input: { productId: number }) => input)
+  .validator((input: { productId: number; startsAt?: string; type?: string }) => input)
   .handler(async ({ context, data }) => {
+    if (!stripeConfigured()) {
+      return {
+        ok: false as const,
+        error: "Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel, then pay for a meeting.",
+      };
+    }
     const sql = await getSql();
-    const product = await sql<{ price_cents: number; name: string }>`
+    const product = await sql<{ price_cents: number; name: string; email?: string }>`
       select price_cents, name from products where id = ${data.productId} and active = true
     `;
     if (!product[0]) return { ok: false as const, error: "That offering is no longer available." };
-    const profile = await sql<{ email: string | null }>`select email from profiles where user_id = ${context.userId}`;
-    await sql`
-      insert into purchases (user_id, email, product_id, amount_cents, status)
-      values (${context.userId}, ${profile[0]?.email ?? "member"}, ${data.productId}, ${product[0].price_cents}, 'paid')
+    const profile = await sql<{ email: string | null; display_name: string | null }>`
+      select email, display_name from profiles where user_id = ${context.userId}
     `;
-    return { ok: true as const };
+    const email = profile[0]?.email?.trim();
+    if (!email) return { ok: false as const, error: "Add an email on your profile before Stripe can bill this meeting." };
+    const session = await createStripeMeetingCheckout({
+      email,
+      name: profile[0]?.display_name || "Member",
+      priceCents: product[0].price_cents,
+      origin: publicOrigin(),
+      productId: data.productId,
+      userId: context.userId,
+      startsAt: data.startsAt,
+      type: data.type,
+    });
+    if ("error" in session) return { ok: false as const, error: session.error };
+    return { ok: true as const, url: session.url };
   });

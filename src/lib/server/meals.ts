@@ -6,6 +6,7 @@ import {
   RECIPES,
   SEASONAL_PRODUCE,
   recipesFor,
+  recipePhoto,
   type Recipe,
   type Stage,
 } from "@/lib/content/catalog";
@@ -14,6 +15,7 @@ import { ensureProfile } from "./profile";
 import { houseAiReady, houseChat } from "./openai";
 import { uid } from "@/lib/utils";
 import type { Profile } from "./types";
+import { peekAiQuota, quotaMessage, takeAiTurn } from "./ai-quota";
 
 function startOfWeekISO() {
   const d = new Date();
@@ -74,6 +76,7 @@ async function ensureMealWeek(sql: Sql, userId: string) {
     profile,
     aiReady: houseAiReady(),
     place: placeLine(profile),
+    ai: await peekAiQuota(userId),
   };
 }
 
@@ -99,6 +102,7 @@ export const getMealWeek = createServerFn({ method: "GET" })
       catalog: week.catalog,
       aiReady: week.aiReady,
       place: week.place,
+      ai: week.ai,
     };
   });
 
@@ -131,13 +135,45 @@ function fallbackPlate(profile: Profile, usedIds: string[], want?: string): Reci
   const pick = source[Math.floor(Math.random() * source.length)] ?? RECIPES[0];
   return {
     ...pick,
-    id: uid("plate"),
-    title: want ? `${pick.title}` : pick.title,
     summary: want
-      ? `A house plate close to “${want.slice(0, 80)}.” The kitchen will write originals once ChatGPT is connected.`
+      ? `A house recipe close to “${want.slice(0, 80)}.”`
       : pick.summary,
-    why: want ? `Built from the house catalog while we wait on a ChatGPT key.` : pick.why,
   };
+}
+
+function imageForGenerated(title: string, ingredients: { name?: string }[]): string {
+  const blob = `${title} ${ingredients.map((i) => i.name ?? "").join(" ")}`.toLowerCase();
+  const hits: [string, string][] = [
+    ["salmon", "salmon-dill"],
+    ["fish", "coconut-fish"],
+    ["oat", "oat-restore"],
+    ["pancake", "banana-oat-cakes"],
+    ["banana", "banana-oat-cakes"],
+    ["avocado", "soft-egg-toast"],
+    ["toast", "soft-egg-toast"],
+    ["egg", "herb-frittata"],
+    ["lentil", "golden-lentil"],
+    ["chickpea", "chickpea-spinach"],
+    ["chili", "turkey-chili"],
+    ["bean", "black-bean"],
+    ["orzo", "chicken-orzo"],
+    ["chicken", "sheet-chicken-squash"],
+    ["jollof", "jollof-greens"],
+    ["rice porridge", "rice-porridge"],
+    ["congee", "rice-porridge"],
+    ["quinoa", "quinoa-black-bean"],
+    ["apple", "apple-quinoa"],
+    ["sweet potato", "miso-sweet-potato"],
+    ["beet", "beet-citrus"],
+    ["date", "tahini-dates"],
+    ["ginger", "ginger-broth"],
+    ["broth", "ginger-broth"],
+    ["porridge", "cornmeal-porridge"],
+  ];
+  for (const [key, id] of hits) {
+    if (blob.includes(key)) return recipePhoto(id);
+  }
+  return recipePhoto("golden-lentil");
 }
 
 export const cookAnotherPlate = createServerFn({ method: "POST" })
@@ -158,24 +194,34 @@ export const cookAnotherPlate = createServerFn({ method: "POST" })
     `;
     const meals = asJson<MealSlot[]>(existing[0]?.meals, []);
     const usedIds = meals.map((m) => m.recipeId);
-    const raw = await houseChat({
-      json: true,
-      maxTokens: 900,
-      system:
-        "Write one original pregnancy or postpartum recipe as JSON with keys: title, summary, minutes, servings, why, ingredients (array of {name, qty, dept}), steps (string array). Soft, maternal, practical. Never diagnose. Respect allergies. No alcohol. No raw fish or unpasteurized dairy. Prefer ingredients she can find at ordinary grocery stores near the given location.",
-      messages: [
-        {
-          role: "user",
-          content: kitchenNotes(profile, [
-            `Diets: ${asJson<string[]>(diet[0]?.diets, []).join(", ") || "none"}`,
-            `Allergies: ${asJson<string[]>(diet[0]?.allergies, []).join(", ") || "none"}`,
-            `Avoids: ${diet[0]?.avoids ?? "none"}`,
-            `Loves: ${diet[0]?.loves ?? "none"}`,
-            data.want ? `She asked for: ${data.want.slice(0, 240)}` : "Surprise her with a new plate for this day.",
-          ]),
-        },
-      ],
-    });
+    const want = data.want?.trim();
+    let raw: string | null = null;
+    let quotaNote: string | null = null;
+    if (want && houseAiReady()) {
+      const turn = await takeAiTurn(context.userId, "recipes");
+      if (turn.ok) {
+        raw = await houseChat({
+          json: true,
+          maxTokens: 900,
+          system:
+            "Write one original pregnancy or postpartum recipe as JSON with keys: title, summary, minutes, servings, why, ingredients (array of {name, qty, dept}), steps (string array). Soft, maternal, practical. Never diagnose. Respect allergies. No alcohol. No raw fish or unpasteurized dairy. Prefer ingredients she can find at ordinary grocery stores near the given location.",
+          messages: [
+            {
+              role: "user",
+              content: kitchenNotes(profile, [
+                `Diets: ${asJson<string[]>(diet[0]?.diets, []).join(", ") || "none"}`,
+                `Allergies: ${asJson<string[]>(diet[0]?.allergies, []).join(", ") || "none"}`,
+                `Avoids: ${diet[0]?.avoids ?? "none"}`,
+                `Loves: ${diet[0]?.loves ?? "none"}`,
+                `She asked for: ${want.slice(0, 240)}`,
+              ]),
+            },
+          ],
+        });
+      } else {
+        quotaNote = quotaMessage("recipes");
+      }
+    }
     let recipe: Recipe;
     if (raw) {
       let parsed: Partial<Recipe> = {};
@@ -184,6 +230,7 @@ export const cookAnotherPlate = createServerFn({ method: "POST" })
       } catch {
         parsed = {};
       }
+      const ingredients = Array.isArray(parsed.ingredients) ? parsed.ingredients : [];
       recipe = {
         id: uid("plate"),
         title: parsed.title || "A quiet bowl",
@@ -192,14 +239,14 @@ export const cookAnotherPlate = createServerFn({ method: "POST" })
         diets: asJson<Recipe["diets"]>(parsed.diets, []),
         minutes: Number(parsed.minutes ?? 30),
         servings: Number(parsed.servings ?? 2),
-        image: "/images/meal-bowl.jpg",
+        image: imageForGenerated(parsed.title || want || "", ingredients),
         department: "kitchen",
-        ingredients: Array.isArray(parsed.ingredients) ? parsed.ingredients : [],
+        ingredients,
         steps: Array.isArray(parsed.steps) ? parsed.steps : [],
         why: parsed.why || "Made for her table today.",
       };
     } else {
-      recipe = fallbackPlate(profile, usedIds, data.want);
+      recipe = fallbackPlate(profile, usedIds, want);
     }
     const next = meals.map((m) => (m.day === data.day ? { day: data.day, recipeId: recipe.id, recipe } : m));
     await sql`
@@ -207,7 +254,7 @@ export const cookAnotherPlate = createServerFn({ method: "POST" })
       values (${context.userId}, ${weekStart}, ${JSON.stringify(next)}::jsonb)
       on conflict (user_id, week_start) do update set meals = excluded.meals
     `;
-    return { ok: true, recipe, original: Boolean(raw) };
+    return { ok: true, recipe, original: Boolean(raw), quotaNote };
   });
 
 type GroceryItem = { name: string; qty: string; dept: string; checked: boolean; from?: string };
@@ -329,39 +376,44 @@ export const composeLocalGrocery = createServerFn({ method: "POST" })
     const month = new Date().getMonth();
     const seasonal = SEASONAL_PRODUCE[month] ?? SEASONAL_PRODUCE[0];
     let extras: GroceryItem[] = seasonal.map((s) => ({ ...s, checked: false, from: "market" }));
-    const raw = await houseChat({
-      json: true,
-      maxTokens: 700,
-      system:
-        "Return JSON {items:[{name, qty, dept}]} with 6 to 10 grocery items a pregnant or postpartum mother should pick up this week. Prefer seasonal produce for the given city and ordinary aisles at the named stores. Skip anything already on the list or in the pantry. No alcohol. Never diagnose.",
-      messages: [
-        {
-          role: "user",
-          content: kitchenNotes(week.profile, [
-            `Stores: ${week.stores.join(", ") || "unspecified"}`,
-            `Already on the list: ${current.map((i) => i.name).join(", ") || "none"}`,
-            `Pantry: ${pantry.map((p) => p.name).join(", ") || "none"}`,
-            `This week's plates: ${week.meals.map((m) => m.recipe.title).join("; ")}`,
-          ]),
-        },
-      ],
-    });
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as { items?: { name?: string; qty?: string; dept?: string }[] };
-        if (Array.isArray(parsed.items) && parsed.items.length) {
-          extras = parsed.items
-            .filter((i) => i.name)
-            .map((i) => ({
-              name: String(i.name).slice(0, 80),
-              qty: String(i.qty || "1").slice(0, 24),
-              dept: String(i.dept || "Produce").slice(0, 32),
-              checked: false,
-              from: "market",
-            }));
+    let original = false;
+    const turn = houseAiReady() ? await takeAiTurn(context.userId, "grocery") : { ok: false, left: 0 };
+    if (turn.ok) {
+      const raw = await houseChat({
+        json: true,
+        maxTokens: 700,
+        system:
+          "Return JSON {items:[{name, qty, dept}]} with 6 to 10 grocery items a pregnant or postpartum mother should pick up this week. Prefer seasonal produce for the given city and ordinary aisles at the named stores. Skip anything already on the list or in the pantry. No alcohol. Never diagnose.",
+        messages: [
+          {
+            role: "user",
+            content: kitchenNotes(week.profile, [
+              `Stores: ${week.stores.join(", ") || "unspecified"}`,
+              `Already on the list: ${current.map((i) => i.name).join(", ") || "none"}`,
+              `Pantry: ${pantry.map((p) => p.name).join(", ") || "none"}`,
+              `This week's plates: ${week.meals.map((m) => m.recipe.title).join("; ")}`,
+            ]),
+          },
+        ],
+      });
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as { items?: { name?: string; qty?: string; dept?: string }[] };
+          if (Array.isArray(parsed.items) && parsed.items.length) {
+            extras = parsed.items
+              .filter((i) => i.name)
+              .map((i) => ({
+                name: String(i.name).slice(0, 80),
+                qty: String(i.qty || "1").slice(0, 24),
+                dept: String(i.dept || "Produce").slice(0, 32),
+                checked: false,
+                from: "market",
+              }));
+            original = true;
+          }
+        } catch {
+          /* keep seasonal */
         }
-      } catch {
-        /* keep seasonal */
       }
     }
     const names = new Set(current.map((i) => i.name.toLowerCase()));
@@ -372,7 +424,7 @@ export const composeLocalGrocery = createServerFn({ method: "POST" })
       next.push(extra);
     }
     await persistGrocery(sql, context.userId, week.weekStart, next);
-    return { ok: true, added: next.length - current.length, original: Boolean(raw) };
+    return { ok: true, added: next.length - current.length, original };
   });
 
 export const listPantry = createServerFn({ method: "GET" })

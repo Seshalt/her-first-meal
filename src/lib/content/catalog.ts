@@ -123,6 +123,36 @@ export const DIETS: { id: DietFlag; label: string }[] = [
   { id: "kosher", label: "Kosher" },
 ];
 
+export const JOIN_DIETS_STORAGE = "hfm.join.diets";
+
+export function recipePhoto(id: string) {
+  return `/images/recipes/${id}.jpg`;
+}
+
+export const RECIPE_IMAGE_ALT: Record<string, string> = {
+  "/images/recipes/golden-lentil.jpg": "Bowl of golden lentil soup garnished with cilantro",
+  "/images/recipes/ginger-broth.jpg": "Bowl of ginger broth with lemon and bread",
+  "/images/recipes/tahini-dates.jpg": "Dates filled and arranged on a plate",
+  "/images/recipes/salmon-dill.jpg": "Grilled salmon fillet served with seasoned rice",
+  "/images/recipes/oat-restore.jpg": "Overnight oats in a glass jar with blackberries",
+  "/images/recipes/coconut-fish.jpg": "Fish curry in coconut sauce served with rice",
+  "/images/recipes/herb-frittata.jpg": "Eggs cooked with fresh vegetables on a plate",
+  "/images/recipes/black-bean.jpg": "Tomato and bean skillet with greens",
+  "/images/recipes/jollof-greens.jpg": "Tomato rice in a pot, jollof-style",
+  "/images/recipes/chicken-orzo.jpg": "Chicken noodle soup in a white bowl with herbs",
+  "/images/recipes/soft-egg-toast.jpg": "Avocado toast topped with a fried egg",
+  "/images/recipes/miso-sweet-potato.jpg": "Roasted potato wedges on a tray",
+  "/images/recipes/quinoa-black-bean.jpg": "Quinoa salad bowl with vegetables",
+  "/images/recipes/apple-quinoa.jpg": "Warm porridge topped with cinnamon apples",
+  "/images/recipes/rice-porridge.jpg": "Rice porridge in a ceramic bowl with scallions",
+  "/images/recipes/chickpea-spinach.jpg": "Yellow chickpea stew in a black bowl",
+  "/images/recipes/banana-oat-cakes.jpg": "Stack of skillet pancakes with butter",
+  "/images/recipes/turkey-chili.jpg": "Hearty bean and meat stew in a bowl",
+  "/images/recipes/beet-citrus.jpg": "Beet salad with citrus and greens",
+  "/images/recipes/sheet-chicken-squash.jpg": "Roast chicken in a pan with vegetables",
+  "/images/recipes/cornmeal-porridge.jpg": "A warm bowl of morning porridge",
+};
+
 export type Recipe = {
   id: string;
   title: string;
@@ -147,7 +177,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 35,
     servings: 4,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("golden-lentil"),
     department: "Produce",
     ingredients: [
       { name: "Red lentils", qty: "1.5 cups", dept: "Dry goods" },
@@ -171,7 +201,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "pescatarian", "nut-free", "halal"],
     minutes: 20,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("ginger-broth"),
     department: "Produce",
     ingredients: [
       { name: "Fresh ginger", qty: "2 in", dept: "Produce" },
@@ -194,7 +224,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 10,
     servings: 8,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("tahini-dates"),
     department: "Produce",
     ingredients: [
       { name: "Medjool dates", qty: "8", dept: "Produce" },
@@ -216,7 +246,7 @@ export const RECIPES: Recipe[] = [
     diets: ["pescatarian", "gluten-free", "nut-free", "halal", "kosher"],
     minutes: 30,
     servings: 3,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("salmon-dill"),
     department: "Seafood",
     ingredients: [
       { name: "Salmon fillet", qty: "1 lb", dept: "Seafood" },
@@ -240,7 +270,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "nut-free", "halal", "kosher"],
     minutes: 8,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("oat-restore"),
     department: "Dry goods",
     ingredients: [
       { name: "Rolled oats", qty: "1 cup", dept: "Dry goods" },
@@ -263,7 +293,7 @@ export const RECIPES: Recipe[] = [
     diets: ["pescatarian", "gluten-free", "dairy-free", "nut-free"],
     minutes: 28,
     servings: 4,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("coconut-fish"),
     department: "Seafood",
     ingredients: [
       { name: "White fish", qty: "1 lb", dept: "Seafood" },
@@ -286,7 +316,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "gluten-free", "nut-free", "halal", "kosher"],
     minutes: 25,
     servings: 4,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("herb-frittata"),
     department: "Dairy",
     ingredients: [
       { name: "Eggs", qty: "8", dept: "Dairy" },
@@ -308,7 +338,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 30,
     servings: 4,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("black-bean"),
     department: "Produce",
     ingredients: [
       { name: "Black beans", qty: "2 cans", dept: "Dry goods" },
@@ -331,7 +361,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 45,
     servings: 4,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("jollof-greens"),
     department: "Produce",
     ingredients: [
       { name: "Long-grain rice", qty: "2 cups", dept: "Dry goods" },
@@ -355,7 +385,7 @@ export const RECIPES: Recipe[] = [
     diets: ["nut-free", "halal"],
     minutes: 35,
     servings: 4,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("chicken-orzo"),
     department: "Meat",
     ingredients: [
       { name: "Chicken thighs", qty: "1.5 lb", dept: "Meat" },
@@ -379,7 +409,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "nut-free", "halal", "kosher"],
     minutes: 12,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("soft-egg-toast"),
     department: "Produce",
     ingredients: [
       { name: "Eggs", qty: "4", dept: "Dairy" },
@@ -402,7 +432,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "nut-free", "halal"],
     minutes: 40,
     servings: 3,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("miso-sweet-potato"),
     department: "Produce",
     ingredients: [
       { name: "Sweet potatoes", qty: "3", dept: "Produce" },
@@ -426,7 +456,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 25,
     servings: 4,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("quinoa-black-bean"),
     department: "Produce",
     ingredients: [
       { name: "Quinoa", qty: "1.5 cups", dept: "Dry goods" },
@@ -450,7 +480,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 20,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("apple-quinoa"),
     department: "Produce",
     ingredients: [
       { name: "Quinoa", qty: "1 cup", dept: "Dry goods" },
@@ -474,7 +504,7 @@ export const RECIPES: Recipe[] = [
     diets: ["gluten-free", "dairy-free", "nut-free", "halal"],
     minutes: 50,
     servings: 4,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("rice-porridge"),
     department: "Dry goods",
     ingredients: [
       { name: "Jasmine rice", qty: "1 cup", dept: "Dry goods" },
@@ -498,7 +528,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegan", "vegetarian", "gluten-free", "dairy-free", "nut-free", "halal", "kosher"],
     minutes: 30,
     servings: 4,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("chickpea-spinach"),
     department: "Produce",
     ingredients: [
       { name: "Chickpeas", qty: "2 cans", dept: "Dry goods" },
@@ -522,7 +552,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "nut-free", "halal", "kosher"],
     minutes: 15,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("banana-oat-cakes"),
     department: "Dry goods",
     ingredients: [
       { name: "Ripe bananas", qty: "2", dept: "Produce" },
@@ -546,7 +576,7 @@ export const RECIPES: Recipe[] = [
     diets: ["gluten-free", "dairy-free", "nut-free", "halal"],
     minutes: 40,
     servings: 6,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("turkey-chili"),
     department: "Meat",
     ingredients: [
       { name: "Ground turkey", qty: "1 lb", dept: "Meat" },
@@ -570,7 +600,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "gluten-free", "nut-free", "halal", "kosher"],
     minutes: 50,
     servings: 3,
-    image: "/images/meal-bowl.jpg",
+    image: recipePhoto("beet-citrus"),
     department: "Produce",
     ingredients: [
       { name: "Beets", qty: "4", dept: "Produce" },
@@ -593,7 +623,7 @@ export const RECIPES: Recipe[] = [
     diets: ["gluten-free", "dairy-free", "nut-free", "halal"],
     minutes: 40,
     servings: 4,
-    image: "/images/family-table.jpg",
+    image: recipePhoto("sheet-chicken-squash"),
     department: "Meat",
     ingredients: [
       { name: "Chicken pieces", qty: "2 lb", dept: "Meat" },
@@ -617,7 +647,7 @@ export const RECIPES: Recipe[] = [
     diets: ["vegetarian", "gluten-free", "nut-free", "halal", "kosher"],
     minutes: 18,
     servings: 2,
-    image: "/images/hydration.jpg",
+    image: recipePhoto("cornmeal-porridge"),
     department: "Dry goods",
     ingredients: [
       { name: "Fine cornmeal", qty: "1/2 cup", dept: "Dry goods" },

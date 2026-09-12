@@ -279,6 +279,35 @@ export const saveOnboarding = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const saveJoinDiets = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { diets?: string[] }) => {
+    const allowed = new Set([
+      "vegan",
+      "vegetarian",
+      "pescatarian",
+      "gluten-free",
+      "dairy-free",
+      "nut-free",
+      "soy-free",
+      "halal",
+      "kosher",
+    ]);
+    return {
+      diets: (input.diets ?? []).filter((d) => typeof d === "string" && allowed.has(d)).slice(0, 12),
+    };
+  })
+  .handler(async ({ context, data }) => {
+    const sql = await getSql();
+    await ensureProfile(context.userId);
+    await sql`
+      insert into dietary_profiles (user_id, diets)
+      values (${context.userId}, ${JSON.stringify(data.diets)}::jsonb)
+      on conflict (user_id) do update set diets = excluded.diets
+    `;
+    return { ok: true };
+  });
+
 export const saveProfile = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(

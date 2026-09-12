@@ -5,6 +5,7 @@ import { asJson } from "./json";
 import { ensureProfile } from "./profile";
 import { houseAiReady, houseChat } from "./openai";
 import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/utils";
+import { quotaMessage, takeAiTurn } from "./ai-quota";
 
 const SYSTEM = `You are Nouri, the companion inside Her First Meal, a pregnancy and postpartum wellness home.
 Your name is inspired by the word "nourish."
@@ -84,6 +85,13 @@ export const askNouri = createServerFn({ method: "POST" })
       const fallback = fallbackNouri(data.message, profile.displayName);
       await persist(sql, context.userId, existing[0]?.id, history, data.message, fallback);
       return { ok: true as const, text: fallback, degraded: true };
+    }
+
+    const turn = await takeAiTurn(context.userId, "nouri");
+    if (!turn.ok) {
+      const text = quotaMessage("nouri");
+      await persist(sql, context.userId, existing[0]?.id, history, data.message, text);
+      return { ok: true as const, text, degraded: true };
     }
 
     const text =
