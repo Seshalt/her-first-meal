@@ -10,7 +10,7 @@ export const LANDING_IMAGE_SLOTS = [
   { id: "family", label: "Home · family table", fallback: "/images/family-table.jpg" },
   { id: "grocery", label: "Home · grocery / partner", fallback: "/images/grocery-partner.jpg" },
   { id: "hydration", label: "Home · hydration", fallback: "/images/hydration.jpg" },
-  { id: "about", label: "About · Maat", fallback: "/images/postpartum-rest.jpg" },
+  { id: "about", label: "About · Maat", fallback: "/images/about-portrait.jpg" },
   { id: "login", label: "Sign in · photograph", fallback: "/images/hero-kitchen.jpg" },
   { id: "join", label: "Join · photograph", fallback: "/images/family-table.jpg" },
   { id: "pricing", label: "Membership · background", fallback: "/images/hero-kitchen.jpg" },
