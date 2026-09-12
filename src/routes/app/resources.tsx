@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { RESOURCE_LIBRARY } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/resources")({ component: Resources });
 
@@ -12,7 +13,7 @@ function Resources() {
         title="Short, practical pieces"
         body="Unlocked with your season inside the journey — never a feed to catch up on."
         src="/images/hydration.jpg"
-        alt="Lemon water in a ceramic pitcher"
+        alt={altFor("/images/hydration.jpg")}
         tone="plum"
       />
       <RoomBody>

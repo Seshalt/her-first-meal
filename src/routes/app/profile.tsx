@@ -6,6 +6,7 @@ import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { deleteAccount, getMyHome, saveProfile } from "@/lib/server/profile";
 import { listNotifications, markNotificationsRead } from "@/lib/server/profile";
 
@@ -55,7 +56,7 @@ function Profile() {
         title="Your house, your terms"
         body={p.email ?? "The details Nouri and the table already know."}
         src="/images/postpartum-rest.jpg"
-        alt="Morning rest by a window"
+        alt={altFor("/images/postpartum-rest.jpg")}
         tone="gold"
       />
       <RoomBody className="max-w-2xl space-y-12">

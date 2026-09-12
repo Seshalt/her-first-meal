@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { getGroceryList, toggleGroceryItem } from "@/lib/server/meals";
+import { altFor } from "@/lib/landing";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/grocery")({ component: Grocery });
@@ -32,7 +33,7 @@ function Grocery() {
         title="Grocery intelligence"
         body={`Organized by department for ${data.stores.length ? data.stores.join(", ") : "your preferred stores"}. We never claim exact shelf inventory.`}
         src="/images/grocery-partner.jpg"
-        alt="A partner choosing produce from a handwritten list"
+        alt={altFor("/images/grocery-partner.jpg")}
         tone="gold"
       />
       <RoomBody>

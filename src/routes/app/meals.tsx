@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { getMealWeek, swapMeal, toggleFavoriteRecipe, cookAnotherPlate } from "@/lib/server/meals";
 import { Button } from "@/components/ui/button";
+import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/meals")({ component: Meals });
 
@@ -24,14 +25,14 @@ function Meals() {
         title="This week's table"
         body="Built from your stage, diets, and loves. Swap any plate. Ask Nouri if you want a rewrite."
         src="/images/meal-bowl.jpg"
-        alt="A nourishing bowl set on linen"
+        alt={altFor("/images/meal-bowl.jpg")}
         tone="clay"
       />
       <div>
         {data.meals.map((m, i) => (
           <article key={m.day} className="grid min-h-[70vh] lg:grid-cols-2 lg:min-h-[78vh]">
             <div className={i % 2 === 1 ? "relative min-h-[48vh] lg:order-2 lg:min-h-[78vh]" : "relative min-h-[48vh] lg:min-h-[78vh]"}>
-              <img src={m.recipe.image} alt="" className="media absolute inset-0 h-full w-full object-cover" />
+              <img src={m.recipe.image} alt={altFor(m.recipe.image, m.recipe.title)} className="media absolute inset-0 h-full w-full object-cover" />
             </div>
             <div className="flex flex-col justify-center bg-wash-clay px-5 py-16 md:px-16">
               <p className="text-xs uppercase tracking-[0.28em] text-clay">{m.day}</p>

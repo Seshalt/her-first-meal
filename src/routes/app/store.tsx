@@ -5,6 +5,7 @@ import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { buyProduct, listStore } from "@/lib/server/binding";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/store")({ component: Store });
 
@@ -22,7 +23,7 @@ function Store() {
         title="A meeting with Maat"
         body="Membership already holds the table, the studio, Nouri, and the pantry. The only thing billed beyond that is time with Maat."
         src="/images/binding-hands.jpg"
-        alt="Hands wrapping a cotton belly bind"
+        alt={altFor("/images/binding-hands.jpg")}
         tone="gold"
       />
       <div>
@@ -36,7 +37,7 @@ function Store() {
               <div className={i % 2 === 1 ? "relative min-h-[42vh] lg:order-2" : "relative min-h-[42vh]"}>
                 <img
                   src={p.image || "/images/binding-hands.jpg"}
-                  alt=""
+                  alt={altFor(p.image || "/images/binding-hands.jpg", p.name)}
                   className="media absolute inset-0 h-full w-full object-cover"
                 />
               </div>

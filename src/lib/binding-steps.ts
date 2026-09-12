@@ -1,3 +1,4 @@
+import { altFor } from "@/lib/landing";
 import { DEFAULT_SITE_COPY, type SiteCopy } from "@/lib/site";
 
 export type BindingStep = {
@@ -5,6 +6,7 @@ export type BindingStep = {
   title: string;
   body: string;
   image: string;
+  alt: string;
 };
 
 const FALLBACK_IMAGES = [
@@ -16,10 +18,10 @@ const FALLBACK_IMAGES = [
 
 export function defaultBindingSteps(site: SiteCopy = DEFAULT_SITE_COPY): BindingStep[] {
   return [
-    { id: "step-1", title: site.bindStep1Title, body: site.bindStep1Body, image: FALLBACK_IMAGES[0] },
-    { id: "step-2", title: site.bindStep2Title, body: site.bindStep2Body, image: FALLBACK_IMAGES[1] },
-    { id: "step-3", title: site.bindStep3Title, body: site.bindStep3Body, image: FALLBACK_IMAGES[2] },
-    { id: "step-4", title: site.bindStep4Title, body: site.bindStep4Body, image: FALLBACK_IMAGES[3] },
+    { id: "step-1", title: site.bindStep1Title, body: site.bindStep1Body, image: FALLBACK_IMAGES[0], alt: altFor(FALLBACK_IMAGES[0]) },
+    { id: "step-2", title: site.bindStep2Title, body: site.bindStep2Body, image: FALLBACK_IMAGES[1], alt: altFor(FALLBACK_IMAGES[1]) },
+    { id: "step-3", title: site.bindStep3Title, body: site.bindStep3Body, image: FALLBACK_IMAGES[2], alt: altFor(FALLBACK_IMAGES[2]) },
+    { id: "step-4", title: site.bindStep4Title, body: site.bindStep4Body, image: FALLBACK_IMAGES[3], alt: altFor(FALLBACK_IMAGES[3]) },
   ];
 }
 
@@ -31,7 +33,7 @@ export function mergeBindingSteps(
   const fallback = defaultBindingSteps(site).map((step, i) => {
     const slot = `bindStep${i + 1}` as "bindStep1" | "bindStep2" | "bindStep3" | "bindStep4";
     const photo = images?.[slot];
-    return photo ? { ...step, image: photo } : step;
+    return photo ? { ...step, image: photo, alt: altFor(photo, step.alt) } : step;
   });
   if (!Array.isArray(raw) || raw.length === 0) return fallback;
   const next: BindingStep[] = [];
@@ -41,11 +43,16 @@ export function mergeBindingSteps(
     const title = typeof row.title === "string" ? row.title.trim() : "";
     const body = typeof row.body === "string" ? row.body.trim() : "";
     if (!title && !body) continue;
+    const image =
+      typeof row.image === "string" && row.image.trim()
+        ? row.image.trim()
+        : FALLBACK_IMAGES[next.length % FALLBACK_IMAGES.length];
     next.push({
       id: typeof row.id === "string" && row.id.trim() ? row.id.trim() : `step-${next.length + 1}`,
       title: title || `Step ${next.length + 1}`,
       body,
-      image: typeof row.image === "string" && row.image.trim() ? row.image.trim() : FALLBACK_IMAGES[next.length % FALLBACK_IMAGES.length],
+      image,
+      alt: typeof row.alt === "string" && row.alt.trim() ? row.alt.trim() : altFor(image, title),
     });
   }
   return next.length ? next : fallback;

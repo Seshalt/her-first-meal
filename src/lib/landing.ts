@@ -1,29 +1,149 @@
 export const LANDING_IMAGE_SLOTS = [
-  { id: "logo", label: "Logo (header mark)", fallback: "" },
-  { id: "hero", label: "Home · full-screen opening", fallback: "/images/hero-kitchen.jpg" },
-  { id: "meals", label: "Home · meals", fallback: "/images/meal-bowl.jpg" },
-  { id: "binding", label: "Home · belly binding", fallback: "/images/binding-hands.jpg" },
-  { id: "bindingStill", label: "Home · wrap still life", fallback: "/images/binding-still.jpg" },
-  { id: "rest", label: "Home · postpartum rest", fallback: "/images/postpartum-rest.jpg" },
-  { id: "movement", label: "Home · movement", fallback: "/images/movement.jpg" },
-  { id: "nouri", label: "Home · Nouri", fallback: "/images/nouri-drop.jpg" },
-  { id: "family", label: "Home · family table", fallback: "/images/family-table.jpg" },
-  { id: "grocery", label: "Home · grocery / partner", fallback: "/images/grocery-partner.jpg" },
-  { id: "hydration", label: "Home · hydration", fallback: "/images/hydration.jpg" },
-  { id: "about", label: "About · Maat", fallback: "/images/about-portrait.jpg" },
-  { id: "login", label: "Sign in · photograph", fallback: "/images/hero-kitchen.jpg" },
-  { id: "join", label: "Join · photograph", fallback: "/images/family-table.jpg" },
-  { id: "pricing", label: "Membership · background", fallback: "/images/hero-kitchen.jpg" },
-  { id: "checkout", label: "Checkout · side photograph", fallback: "/images/meal-bowl.jpg" },
-  { id: "bindHero", label: "Belly binding page · hero", fallback: "/images/binding-still.jpg" },
-  { id: "bindStep1", label: "Binding step 1", fallback: "/images/binding-still.jpg" },
-  { id: "bindStep2", label: "Binding step 2", fallback: "/images/binding-hands.jpg" },
-  { id: "bindStep3", label: "Binding step 3", fallback: "/images/binding-hands.jpg" },
-  { id: "bindStep4", label: "Binding step 4", fallback: "/images/postpartum-rest.jpg" },
-  { id: "nouriHero", label: "Nouri page · photograph", fallback: "/images/nouri-drop.jpg" },
+  { id: "logo", label: "Logo (header mark)", fallback: "", alt: "" },
+  {
+    id: "hero",
+    label: "Home · full-screen opening",
+    fallback: "/images/hero-kitchen.jpg",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+  },
+  {
+    id: "meals",
+    label: "Home · meals",
+    fallback: "/images/meal-bowl.jpg",
+    alt: "Bowl of golden soup with herbs on a wooden table",
+  },
+  {
+    id: "binding",
+    label: "Home · belly binding",
+    fallback: "/images/binding-hands.jpg",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+  },
+  {
+    id: "bindingStill",
+    label: "Home · wrap still life",
+    fallback: "/images/binding-still.jpg",
+    alt: "Folded cream linen cloth laid on a bed",
+  },
+  {
+    id: "rest",
+    label: "Home · postpartum rest",
+    fallback: "/images/postpartum-rest.jpg",
+    alt: "Latina mother standing outside, holding her baby close",
+  },
+  {
+    id: "movement",
+    label: "Home · movement",
+    fallback: "/images/movement.jpg",
+    alt: "Asian woman in a yoga pose on a mat",
+  },
+  {
+    id: "nouri",
+    label: "Home · Nouri",
+    fallback: "/images/nouri-drop.jpg",
+    alt: "Hot tea pouring into a ceramic cup",
+  },
+  {
+    id: "family",
+    label: "Home · family table",
+    fallback: "/images/family-table.jpg",
+    alt: "East Asian family sitting together at a dining table",
+  },
+  {
+    id: "grocery",
+    label: "Home · grocery / partner",
+    fallback: "/images/grocery-partner.jpg",
+    alt: "Hands holding a bag of fresh produce at a market",
+  },
+  {
+    id: "hydration",
+    label: "Home · hydration",
+    fallback: "/images/hydration.jpg",
+    alt: "Glass of lemon water on a sunlit table",
+  },
+  {
+    id: "about",
+    label: "About · Maat",
+    fallback: "/images/about-portrait.jpg",
+    alt: "Indian woman cooking at a stove",
+  },
+  {
+    id: "login",
+    label: "Sign in · photograph",
+    fallback: "/images/hero-kitchen.jpg",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+  },
+  {
+    id: "join",
+    label: "Join · photograph",
+    fallback: "/images/family-table.jpg",
+    alt: "East Asian family sitting together at a dining table",
+  },
+  {
+    id: "pricing",
+    label: "Membership · background",
+    fallback: "/images/hero-kitchen.jpg",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
+  },
+  {
+    id: "checkout",
+    label: "Checkout · side photograph",
+    fallback: "/images/meal-bowl.jpg",
+    alt: "Bowl of golden soup with herbs on a wooden table",
+  },
+  {
+    id: "bindHero",
+    label: "Belly binding page · hero",
+    fallback: "/images/binding-still.jpg",
+    alt: "Folded cream linen cloth laid on a bed",
+  },
+  {
+    id: "bindStep1",
+    label: "Binding step 1",
+    fallback: "/images/binding-still.jpg",
+    alt: "Folded cream linen cloth laid on a bed",
+  },
+  {
+    id: "bindStep2",
+    label: "Binding step 2",
+    fallback: "/images/binding-hands.jpg",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+  },
+  {
+    id: "bindStep3",
+    label: "Binding step 3",
+    fallback: "/images/binding-hands.jpg",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
+  },
+  {
+    id: "bindStep4",
+    label: "Binding step 4",
+    fallback: "/images/postpartum-rest.jpg",
+    alt: "Latina mother standing outside, holding her baby close",
+  },
+  {
+    id: "nouriHero",
+    label: "Nouri page · photograph",
+    fallback: "/images/nouri-drop.jpg",
+    alt: "Hot tea pouring into a ceramic cup",
+  },
 ] as const;
 
 export type LandingImageSlot = (typeof LANDING_IMAGE_SLOTS)[number]["id"];
+
+/** Alt text keyed to the photo file, so every page uses the same words. */
+export const IMAGE_ALT: Record<string, string> = Object.fromEntries(
+  LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback, s.alt]),
+);
+
+export function altFor(src: string, fallback = ""): string {
+  if (!src) return fallback;
+  const path = src.split("?")[0];
+  return IMAGE_ALT[path] || fallback;
+}
+
+export function slotAlt(id: LandingImageSlot): string {
+  return LANDING_IMAGE_SLOTS.find((s) => s.id === id)?.alt ?? "";
+}
 
 export type LandingCopy = {
   eyebrow: string;
@@ -78,10 +198,18 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
 
 export type LandingContent = LandingCopy & {
   images: Record<LandingImageSlot, string>;
+  alts: Record<LandingImageSlot, string>;
 };
 
 export function defaultImages(): Record<LandingImageSlot, string> {
   return Object.fromEntries(LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback])) as Record<
+    LandingImageSlot,
+    string
+  >;
+}
+
+export function defaultAlts(): Record<LandingImageSlot, string> {
+  return Object.fromEntries(LANDING_IMAGE_SLOTS.map((s) => [s.id, s.alt])) as Record<
     LandingImageSlot,
     string
   >;
@@ -106,6 +234,7 @@ export function mergeLanding(
     ...DEFAULT_LANDING_COPY,
     ...pickCopy(copy),
     images: base,
+    alts: defaultAlts(),
   };
 }
 
@@ -129,3 +258,4 @@ export const OFFER_TICKER = [
   "Week-by-week journey",
   "Fourth trimester care",
 ];
+

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RoomHero } from "@/components/layout/room-hero";
 import { getMyHome } from "@/lib/server/profile";
 import { WEEKS } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -27,10 +28,10 @@ function Journey() {
   const locked = selected > week + 1;
 
   const chapters = [
-    { kicker: "01", title: "Mother", body: content.mother, src: "/images/hero-kitchen.jpg", alt: "A mother in warm kitchen light", wash: "bg-wash-linen", tone: "text-earth" },
-    { kicker: "02", title: "Baby", body: content.baby, src: "/images/postpartum-rest.jpg", alt: "Quiet rest by a window", wash: "bg-wash-sea", tone: "text-sea" },
-    { kicker: "03", title: "Nourish", body: content.nourish, src: "/images/meal-bowl.jpg", alt: "A nourishing bowl on linen", wash: "bg-wash-clay", tone: "text-clay" },
-    { kicker: "04", title: "Move", body: content.move, src: "/images/movement.jpg", alt: "A pregnant woman stretching on a mat", wash: "bg-wash-blush", tone: "text-blush" },
+    { kicker: "01", title: "Mother", body: content.mother, src: "/images/hero-kitchen.jpg", alt: altFor("/images/hero-kitchen.jpg"), wash: "bg-wash-linen", tone: "text-earth" },
+    { kicker: "02", title: "Baby", body: content.baby, src: "/images/postpartum-rest.jpg", alt: altFor("/images/postpartum-rest.jpg"), wash: "bg-wash-sea", tone: "text-sea" },
+    { kicker: "03", title: "Nourish", body: content.nourish, src: "/images/meal-bowl.jpg", alt: altFor("/images/meal-bowl.jpg"), wash: "bg-wash-clay", tone: "text-clay" },
+    { kicker: "04", title: "Move", body: content.move, src: "/images/movement.jpg", alt: altFor("/images/movement.jpg"), wash: "bg-wash-blush", tone: "text-blush" },
   ];
 
   return (
@@ -40,7 +41,7 @@ function Journey() {
         title="The house grows with you."
         body={`You are in week ${week}. Later weeks wait as a preview — never a locked-door insult.`}
         src="/images/hydration.jpg"
-        alt="Lemon water in a ceramic pitcher"
+        alt={altFor("/images/hydration.jpg")}
         tone="sea"
       />
       <div className="border-y border-border bg-sea py-5 text-primary-foreground">

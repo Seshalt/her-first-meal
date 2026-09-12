@@ -100,7 +100,7 @@ function Login() {
         <div className="relative hidden min-h-dvh overflow-hidden text-paper lg:block">
           <img
             src={content.images.login}
-            alt=""
+            alt={content.alts.login}
             className="media absolute inset-0 h-full w-full object-cover"
           />
           <div className="hero-veil pointer-events-none absolute inset-0" />

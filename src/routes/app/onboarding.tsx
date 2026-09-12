@@ -6,6 +6,7 @@ import { Pill } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { saveOnboarding } from "@/lib/server/profile";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 
@@ -18,7 +19,7 @@ const STEPS = [
     title: "What shall we call you?",
     body: "A name, a place, a language. Nothing else is required yet.",
     src: "/images/hero-kitchen.jpg",
-    alt: "A mother standing in warm kitchen light",
+    alt: altFor("/images/hero-kitchen.jpg"),
   },
   {
     label: "Season",
@@ -26,7 +27,7 @@ const STEPS = [
     title: "Where is the body in this story?",
     body: "Trying, pregnant, or postpartum — the house grows from here.",
     src: "/images/postpartum-rest.jpg",
-    alt: "A postpartum mother resting by a window",
+    alt: altFor("/images/postpartum-rest.jpg"),
   },
   {
     label: "Plate",
@@ -34,7 +35,7 @@ const STEPS = [
     title: "What does her plate need?",
     body: "Loves, avoids, allergies. We cook from this, not a generic week.",
     src: "/images/meal-bowl.jpg",
-    alt: "A nourishing bowl set on linen",
+    alt: altFor("/images/meal-bowl.jpg"),
   },
   {
     label: "Market",
@@ -42,7 +43,7 @@ const STEPS = [
     title: "Where do you shop?",
     body: "Choose as many stores as you like. Location is never required.",
     src: "/images/grocery-partner.jpg",
-    alt: "A partner choosing produce from a handwritten list",
+    alt: altFor("/images/grocery-partner.jpg"),
   },
 ];
 

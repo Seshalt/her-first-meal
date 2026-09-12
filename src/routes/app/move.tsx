@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { WORKOUTS, type Stage } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { logWorkout } from "@/lib/server/binding";
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +25,7 @@ function Move() {
         title="Optional. Never punitive."
         body="Stop for pain, bleeding, or dizziness. This is not a replacement for your clinician."
         src="/images/movement.jpg"
-        alt="A pregnant woman stretching on a mat"
+        alt={altFor("/images/movement.jpg")}
         tone="sea"
       />
       <RoomBody>

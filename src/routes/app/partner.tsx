@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { PARTNER_CARDS } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { getMyHome } from "@/lib/server/profile";
 
 export const Route = createFileRoute("/app/partner")({ component: Partner });
@@ -18,7 +19,7 @@ function Partner() {
         title="A useful, private lane"
         body="Partners see how to help — not private medical notes, pantry inventories, or Nouri threads."
         src="/images/grocery-partner.jpg"
-        alt="A partner choosing produce from a handwritten list"
+        alt={altFor("/images/grocery-partner.jpg")}
         tone="sea"
       />
       <RoomBody>

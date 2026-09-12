@@ -5,6 +5,7 @@ import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { bookAppointment, cancelAppointment, listMyAppointments, listOpenSlots } from "@/lib/server/appointments";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/appointments")({ component: Appointments });
 
@@ -28,7 +29,7 @@ function Appointments() {
         title="A time with Maat"
         body="Membership already includes the house. Holding a live session is the only additional charge — it is billed when you take the time."
         src="/images/family-table.jpg"
-        alt="A family sharing a meal at the kitchen table"
+        alt={altFor("/images/family-table.jpg")}
         tone="gold"
       />
       <RoomBody>

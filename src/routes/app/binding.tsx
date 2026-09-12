@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { BINDING_FAQS, BINDING_STEPS } from "@/lib/content/catalog";
+import { altFor } from "@/lib/landing";
 import { addBindingJournal, listBindingUploads } from "@/lib/server/binding";
 import { compareBindingPhotos } from "@/lib/server/nouri";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,7 @@ function BindingStudio() {
         title="Belly Binding Studio"
         body="Educational wrapping support. Not medical clearance. Ask your provider before you begin, especially after surgery."
         src="/images/binding-hands.jpg"
-        alt="Hands wrapping a cotton belly bind"
+        alt={altFor("/images/binding-hands.jpg")}
         tone="blush"
       />
       <div className="sticky top-16 z-20 border-b border-border bg-background/95 px-5 py-4 backdrop-blur md:top-[4.75rem] md:px-10">
@@ -67,7 +68,7 @@ function BindingStudio() {
           {BINDING_STEPS.map((s, i) => (
             <article key={s.title} className="grid min-h-[70vh] lg:grid-cols-2 lg:min-h-[78vh]">
               <div className={i % 2 === 1 ? "relative min-h-[48vh] lg:order-2 lg:min-h-[78vh]" : "relative min-h-[48vh] lg:min-h-[78vh]"}>
-                <img src={s.image} alt="" className="media absolute inset-0 h-full w-full object-cover" />
+                <img src={s.image} alt={altFor(s.image, s.title)} className="media absolute inset-0 h-full w-full object-cover" />
               </div>
               <div className="flex flex-col justify-center bg-wash-blush px-5 py-16 md:px-16">
                 <p className="text-xs uppercase tracking-[0.32em] text-blush">0{i + 1}</p>
@@ -77,7 +78,7 @@ function BindingStudio() {
             </article>
           ))}
           <section className="relative min-h-[70vh] overflow-hidden text-paper">
-            <img src="/images/binding-still.jpg" alt="A folded belly wrap with eucalyptus" className="media absolute inset-0 h-full w-full object-cover" />
+              <img src="/images/binding-still.jpg" alt={altFor("/images/binding-still.jpg")} className="media absolute inset-0 h-full w-full object-cover" />
             <div className="pointer-events-none absolute inset-0 bg-ink/55" />
             <div className="relative mx-auto flex min-h-[70vh] max-w-5xl flex-col justify-end px-5 py-20 md:px-10">
               <p className="text-xs uppercase tracking-[0.32em] text-aqua">Live review</p>
@@ -110,7 +111,7 @@ function BindingStudio() {
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-earth">Instructional reference</p>
               <h2 className="mt-4 font-display text-4xl">Hold the wrap like this.</h2>
-              <img src="/images/binding-hands.jpg" alt="Reference wrap" className="media mt-8 h-72 w-full object-cover" />
+              <img src="/images/binding-hands.jpg" alt={altFor("/images/binding-hands.jpg")} className="media mt-8 h-72 w-full object-cover" />
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-earth">Your upload</p>

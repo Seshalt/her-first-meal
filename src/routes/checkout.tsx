@@ -190,7 +190,7 @@ function Checkout() {
               Compare monthly and yearly
             </Link>
           </p>
-          <img src={content.images.checkout} alt="A bowl set for the first meal after birth" className="media mt-6 h-48 w-full rounded-2xl object-cover" />
+          <img src={content.images.checkout} alt={content.alts.checkout} className="media mt-6 h-48 w-full rounded-2xl object-cover" />
         </aside>
       </div>
       )}

@@ -47,7 +47,7 @@ function Home() {
         title={content.mealsTitle}
         body={content.mealsBody}
         src={content.images.meals}
-        alt="A nourishing bowl set on linen"
+        alt={content.alts.meals}
         href="/pricing"
         linkLabel="See the membership"
         photo={photoStart}
@@ -58,17 +58,17 @@ function Home() {
         title={content.bindingTitle}
         body={content.bindingBody}
         src={content.images.binding}
-        alt="Hands wrapping a cotton belly wrap"
+        alt={content.alts.binding}
         href="/belly-binding"
         linkLabel="Visit the studio"
         photo={photoStart === "left" ? "right" : "left"}
         extraSrc={content.images.bindingStill}
-        extraAlt="A folded belly wrap with eucalyptus"
+        extraAlt={content.alts.bindingStill}
         tone="blush"
       />
       <NouriBand content={content} />
-      <JourneyBand images={content.images} />
-      <PartnerBand src={content.images.grocery} />
+      <JourneyBand images={content.images} alts={content.alts} />
+      <PartnerBand src={content.images.grocery} alt={content.alts.grocery} />
       <MembershipClose content={content} monthly={monthly} yearly={yearly} />
       <PublicFooter />
       </div>
@@ -100,7 +100,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
           </div>
         </div>
         <div className="relative min-h-[50vh] lg:min-h-full">
-          <img src={content.images.hero} alt="" className="media absolute inset-0 h-full w-full object-cover" />
+          <img src={content.images.hero} alt={content.alts.hero} className="media absolute inset-0 h-full w-full object-cover" />
           <div className="hero-veil pointer-events-none absolute inset-0" />
         </div>
       </section>
@@ -112,7 +112,7 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
     <section className="relative min-h-[100dvh] overflow-hidden text-paper">
       <ParallaxFrame
         src={content.images.hero}
-        alt="A mother standing in warm kitchen light, hands on her belly"
+        alt={content.alts.hero}
         speed={0.42}
         className="absolute inset-0"
       />
@@ -358,7 +358,7 @@ function NouriBand({ content }: { content: LandingContent }) {
   return (
     <section ref={rootRef} className="nouri-splash relative min-h-[120vh] overflow-hidden text-paper">
       <div className="nouri-photo absolute inset-0" data-nouri-photo>
-        <ParallaxFrame src={content.images.nouri} alt="Ripple in a ceramic tea bowl" speed={0.18} className="absolute inset-0" />
+        <ParallaxFrame src={content.images.nouri} alt={content.alts.nouri} speed={0.18} className="absolute inset-0" />
       </div>
       <div className="pointer-events-none absolute inset-0 bg-plum-deep/32" />
       <div className="relative mx-auto flex min-h-[92vh] max-w-6xl items-end px-4 py-28 md:px-6">
@@ -375,12 +375,18 @@ function NouriBand({ content }: { content: LandingContent }) {
   );
 }
 
-function JourneyBand({ images }: { images: LandingContent["images"] }) {
+function JourneyBand({
+  images,
+  alts,
+}: {
+  images: LandingContent["images"];
+  alts: LandingContent["alts"];
+}) {
   const stages = [
-    { w: "Trying", d: "Mineral-rich plates, grocery lists for the kitchen she has, and gentler movement while she waits.", img: images.hydration, alt: "Lemon water in a ceramic pitcher", wash: "bg-wash-sea", kicker: "text-sea" },
-    { w: "Pregnancy", d: "Meals that follow appetite and week, iron and broths, walks, and questions worth bringing to the next visit.", img: images.movement, alt: "A pregnant woman stretching on a mat", wash: "bg-wash-clay", kicker: "text-clay" },
-    { w: "Postpartum", d: "Recovery plates, the Belly Binding Studio, and movement that treats the fourth trimester as a season.", img: images.rest, alt: "A postpartum mother resting by a window", wash: "bg-wash-blush", kicker: "text-blush" },
-    { w: "The table", d: "Household size and culture shape the meals. Partners get a grocery list and a lane that is useful — not her chart.", img: images.family, alt: "A family sharing a meal at the kitchen table", wash: "bg-wash-plum", kicker: "text-plum" },
+    { w: "Trying", d: "Mineral-rich plates, grocery lists for the kitchen she has, and gentler movement while she waits.", img: images.hydration, alt: alts.hydration, wash: "bg-wash-sea", kicker: "text-sea" },
+    { w: "Pregnancy", d: "Meals that follow appetite and week, iron and broths, walks, and questions worth bringing to the next visit.", img: images.movement, alt: alts.movement, wash: "bg-wash-clay", kicker: "text-clay" },
+    { w: "Postpartum", d: "Recovery plates, the Belly Binding Studio, and movement that treats the fourth trimester as a season.", img: images.rest, alt: alts.rest, wash: "bg-wash-blush", kicker: "text-blush" },
+    { w: "The table", d: "Household size and culture shape the meals. Partners get a grocery list and a lane that is useful — not her chart.", img: images.family, alt: alts.family, wash: "bg-wash-plum", kicker: "text-plum" },
   ];
   return (
     <section>
@@ -410,10 +416,10 @@ function JourneyBand({ images }: { images: LandingContent["images"] }) {
   );
 }
 
-function PartnerBand({ src }: { src: string }) {
+function PartnerBand({ src, alt }: { src: string; alt: string }) {
   return (
     <section className="relative min-h-[80vh] overflow-hidden text-paper">
-      <ParallaxFrame src={src} alt="A partner choosing produce from a handwritten list" speed={0.22} className="absolute inset-0" />
+      <ParallaxFrame src={src} alt={alt} speed={0.22} className="absolute inset-0" />
       <div className="pointer-events-none absolute inset-0 bg-wine/62" />
       <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-end px-4 py-24 md:px-6">
         <Reveal className="max-w-xl">

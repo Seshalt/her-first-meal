@@ -5,16 +5,17 @@ import { getMyHome, saveCheckIn } from "@/lib/server/profile";
 import { AFFIRMATIONS, STAGE_LABEL, type Stage } from "@/lib/content/catalog";
 import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/")({ component: Today });
 
 function heroFor(stage: Stage | null) {
-  if (stage === "postpartum") return { src: "/images/postpartum-rest.jpg", alt: "Morning rest by a window" };
+  if (stage === "postpartum") return { src: "/images/postpartum-rest.jpg", alt: altFor("/images/postpartum-rest.jpg") };
   if (stage === "first" || stage === "second" || stage === "third") {
-    return { src: "/images/hero-kitchen.jpg", alt: "A mother in warm kitchen light" };
+    return { src: "/images/hero-kitchen.jpg", alt: altFor("/images/hero-kitchen.jpg") };
   }
-  if (stage === "trying") return { src: "/images/hydration.jpg", alt: "Lemon water in a ceramic pitcher" };
-  return { src: "/images/meal-bowl.jpg", alt: "A nourishing bowl on linen" };
+  if (stage === "trying") return { src: "/images/hydration.jpg", alt: altFor("/images/hydration.jpg") };
+  return { src: "/images/meal-bowl.jpg", alt: altFor("/images/meal-bowl.jpg") };
 }
 
 function Today() {
@@ -41,7 +42,7 @@ function Today() {
   if (!home.profile.onboardingCompleted) {
     return (
       <section className="relative min-h-dvh overflow-hidden text-paper">
-        <img src="/images/hero-kitchen.jpg" alt="A mother standing in warm kitchen light" className="media absolute inset-0 h-full w-full object-cover" />
+        <img src="/images/hero-kitchen.jpg" alt={altFor("/images/hero-kitchen.jpg")} className="media absolute inset-0 h-full w-full object-cover" />
         <div className="hero-veil pointer-events-none absolute inset-0" />
         <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col justify-end px-5 pb-24 pt-32 md:px-10">
           <p className="text-xs uppercase tracking-[0.32em] text-aqua">Before the table is set</p>
@@ -98,7 +99,7 @@ function Today() {
         <ul className="mt-6">
           <Ritual
             photo="/images/hydration.jpg"
-            photoAlt="Lemon water in a ceramic pitcher"
+            photoAlt={altFor("/images/hydration.jpg")}
             kicker="Hydration"
             kickerTone="text-sea"
             title={`${home.checkin.hydration} glasses so far`}
@@ -108,7 +109,7 @@ function Today() {
           />
           <Ritual
             photo="/images/meal-bowl.jpg"
-            photoAlt="A nourishing bowl on linen"
+            photoAlt={altFor("/images/meal-bowl.jpg")}
             kicker="The table"
             kickerTone="text-clay"
             title="Today's meals"
@@ -118,7 +119,7 @@ function Today() {
           />
           <Ritual
             photo="/images/binding-hands.jpg"
-            photoAlt="Hands wrapping a cotton belly bind"
+            photoAlt={altFor("/images/binding-hands.jpg")}
             kicker="Flagship practice"
             kickerTone="text-blush"
             title="Belly binding"
@@ -134,7 +135,7 @@ function Today() {
           />
           <Ritual
             photo="/images/nouri-drop.jpg"
-            photoAlt="Ripple in a ceramic tea bowl"
+            photoAlt={altFor("/images/nouri-drop.jpg")}
             kicker="Companion"
             kickerTone="text-plum"
             title="Need help? Ask Nouri."

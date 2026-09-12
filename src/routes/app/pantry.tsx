@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { listPantry, removePantry, upsertPantry } from "@/lib/server/meals";
+import { altFor } from "@/lib/landing";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 
@@ -27,7 +28,7 @@ function Pantry() {
         title="Virtual pantry"
         body="Estimated quantities, never confirmed inventory. Edit anything. Data stays on your signed-in account."
         src="/images/family-table.jpg"
-        alt="A family sharing a meal at the kitchen table"
+        alt={altFor("/images/family-table.jpg")}
         tone="clay"
       />
       <RoomBody>

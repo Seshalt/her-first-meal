@@ -44,8 +44,8 @@ function Pricing() {
           <span />
           <span />
         </div>
-        <div className="pricing-photo" aria-hidden>
-          <img src={content.images.pricing} alt="" />
+        <div className="pricing-photo">
+          <img src={content.images.pricing} alt={content.alts.pricing} />
         </div>
         <div className="pricing-veil" />
 

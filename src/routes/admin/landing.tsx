@@ -7,6 +7,7 @@ import {
   DEFAULT_LANDING_COPY,
   LANDING_IMAGE_SLOTS,
   mergeLanding,
+  altFor,
   type LandingCopy,
   type LandingImageSlot,
 } from "@/lib/landing";
@@ -249,6 +250,7 @@ function WebsiteEditor() {
                     title: `Step ${prev.length + 1}`,
                     body: "",
                     image: "/images/binding-hands.jpg",
+                    alt: altFor("/images/binding-hands.jpg"),
                   },
                 ])
               }
@@ -493,7 +495,7 @@ function ImageSlot({
     <li className="rounded-2xl bg-white/6 p-4">
       <p className="text-sm">{label}</p>
       {src ? (
-        <img src={src} alt="" className="mt-3 h-40 w-full rounded-xl object-contain bg-white/8" />
+        <img src={src} alt={label} className="mt-3 h-40 w-full rounded-xl object-contain bg-white/8" />
       ) : (
         <div className="mt-3 grid h-40 place-items-center rounded-xl bg-white/8 text-xs text-white/50">
           Default mark (upload to replace)

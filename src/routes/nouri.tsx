@@ -33,7 +33,7 @@ function NouriMarketing() {
               <Link to="/pricing">{site.nouriPageCta}</Link>
             </Button>
           </div>
-          <img src={content.images.nouriHero} alt="" className="media h-80 w-full rounded-[32px] object-cover" />
+          <img src={content.images.nouriHero} alt={content.alts.nouriHero} className="media h-80 w-full rounded-[32px] object-cover" />
         </div>
       </section>
       <section className="pb-16">

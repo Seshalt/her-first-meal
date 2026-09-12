@@ -27,7 +27,7 @@ function About() {
           <h1 className="mt-3 font-display text-5xl">{site.aboutTitle}</h1>
           <img
             src={content.images.about}
-            alt=""
+            alt={content.alts.about}
             className="media mt-10 h-72 w-full rounded-[28px] object-cover"
           />
           <div className="glass-panel mt-10 space-y-5 p-6 text-lg leading-relaxed text-ink-soft md:p-8">

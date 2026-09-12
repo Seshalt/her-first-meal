@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RoomHero } from "@/components/layout/room-hero";
+import { altFor } from "@/lib/landing";
 import { NouriDialog } from "@/components/nouri/nouri-panel";
 
 export const Route = createFileRoute("/app/nouri")({ component: NouriPage });
@@ -12,7 +13,7 @@ function NouriPage() {
         title="Talk to Nouri"
         body="Inspired by nourish. She remembers this conversation and the preferences you authorized. She does not diagnose."
         src="/images/nouri-drop.jpg"
-        alt="Ripple in a ceramic tea bowl"
+        alt={altFor("/images/nouri-drop.jpg")}
         tone="plum"
       />
       <div className="mx-auto max-w-2xl px-5 py-14 md:px-10 md:py-20">
