@@ -94,7 +94,6 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     void getMyRole()
@@ -109,61 +108,46 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
     };
   }, [open]);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   function isActive(to: string) {
     return to === "/app" ? pathname === "/app" : pathname.startsWith(to);
   }
 
-  const onHero = !scrolled && !open;
-  const ink = onHero ? "text-paper" : "text-foreground";
+  const dockIndex = Math.max(
+    0,
+    MOBILE_PRIMARY.findIndex((item) => isActive(item.to)),
+  );
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="house-root min-h-dvh">
       <NoIndex />
-      <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-[80] transition-[background-color,border-color,color] duration-300",
-          onHero
-            ? "border-b border-transparent bg-gradient-to-b from-ink/55 to-transparent"
-            : "border-b border-border/70 bg-background/95 text-foreground backdrop-blur-md",
-        )}
-      >
+      <header className="house-roof">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:h-[4.75rem] md:px-6">
-          <Wordmark to="/app" className={cn("min-w-0", ink)} />
+          <Wordmark to="/app" mark className="min-w-0" />
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Member">
             {PRIMARY.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "text-sm tracking-wide transition-colors",
-                  onHero ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
-                  isActive(item.to) && (onHero ? "text-paper" : "text-foreground"),
+                  "relative py-2 text-sm tracking-wide transition-colors",
+                  isActive(item.to) ? "text-ink" : "text-ink-soft hover:text-ink",
                 )}
               >
                 {item.label}
+                <span className={cn("house-nav-dot", isActive(item.to) && "is-on")} />
               </Link>
             ))}
           </nav>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <Link
               to="/app/profile"
-              className={cn(
-                "hidden h-11 items-center px-2 text-sm underline-offset-4 hover:underline sm:inline-flex",
-                ink,
-              )}
+              className="hidden h-11 items-center px-2 text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline sm:inline-flex"
             >
               Profile
             </Link>
             <button
               type="button"
-              className={cn("grid size-12 place-items-center rounded-full", ink)}
+              className="grid size-12 place-items-center rounded-full text-ink"
               aria-label={open ? "Close house" : "Open house"}
               onClick={() => setOpen((v) => !v)}
             >
@@ -174,9 +158,9 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+        <div className="house-map">
           <div className="flex h-16 items-center justify-between px-4 md:h-[4.75rem] md:px-6">
-            <Wordmark to="/app" />
+            <Wordmark to="/app" mark />
             <button
               type="button"
               className="grid size-12 place-items-center rounded-full"
@@ -199,8 +183,8 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
                         to={item.to}
                         onClick={() => setOpen(false)}
                         className={cn(
-                          "block py-2 font-display text-4xl leading-[1.05] md:text-5xl",
-                          isActive(item.to) ? "text-sea italic" : "text-foreground",
+                          "block py-2 font-display text-4xl leading-[1.05] transition-colors md:text-5xl",
+                          isActive(item.to) ? "text-sea italic" : "text-ink hover:text-sea",
                         )}
                       >
                         {item.label}
@@ -214,11 +198,11 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-5 pb-8 md:px-10">
             <div>
               {isAdmin ? (
-                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm text-primary">
+                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm text-sea">
                   Owner atelier
                 </Link>
               ) : null}
-              <p className="truncate text-xs text-muted-foreground">{user?.displayName ?? user?.primaryEmail}</p>
+              <p className="truncate text-xs text-ink-soft">{user?.displayName ?? user?.primaryEmail}</p>
             </div>
             <button
               type="button"
@@ -227,7 +211,7 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
                 setSigningOut(true);
                 void signOut("/").catch(() => setSigningOut(false));
               }}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="text-sm text-ink-soft hover:text-ink"
             >
               {signingOut ? "Signing out…" : "Sign out"}
             </button>
@@ -235,12 +219,16 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
         </div>
       ) : null}
 
-      <main className="min-w-0" aria-hidden={open || undefined}>{children}</main>
+      <main className="min-w-0" aria-hidden={open || undefined}>
+        {children}
+      </main>
 
-      <nav
-        className="sticky bottom-0 z-30 grid grid-cols-5 border-t border-border bg-background/90 px-1 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden"
-        aria-label="Primary mobile"
-      >
+      <nav className="house-dock md:hidden" aria-label="Primary mobile">
+        <span
+          className="house-dock-pill"
+          style={{ transform: `translateX(${dockIndex * 100}%)` }}
+          aria-hidden
+        />
         {MOBILE_PRIMARY.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.to);
@@ -248,12 +236,9 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
             <Link
               key={item.to}
               to={item.to}
-              className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-1 text-[10px]",
-                active ? "text-primary" : "text-muted-foreground",
-              )}
+              className={cn("house-dock-item", active && "is-on")}
             >
-              <Icon className="size-4" />
+              <Icon className="size-5" />
               {item.label}
             </Link>
           );

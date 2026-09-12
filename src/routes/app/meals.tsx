@@ -71,18 +71,19 @@ function Meals() {
                 </Button>
               </div>
               {swapDay === m.day ? (
-                <div className="mt-6 grid gap-2 sm:grid-cols-2">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   {data.catalog.map((r) => (
                     <button
                       key={r.id}
                       type="button"
-                      className="rounded-xl bg-secondary px-3 py-3 text-left text-sm"
+                      className="swap-plate"
                       onClick={() => {
                         void swapMeal({ data: { day: m.day, recipeId: r.id } }).then(() => getMealWeek().then(setData));
                         setSwapDay(null);
                       }}
                     >
-                      {r.title}
+                      <span className="swap-plate-title">{r.title}</span>
+                      <span className="swap-plate-meta">{r.minutes} min</span>
                     </button>
                   ))}
                 </div>

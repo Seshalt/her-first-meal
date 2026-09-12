@@ -5,6 +5,7 @@ import { listPantry, removePantry, upsertPantry } from "@/lib/server/meals";
 import { altFor } from "@/lib/landing";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/pantry")({ component: Pantry });
 
@@ -33,7 +34,7 @@ function Pantry() {
       />
       <RoomBody>
         <form
-          className="grid gap-4 md:grid-cols-[1fr_90px_90px_auto]"
+          className="jar-add-form"
           onSubmit={(e) => {
             e.preventDefault();
             void upsertPantry({ data: { name, quantity: Number(quantity) || 1, unit } }).then(() => {
@@ -55,32 +56,40 @@ function Pantry() {
             <Input id="punit" value={unit} onChange={(e) => setUnit(e.target.value)} />
           </div>
           <Button type="submit" className="self-end">
-            Add
+            Set on the shelf
           </Button>
         </form>
-        <ul className="mt-12 divide-y divide-border">
-          {items.length === 0 ? (
-            <li className="py-10 font-display text-2xl text-ink-soft">
-              Your pantry is empty. Add staples you already keep.
-            </li>
-          ) : (
-            items.map((item) => (
-              <li key={item.id} className="flex min-h-16 items-center justify-between gap-4 py-5">
-                <span>
-                  <span className="font-display text-2xl">{item.name}</span>
-                  <span className="ml-3 text-sm text-muted-foreground">
+
+        {items.length === 0 ? (
+          <p className="mt-12 font-display text-2xl text-ink-soft">Your pantry is empty. Add staples you already keep.</p>
+        ) : (
+          <ul className="jar-shelf mt-12">
+            {items.map((item) => {
+              const fill = Math.min(92, Math.max(18, Number(item.quantity) * 14));
+              return (
+                <li key={item.id} className={cn("jar", item.low && "is-low")}>
+                  <div className="jar-body" aria-hidden>
+                    <span className="jar-fill" style={{ height: `${fill}%` }} />
+                    <span className="jar-lid" />
+                  </div>
+                  <p className="jar-name">{item.name}</p>
+                  <p className="jar-meta">
                     {item.quantity} {item.unit}
                     {item.estimated ? " · estimated" : ""}
                     {item.low ? " · running low" : ""}
-                  </span>
-                </span>
-                <button type="button" className="text-sm text-muted-foreground" onClick={() => void removePantry({ data: { id: item.id } }).then(reload)}>
-                  Remove
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
+                  </p>
+                  <button
+                    type="button"
+                    className="jar-remove"
+                    onClick={() => void removePantry({ data: { id: item.id } }).then(reload)}
+                  >
+                    Take off the shelf
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </RoomBody>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Link } from "@tanstack/react-router";
-import { Send, Sparkles, X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { askNouri, getNouriThread } from "@/lib/server/nouri";
 import { cn } from "@/lib/utils";
@@ -14,10 +14,10 @@ export function NouriFab({ about }: { about?: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-border)] md:bottom-6"
+        className="nouri-drop-fab"
         aria-haspopup="dialog"
       >
-        <Sparkles className="size-4" />
+        <span className="nouri-drop-bead" aria-hidden />
         Ask Nouri
       </button>
       {open ? <NouriDialog about={about} onClose={() => setOpen(false)} /> : null}

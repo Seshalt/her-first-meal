@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
+import { TickRow } from "@/components/house/tick";
 import { getGroceryList, toggleGroceryItem } from "@/lib/server/meals";
 import { altFor } from "@/lib/landing";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/grocery")({ component: Grocery });
 
@@ -24,7 +24,15 @@ function Grocery() {
     return [...map.entries()];
   }, [data]);
 
-  if (!data) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">Building your list…</p>;
+  if (!data) {
+    return (
+      <div className="house-morning px-5 pt-28">
+        <p className="font-display text-3xl text-ink-soft">Building your list…</p>
+      </div>
+    );
+  }
+
+  const remaining = data.items.filter((i) => !i.checked).length;
 
   return (
     <div>
@@ -37,34 +45,28 @@ function Grocery() {
         tone="gold"
       />
       <RoomBody>
+        <p className="font-display text-2xl text-ink-soft">
+          <span className="tabular-nums text-ink">{remaining}</span> still to gather
+        </p>
         {grouped.map(([dept, items]) => (
-          <section key={dept} className="mb-16">
+          <section key={dept} className="mt-12">
             <p className="text-xs uppercase tracking-[0.32em] text-gold">{dept}</p>
             <div className="editorial-rule mt-4" />
             <ul className="mt-2">
               {items.map((item) => (
-                <li key={item.name} className="border-b border-border">
-                  <label
-                    className={cn(
-                      "flex min-h-16 cursor-pointer items-center gap-4 py-4",
-                      item.checked && "opacity-45",
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={item.checked}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setData({
-                          ...data,
-                          items: data.items.map((i) => (i.name === item.name ? { ...i, checked } : i)),
-                        });
-                        void toggleGroceryItem({ data: { name: item.name, checked } });
-                      }}
-                    />
-                    <span className="flex-1 font-display text-2xl">{item.name}</span>
-                    <span className="text-sm text-muted-foreground">{item.qty}</span>
-                  </label>
+                <li key={item.name}>
+                  <TickRow
+                    name={item.name}
+                    qty={item.qty}
+                    checked={item.checked}
+                    onChecked={(checked) => {
+                      setData({
+                        ...data,
+                        items: data.items.map((i) => (i.name === item.name ? { ...i, checked } : i)),
+                      });
+                      void toggleGroceryItem({ data: { name: item.name, checked } });
+                    }}
+                  />
                 </li>
               ))}
             </ul>
