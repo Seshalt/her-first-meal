@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export function ParallaxFrame({
   src,
   alt,
-  speed = 0.28,
+  speed = 0.35,
   className,
   imgClassName,
 }: {
@@ -14,44 +14,43 @@ export function ParallaxFrame({
   className?: string;
   imgClassName?: string;
 }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    const wrap = wrapRef.current;
     const img = imgRef.current;
-    if (!img) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let frame = 0;
-    const update = () => {
-      const parent = img.parentElement;
-      if (!parent) return;
-      const rect = parent.getBoundingClientRect();
-      const viewH = window.innerHeight || 1;
-      const progress = (rect.top + rect.height / 2 - viewH / 2) / viewH;
-      const shift = Math.max(-140, Math.min(140, progress * speed * 280));
-      img.style.transform = `translate3d(0, ${shift}px, 0) scale(1.22)`;
+    if (!wrap || !img) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    const tick = () => {
+      if (reduced) {
+        img.style.transform = "translate3d(0,0,0) scale(1.08)";
+        return;
+      }
+      const r = wrap.getBoundingClientRect();
+      const view = window.innerHeight || 1;
+      const p = (r.top + r.height / 2 - view / 2) / view;
+      const y = Math.max(-240, Math.min(240, p * speed * 520));
+      img.style.transform = `translate3d(0, ${y}px, 0) scale(1.32)`;
     };
     const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
     };
-    update();
+    tick();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
-      cancelAnimationFrame(frame);
+      cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
   }, [speed, src]);
 
   return (
-    <div className={cn("relative overflow-hidden bg-secondary", className)}>
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        className={cn("media absolute inset-x-0 -top-[12%] h-[124%] w-full object-cover will-change-transform", imgClassName)}
-      />
+    <div ref={wrapRef} className={cn("parallax-frame", className)}>
+      <img ref={imgRef} src={src} alt={alt} className={cn("parallax-frame-img", imgClassName)} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { usePublicSite } from "@/lib/use-public-site";
 import { publicHttpUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export function PublicNav({ overlay = false }: { overlay?: boolean }) {
+export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { site } = usePublicSite();
   const [open, setOpen] = useState(false);
@@ -57,7 +57,8 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
   }, [open]);
 
   const onHero = overlay && !scrolled && !open;
-  const ink = onHero ? "text-paper" : "text-foreground";
+  const stayDark = cinematic;
+  const ink = onHero || stayDark ? "text-paper" : "text-foreground";
 
   return (
     <header
@@ -65,7 +66,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
       className={cn(
         overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
         "transition-[background,box-shadow,border-color,color] duration-700 ease-out",
-        onHero
+        onHero || stayDark
           ? "nav-liquid-glass nav-liquid-glass-thin border-b border-white/15 text-paper"
           : "nav-liquid-glass border-b border-white/35 text-foreground",
       )}
@@ -79,8 +80,8 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
               to={l.to}
               className={cn(
                 "text-sm tracking-wide transition-colors",
-                onHero ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
-                pathname === l.to && (onHero ? "text-paper" : "text-foreground"),
+                onHero || stayDark ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
+                pathname === l.to && (onHero || stayDark ? "text-paper" : "text-foreground"),
               )}
             >
               {l.label}
@@ -115,7 +116,7 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
             to="/pricing"
             className={cn(
               "hidden h-11 items-center rounded-full px-5 text-sm font-medium sm:inline-flex",
-              onHero ? "bg-paper text-ink hover:bg-cream" : "bg-primary text-primary-foreground hover:bg-sea-deep",
+              onHero || stayDark ? "bg-gold text-ink hover:bg-paper" : "bg-primary text-primary-foreground hover:bg-sea-deep",
             )}
           >
             {site.navCta}
@@ -136,9 +137,9 @@ export function PublicNav({ overlay = false }: { overlay?: boolean }) {
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background text-foreground">
+        <div className={cn("fixed inset-0 z-[100] flex flex-col", stayDark ? "bg-ink text-paper" : "bg-background text-foreground")}>
           <div className="flex h-16 items-center justify-between px-4">
-            <Wordmark />
+            <Wordmark className={stayDark ? "text-paper" : undefined} />
             <button
               type="button"
               className="grid size-12 place-items-center rounded-full"

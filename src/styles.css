@@ -959,3 +959,174 @@ html[data-pricing="linen"] .pricing-stage {
 
 
 
+
+.parallax-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.parallax-frame-img {
+  position: absolute;
+  left: -8%;
+  top: -22%;
+  width: 116%;
+  height: 144%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center 28%;
+  will-change: transform;
+  transform: translate3d(0, 0, 0) scale(1.18);
+}
+
+.skip-to-house {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 200;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-ink);
+  padding: 0.7rem 1.1rem;
+}
+.skip-to-house:focus {
+  top: 1rem;
+}
+
+.landing-cinematic {
+  background: #120e10;
+  color: var(--color-paper);
+  min-height: 100dvh;
+}
+html:has(.landing-cinematic) {
+  background: #120e10;
+}
+html:has(.landing-cinematic) body {
+  background: #120e10;
+  background-image: none;
+}
+.landing-cinematic .cine-wash {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(42% 36% at 8% 6%, color-mix(in oklab, var(--color-wine) 46%, transparent), transparent 62%),
+    radial-gradient(34% 32% at 92% 10%, color-mix(in oklab, var(--color-gold) 16%, transparent), transparent 58%),
+    radial-gradient(48% 40% at 78% 92%, color-mix(in oklab, var(--color-sea) 22%, transparent), transparent 64%),
+    #120e10;
+}
+.cine-air {
+  padding-block: clamp(5.5rem, 14vw, 10.5rem);
+  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+}
+.cine-hero {
+  background: #0e0b0c;
+  min-height: 100dvh;
+}
+.cine-hero-veil {
+  background:
+    linear-gradient(90deg, rgba(10, 8, 9, 0.78) 0%, rgba(10, 8, 9, 0.32) 46%, transparent 72%),
+    linear-gradient(180deg, rgba(10, 8, 9, 0.42) 0%, transparent 26%, rgba(10, 8, 9, 0.86) 100%),
+    radial-gradient(70% 50% at 80% 20%, color-mix(in oklab, var(--color-wine) 28%, transparent), transparent 60%);
+}
+.cine-manifesto {
+  background:
+    radial-gradient(60% 50% at 100% 0%, color-mix(in oklab, var(--color-wine) 28%, transparent), transparent 58%),
+    #160f12;
+  color: var(--color-paper);
+}
+.cine-portrait {
+  position: relative;
+  min-height: 70vh;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.7);
+}
+@media (min-width: 1024px) {
+  .cine-portrait {
+    min-height: 82vh;
+  }
+}
+.cine-split {
+  display: grid;
+  background: #120e10;
+}
+.cine-split-photo {
+  position: relative;
+  min-height: 70vh;
+  overflow: hidden;
+}
+.cine-split-copy {
+  display: flex;
+  align-items: center;
+  padding: clamp(3.5rem, 10vw, 7.5rem) clamp(1.25rem, 6vw, 4.5rem);
+  background: #160f12;
+}
+@media (min-width: 1024px) {
+  .cine-split {
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+  .cine-split-photo {
+    min-height: 100vh;
+  }
+}
+.cine-panel {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  padding: 0;
+  color: var(--color-paper);
+}
+.cine-journey {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--color-paper);
+  background: #120e10;
+}
+.cine-journey-photo {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.cine-journey-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(12, 10, 11, 0.55) 0%, rgba(12, 10, 11, 0.72) 42%, rgba(12, 10, 11, 0.88) 100%),
+    radial-gradient(50% 40% at 80% 20%, color-mix(in oklab, var(--color-sea) 22%, transparent), transparent 70%);
+}
+.cine-partner-veil {
+  background:
+    linear-gradient(90deg, rgba(14, 10, 12, 0.82) 0%, rgba(14, 10, 12, 0.4) 50%, rgba(14, 10, 12, 0.55) 100%),
+    linear-gradient(180deg, transparent 0%, rgba(14, 10, 12, 0.55) 100%);
+}
+.cine-partner {
+  min-height: 88vh;
+}
+.cine-close {
+  background:
+    radial-gradient(70% 50% at 50% 0%, color-mix(in oklab, var(--color-sea) 28%, transparent), transparent 62%),
+    radial-gradient(50% 40% at 100% 100%, color-mix(in oklab, var(--color-gold) 12%, transparent), transparent 58%),
+    #0f1614;
+  color: var(--color-paper);
+}
+
+.landing-cinematic [data-site-nav]:not(.nav-liquid-glass-thin) {
+  background: rgba(16, 12, 14, 0.9);
+  color: var(--color-paper);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax-frame-img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: none !important;
+  }
+}

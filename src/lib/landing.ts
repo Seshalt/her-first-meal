@@ -4,127 +4,127 @@ export const LANDING_IMAGE_SLOTS = [
     id: "hero",
     label: "Home · full-screen opening",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a white top, both hands on her belly",
+    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
   },
   {
     id: "meals",
     label: "Home · meals",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Colorful grain bowl with avocado, tomatoes, and greens",
+    alt: "Ceramic bowl of vegetable soup with tofu, herbs, and a spoon",
   },
   {
     id: "binding",
     label: "Home · belly binding",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
+    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
   },
   {
     id: "bindingStill",
     label: "Home · wrap still life",
     fallback: "/images/binding-still.jpg",
-    alt: "Close-up of hands resting on a pregnant belly",
+    alt: "Folded patterned cloths and scarves prepared for wrapping",
   },
   {
     id: "rest",
     label: "Home · postpartum rest",
     fallback: "/images/postpartum-rest.jpg",
-    alt: "Latina mother standing outside, holding her baby close",
+    alt: "Mother lying in bed holding her newborn against her chest",
   },
   {
     id: "movement",
     label: "Home · movement",
     fallback: "/images/movement.jpg",
-    alt: "Asian woman in a yoga pose on a mat",
+    alt: "Pregnant woman stretching on a yoga ball in her living room",
   },
   {
     id: "nouri",
     label: "Home · Nouri",
     fallback: "/images/nouri-drop.jpg",
-    alt: "Hot tea pouring into a ceramic cup",
+    alt: "Cup of herbal tea with ginger and lemon on a wooden tray",
   },
   {
     id: "family",
     label: "Home · family table",
     fallback: "/images/family-table.jpg",
-    alt: "East Asian family sitting together at a dining table",
+    alt: "Family sharing a meal together at the table",
   },
   {
     id: "grocery",
     label: "Home · grocery / partner",
     fallback: "/images/grocery-partner.jpg",
-    alt: "Couple cooking together at a kitchen counter",
+    alt: "Couple cooking a meal together in a home kitchen",
   },
   {
     id: "hydration",
     label: "Home · hydration",
     fallback: "/images/hydration.jpg",
-    alt: "Glass of lemon water on a sunlit table",
+    alt: "Glass of lemon water on a wooden board",
   },
   {
     id: "about",
     label: "About · Maat",
     fallback: "/images/about-portrait.jpg",
-    alt: "Indian woman cooking at a stove",
+    alt: "African woman smiling in warm, moody light",
   },
   {
     id: "login",
     label: "Sign in · photograph",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a white top, both hands on her belly",
+    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
   },
   {
     id: "join",
     label: "Join · photograph",
     fallback: "/images/family-table.jpg",
-    alt: "East Asian family sitting together at a dining table",
+    alt: "Family sharing a meal together at the table",
   },
   {
     id: "pricing",
     label: "Membership · background",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman in a white top, both hands on her belly",
+    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
   },
   {
     id: "checkout",
     label: "Checkout · side photograph",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Colorful grain bowl with avocado, tomatoes, and greens",
+    alt: "Ceramic bowl of vegetable soup with tofu, herbs, and a spoon",
   },
   {
     id: "bindHero",
     label: "Belly binding page · hero",
     fallback: "/images/binding-still.jpg",
-    alt: "Close-up of hands resting on a pregnant belly",
+    alt: "Folded patterned cloths and scarves prepared for wrapping",
   },
   {
     id: "bindStep1",
     label: "Binding step 1",
     fallback: "/images/binding-still.jpg",
-    alt: "Close-up of hands resting on a pregnant belly",
+    alt: "Folded patterned cloths and scarves prepared for wrapping",
   },
   {
     id: "bindStep2",
     label: "Binding step 2",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
+    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
   },
   {
     id: "bindStep3",
     label: "Binding step 3",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant woman in a yellow dress standing outdoors, hands on her belly",
+    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
   },
   {
     id: "bindStep4",
     label: "Binding step 4",
     fallback: "/images/postpartum-rest.jpg",
-    alt: "Latina mother standing outside, holding her baby close",
+    alt: "Mother lying in bed holding her newborn against her chest",
   },
   {
     id: "nouriHero",
     label: "Nouri page · photograph",
     fallback: "/images/nouri-drop.jpg",
-    alt: "Hot tea pouring into a ceramic cup",
+    alt: "Cup of herbal tea with ginger and lemon on a wooden tray",
   },
 ] as const;
 
@@ -203,7 +203,7 @@ export type LandingContent = LandingCopy & {
 
 export function defaultImages(): Record<LandingImageSlot, string> {
   return Object.fromEntries(
-    LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback ? `${s.fallback.split("?")[0]}?v=6` : s.fallback]),
+    LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback ? `${s.fallback.split("?")[0]}?v=9` : s.fallback]),
   ) as Record<LandingImageSlot, string>;
 }
 
@@ -257,4 +257,3 @@ export const OFFER_TICKER = [
   "Week-by-week journey",
   "Fourth trimester care",
 ];
-
