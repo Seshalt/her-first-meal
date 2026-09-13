@@ -18,8 +18,8 @@ export type Profile = {
   weeklyBudget: string | null;
   zipCode: string | null;
   city: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  region: string | null;
+  stateCode: string | null;
   locationPermission: string;
   onboardingCompleted: boolean;
   onboardingStep: number;

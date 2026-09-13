@@ -1,17 +1,12 @@
-/** Every visible string should pass through `t()` so layouts can later swap locales. */
-export const messages = {
-  brand: "Her First Meal",
-  tagline: "The world celebrates the baby. We remember the mother.",
-  cta: "Start your journey today",
-  memberLogin: "Member login",
-  askNouri: "Ask Nouri",
-  talkToNouri: "Talk to Nouri",
-  unauthorized: "This page isn't available.",
-  loading: "Gathering your table…",
-} as const;
+import { EN, type MsgKey } from "./i18n/en";
 
-export type MessageKey = keyof typeof messages;
+export { LocaleProvider, useI18n, useT, normalizeLocale } from "./i18n/provider";
+export { LOCALES, isLocale, localeMeta, LOCALE_STORAGE, type LocaleId } from "./i18n/locales";
+export type { MsgKey };
 
-export function t(key: MessageKey): string {
-  return messages[key];
+/** Static English lookup for server copy. Client UI should use useT(). */
+export function t(key: MsgKey): string {
+  return EN[key];
 }
+
+export const messages = EN;

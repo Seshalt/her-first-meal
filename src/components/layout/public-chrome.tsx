@@ -6,18 +6,21 @@ import { SignedIn, SignedOut } from "@/lib/auth/gates";
 import { usePublicSite } from "@/lib/use-public-site";
 import { publicHttpUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { LocaleSwitch } from "@/components/i18n/locale-switch";
+import { useT } from "@/lib/i18n/provider";
 
 export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { site } = usePublicSite();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const links = [
-    { to: "/about" as const, label: site.navAbout },
-    { to: "/belly-binding" as const, label: site.navBinding },
-    { to: "/nouri" as const, label: site.navNouri },
-    { to: "/pricing" as const, label: site.navMembership },
-    { to: "/contact" as const, label: site.contactNav },
+    { to: "/about" as const, label: t("nav.about") },
+    { to: "/belly-binding" as const, label: t("nav.binding") },
+    { to: "/nouri" as const, label: t("nav.write") },
+    { to: "/pricing" as const, label: t("nav.membership") },
+    { to: "/contact" as const, label: t("nav.contact") },
   ];
 
   useEffect(() => {
@@ -89,6 +92,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+          <LocaleSwitch tone={onHero ? "paper" : "ink"} className="hidden md:inline-flex" />
           <SignedOut>
             <Link
               to="/login"
@@ -186,6 +190,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
 
 export function PublicFooter() {
   const { site, content } = usePublicSite();
+  const t = useT();
   const instagram = publicHttpUrl(site.instagramUrl);
   const tiktok = publicHttpUrl(site.tiktokUrl);
   return (
@@ -208,7 +213,7 @@ export function PublicFooter() {
               <Link to="/belly-binding">{site.footerStudio}</Link>
             </li>
             <li>
-              <Link to="/nouri">{site.footerNouri}</Link>
+              <Link to="/nouri">{t("footer.write")}</Link>
             </li>
             <li>
               <Link to="/pricing">{site.footerMembership}</Link>

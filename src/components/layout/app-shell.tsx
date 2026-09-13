@@ -6,9 +6,9 @@ import {
   HeartHandshake,
   Home,
   Library,
+  Mail,
   Menu,
   ShoppingBag,
-  Sparkles,
   StretchHorizontal,
   UserRound,
   UtensilsCrossed,
@@ -17,11 +17,13 @@ import {
 } from "lucide-react";
 import { Wordmark } from "@/components/brand/logo";
 import { NouriFab } from "@/components/nouri/nouri-panel";
+import { LocaleSwitch } from "@/components/i18n/locale-switch";
 import { NoIndex } from "@/components/security/noindex";
 import { signOut } from "@/lib/auth/client";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { getMyRole } from "@/lib/server/admin";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
 
 type RoomTo =
   | "/app"
@@ -62,7 +64,7 @@ const GROUPS: { label: string; tone: string; items: { to: RoomTo; label: string;
     items: [
       { to: "/app/binding", label: "Binding", icon: HeartHandshake },
       { to: "/app/move", label: "Move", icon: StretchHorizontal },
-      { to: "/app/nouri", label: "Nouri", icon: Sparkles },
+      { to: "/app/nouri", label: "Write us", icon: Mail },
       { to: "/app/appointments", label: "Appointments", icon: Calendar },
     ],
   },
@@ -82,7 +84,7 @@ const PRIMARY: { to: RoomTo; label: string }[] = [
   { to: "/app", label: "Today" },
   { to: "/app/meals", label: "Meals" },
   { to: "/app/binding", label: "Binding" },
-  { to: "/app/nouri", label: "Nouri" },
+  { to: "/app/nouri", label: "Write us" },
 ];
 
 const FLAT = GROUPS.flatMap((g) => g.items);
@@ -91,9 +93,11 @@ const MOBILE_PRIMARY = [FLAT[0], FLAT[2], FLAT[5], FLAT[7], FLAT[12]];
 export function AppShell({ children, hideNouri = false }: { children: ReactNode; hideNouri?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const user = useCurrentUser();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     void getMyRole()
@@ -108,46 +112,62 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
     };
   }, [open]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   function isActive(to: string) {
     return to === "/app" ? pathname === "/app" : pathname.startsWith(to);
   }
 
-  const dockIndex = Math.max(
-    0,
-    MOBILE_PRIMARY.findIndex((item) => isActive(item.to)),
-  );
+  const onHero = !scrolled && !open;
+  const ink = onHero ? "text-paper" : "text-foreground";
 
   return (
-    <div className="house-root min-h-dvh">
+    <div className="min-h-dvh bg-background">
       <NoIndex />
-      <header className="house-roof">
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-[80] transition-[background-color,border-color,color] duration-300",
+          onHero
+            ? "border-b border-transparent bg-gradient-to-b from-ink/55 to-transparent"
+            : "border-b border-border/70 bg-background/95 text-foreground backdrop-blur-md",
+        )}
+      >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:h-[4.75rem] md:px-6">
-          <Wordmark to="/app" mark className="min-w-0" />
+          <Wordmark to="/app" className={cn("min-w-0", ink)} />
           <nav className="hidden items-center gap-8 lg:flex" aria-label="Member">
             {PRIMARY.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "relative py-2 text-sm tracking-wide transition-colors",
-                  isActive(item.to) ? "text-ink" : "text-ink-soft hover:text-ink",
+                  "text-sm tracking-wide transition-colors",
+                  onHero ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
+                  isActive(item.to) && (onHero ? "text-paper" : "text-foreground"),
                 )}
               >
-                {item.label}
-                <span className={cn("house-nav-dot", isActive(item.to) && "is-on")} />
+                {item.to === "/app" ? t("room.today") : item.to === "/app/meals" ? t("room.meals") : item.to === "/app/binding" ? t("room.binding") : t("room.write")}
               </Link>
             ))}
           </nav>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <LocaleSwitch tone={onHero ? "paper" : "ink"} className="hidden md:inline-flex" />
             <Link
               to="/app/profile"
-              className="hidden h-11 items-center px-2 text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline sm:inline-flex"
+              className={cn(
+                "hidden h-11 items-center px-2 text-sm underline-offset-4 hover:underline sm:inline-flex",
+                ink,
+              )}
             >
-              Profile
+              {t("room.profile")}
             </Link>
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full text-ink"
+              className={cn("grid size-12 place-items-center rounded-full", ink)}
               aria-label={open ? "Close house" : "Open house"}
               onClick={() => setOpen((v) => !v)}
             >
@@ -158,9 +178,9 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
       </header>
 
       {open ? (
-        <div className="house-map">
+        <div className="fixed inset-0 z-[100] flex flex-col bg-background">
           <div className="flex h-16 items-center justify-between px-4 md:h-[4.75rem] md:px-6">
-            <Wordmark to="/app" mark />
+            <Wordmark to="/app" />
             <button
               type="button"
               className="grid size-12 place-items-center rounded-full"
@@ -183,8 +203,8 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
                         to={item.to}
                         onClick={() => setOpen(false)}
                         className={cn(
-                          "block py-2 font-display text-4xl leading-[1.05] transition-colors md:text-5xl",
-                          isActive(item.to) ? "text-sea italic" : "text-ink hover:text-sea",
+                          "block py-2 font-display text-4xl leading-[1.05] md:text-5xl",
+                          isActive(item.to) ? "text-sea italic" : "text-foreground",
                         )}
                       >
                         {item.label}
@@ -198,11 +218,11 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-5 pb-8 md:px-10">
             <div>
               {isAdmin ? (
-                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm text-sea">
+                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm text-primary">
                   Owner atelier
                 </Link>
               ) : null}
-              <p className="truncate text-xs text-ink-soft">{user?.displayName ?? user?.primaryEmail}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.displayName ?? user?.primaryEmail}</p>
             </div>
             <button
               type="button"
@@ -211,24 +231,20 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
                 setSigningOut(true);
                 void signOut("/").catch(() => setSigningOut(false));
               }}
-              className="text-sm text-ink-soft hover:text-ink"
+              className="text-sm text-muted-foreground hover:text-foreground"
             >
-              {signingOut ? "Signing out…" : "Sign out"}
+              {signingOut ? t("signingOut") : t("signOut")}
             </button>
           </div>
         </div>
       ) : null}
 
-      <main className="min-w-0" aria-hidden={open || undefined}>
-        {children}
-      </main>
+      <main className="min-w-0" aria-hidden={open || undefined}>{children}</main>
 
-      <nav className="house-dock md:hidden" aria-label="Primary mobile">
-        <span
-          className="house-dock-pill"
-          style={{ transform: `translateX(${dockIndex * 100}%)` }}
-          aria-hidden
-        />
+      <nav
+        className="sticky bottom-0 z-30 grid grid-cols-5 border-t border-border bg-background/90 px-1 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden"
+        aria-label="Primary mobile"
+      >
         {MOBILE_PRIMARY.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.to);
@@ -236,9 +252,12 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
             <Link
               key={item.to}
               to={item.to}
-              className={cn("house-dock-item", active && "is-on")}
+              className={cn(
+                "flex min-h-12 flex-col items-center justify-center gap-1 text-[10px]",
+                active ? "text-primary" : "text-muted-foreground",
+              )}
             >
-              <Icon className="size-5" />
+              <Icon className="size-4" />
               {item.label}
             </Link>
           );

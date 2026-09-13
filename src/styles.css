@@ -952,6 +952,17 @@ html[data-pricing="linen"] .pricing-stage {
 .receipt-paper.is-out {
   transform: translateY(0);
 }
+.kitchen-card {
+  transition: transform 180ms var(--ease-out-soft), box-shadow 180ms var(--ease-out-soft);
+}
+.kitchen-card:hover {
+  transform: translateY(-2px);
+}
+
+[dir="rtl"] .editorial-rule {
+  transform: scaleX(-1);
+}
+
 @keyframes receipt-feed {
   from { transform: translateY(-92%); }
   to { transform: translateY(0); }

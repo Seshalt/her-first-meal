@@ -1,60 +1,55 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { applyAtelierEdit } from "@/lib/server/atelier-ai";
-import { bustPublicSiteCache } from "@/lib/use-public-site";
+import { listHouseLetters, markLetterRead } from "@/lib/server/letters";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
 
-export const Route = createFileRoute("/admin/ai")({ component: HouseAi });
+export const Route = createFileRoute("/admin/ai")({ component: Letters });
 
-function HouseAi() {
-  const [message, setMessage] = useState("");
-  const [log, setLog] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
+function Letters() {
+  const [rows, setRows] = useState<Awaited<ReturnType<typeof listHouseLetters>>>([]);
+
+  useEffect(() => {
+    void listHouseLetters().then(setRows);
+  }, []);
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="font-display text-4xl">House AI</h1>
+    <div className="max-w-3xl">
+      <h1 className="font-display text-4xl">Letters</h1>
       <p className="mt-3 text-sm text-white/60">
-        Speak to ChatGPT here and it writes straight onto the public site — headlines, belly binding steps, contact
-        lines, footer links. You do not need to open each field. Paste OPENAI_API_KEY in Vercel; you can reuse a key
-        from another website. A new key is only needed if you want this house billed on its own.
+        The house does not use AI. Members and visitors write Maat here. Open an email to reply from your own inbox.
       </p>
-      <Textarea
-        className="mt-8 min-h-36 bg-white/8 text-[#efe6d6]"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Example: Add a fifth belly binding step about resting after the wrap. Change the home headline to mention Sunday kitchen hours."
-      />
-      <Button
-        className="mt-4"
-        disabled={busy || !message.trim()}
-        onClick={() => {
-          setBusy(true);
-          void applyAtelierEdit({ data: { message } })
-            .then((r) => {
-              bustPublicSiteCache();
-              setLog((prev) => [r.text, ...prev].slice(0, 8));
-              if (r.ok) {
-                setMessage("");
-                toast.success("Public site updated.");
-              } else {
-                toast.error(r.text);
-              }
-            })
-            .catch((err) => toast.error(err instanceof Error ? err.message : "ChatGPT could not edit."))
-            .finally(() => setBusy(false));
-        }}
-      >
-        {busy ? "Editing the house…" : "Apply to the public site"}
-      </Button>
-      <ul className="mt-10 space-y-3 text-sm text-white/70">
-        {log.map((line, i) => (
-          <li key={i} className="rounded-2xl bg-white/6 px-4 py-3 whitespace-pre-wrap">
-            {line}
+      <ul className="mt-10 space-y-4">
+        {rows.map((row) => (
+          <li key={row.id} className="rounded-2xl bg-white/6 px-5 py-4">
+            <p className="text-xs uppercase tracking-[0.18em] text-white/50">
+              {new Date(row.created_at).toLocaleString()} · {row.locale ?? "en"} · {row.stage ?? "unspecified"}
+            </p>
+            <p className="mt-2 font-display text-2xl">{row.subject}</p>
+            <p className="mt-1 text-sm text-white/70">
+              {row.name} · {row.email}
+            </p>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/80">{row.body}</p>
+            {!row.read_at ? (
+              <Button
+                className="mt-4"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  void markLetterRead({ data: { id: row.id } }).then(() => {
+                    toast.success("Marked read.");
+                    void listHouseLetters().then(setRows);
+                  })
+                }
+              >
+                Mark read
+              </Button>
+            ) : (
+              <p className="mt-3 text-xs text-white/40">Read</p>
+            )}
           </li>
         ))}
+        {!rows.length ? <p className="text-sm text-white/50">No letters yet.</p> : null}
       </ul>
     </div>
   );

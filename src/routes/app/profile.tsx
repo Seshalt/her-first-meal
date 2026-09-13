@@ -5,15 +5,20 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { DIETS, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { US_STATES } from "@/lib/content/places";
+import { LocaleSwitch } from "@/components/i18n/locale-switch";
+import { DietPicks } from "@/components/house/diet-picks";
+import { useI18n } from "@/lib/i18n/provider";
+import type { MsgKey } from "@/lib/i18n/en";
 import { altFor } from "@/lib/landing";
 import { deleteAccount, getMyHome, saveProfile } from "@/lib/server/profile";
 import { listNotifications, markNotificationsRead } from "@/lib/server/profile";
-import { PlaceAsk } from "@/components/house/place";
 
 export const Route = createFileRoute("/app/profile")({ component: Profile });
 
 function Profile() {
+  const { locale, t } = useI18n();
   const [home, setHome] = useState<Awaited<ReturnType<typeof getMyHome>> | null>(null);
   const [notes, setNotes] = useState<Awaited<ReturnType<typeof listNotifications>>>([]);
 
@@ -38,6 +43,8 @@ function Profile() {
         weeklyBudget: p.weeklyBudget ?? "",
         zipCode: p.zipCode ?? "",
         city: p.city ?? "",
+        stateCode: p.stateCode ?? "",
+        language: locale,
         diets: home.diet.diets,
         allergies: home.diet.allergies,
         avoids: home.diet.avoids ?? "",
@@ -55,7 +62,7 @@ function Profile() {
       <RoomHero
         kicker="Settings"
         title="Your house, your terms"
-        body={p.email ?? "The details Nouri and the table already know."}
+        body={p.email ?? t("profile.body")}
         src="/images/postpartum-rest.jpg"
         alt={altFor("/images/postpartum-rest.jpg")}
         tone="gold"
@@ -69,52 +76,39 @@ function Profile() {
           />
           <Label>Location</Label>
           <Input value={p.location ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, location: e.target.value } })} />
-          <Label>City</Label>
-          <Input value={p.city ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, city: e.target.value } })} />
           <Label>ZIP</Label>
           <Input value={p.zipCode ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, zipCode: e.target.value } })} />
-          <PlaceAsk
-            label={[p.city, p.location, p.zipCode].filter(Boolean).join(" · ")}
-            permission={p.locationPermission}
-            onSaved={(place) =>
-              setHome({
-                ...home,
-                profile: {
-                  ...p,
-                  city: place.city || p.city,
-                  location: place.location || p.location,
-                  zipCode: place.zipCode || p.zipCode,
-                  locationPermission: place.locationPermission,
-                },
-              })
-            }
-          />
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">Season</p>
+          <Label>{t("profile.state")}</Label>
+          <select
+            className="h-12 w-full rounded-xl border border-border bg-transparent px-3"
+            value={p.stateCode ?? ""}
+            onChange={(e) => setHome({ ...home, profile: { ...p, stateCode: e.target.value } })}
+          >
+            <option value="">—</option>
+            {US_STATES.map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <Label>{t("profile.language")}</Label>
+          <LocaleSwitch tone="gold" />
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{t("profile.season")}</p>
           <div className="flex flex-wrap gap-2">
             {(Object.keys(STAGE_LABEL) as Stage[]).map((s) => (
               <Pill key={s} active={p.stage === s} onClick={() => setHome({ ...home, profile: { ...p, stage: s } })}>
-                {STAGE_LABEL[s]}
+                {t(`stage.${s}` as MsgKey)}
               </Pill>
             ))}
           </div>
         </section>
         <section>
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">Dietary preferences</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {DIETS.map((d) => (
-              <Pill
-                key={d.id}
-                active={home.diet.diets.includes(d.id)}
-                onClick={() => {
-                  const diets = home.diet.diets.includes(d.id)
-                    ? home.diet.diets.filter((x) => x !== d.id)
-                    : [...home.diet.diets, d.id];
-                  setHome({ ...home, diet: { ...home.diet, diets } });
-                }}
-              >
-                {d.label}
-              </Pill>
-            ))}
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{t("profile.diets")}</p>
+          <div className="mt-4">
+            <DietPicks
+              value={home.diet.diets}
+              onChange={(diets) => setHome({ ...home, diet: { ...home.diet, diets } })}
+            />
           </div>
         </section>
         <section>

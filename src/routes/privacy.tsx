@@ -20,7 +20,7 @@ function Privacy() {
               <h2 className="font-display text-2xl text-ink">What we collect</h2>
               <p className="mt-2">
                 Account email and password hash, name, optional pregnancy stage, due date or baby’s birthday,
-                household notes, pantry and grocery preferences, appointments, Nouri conversations, belly-binding
+                household notes, pantry and grocery preferences, appointments, letters you send to Maat, belly-binding
                 photographs you choose to upload, and records of membership and purchases.
               </p>
               <p className="mt-2">
@@ -32,17 +32,16 @@ function Privacy() {
               <h2 className="font-display text-2xl text-ink">How we use it</h2>
               <p className="mt-2">
                 To keep you signed in, run membership, suggest meals and groceries, operate the binding studio and
-                movement rooms, answer through Nouri, book optional sessions, take payment, and — if you allow
+                movement rooms, carry letters to Maat, book optional sessions, take payment, and — if you allow
                 cookies — count visits or measure ads.
               </p>
             </section>
             <section>
-              <h2 className="font-display text-2xl text-ink">Artificial intelligence</h2>
+              <h2 className="font-display text-2xl text-ink">No artificial intelligence</h2>
               <p className="mt-2">
-                Nouri and some studio notes are generated with AI. The text you type and the photos you upload for
-                those features may be sent to our servers and to the model provider we use so a reply can be written.
-                Do not put another person’s medical file or a child’s full name into those rooms. AI output is not
-                stored as a medical record. It is not shared with other members.
+                This house does not send your notes to an AI model. Meals, grocery lists, and season guidance are
+                written in the catalog and chosen from the stage, diet, and state you share. Questions go to Maat by
+                letter — from the contact page or from Write us inside the house.
               </p>
             </section>
             <section>

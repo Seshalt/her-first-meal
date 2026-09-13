@@ -58,7 +58,7 @@ const TABS = [
   ...SITE_FIELD_GROUPS.map((g) => ({ id: g.id, label: g.label })),
   { id: "photos", label: "Photographs" },
   { id: "steps", label: "Binding steps" },
-  { id: "ai", label: "House AI" },
+  { id: "ai", label: "Letters note" },
   { id: "colors", label: "Colors" },
   { id: "layout", label: "Layout" },
 ] as const;

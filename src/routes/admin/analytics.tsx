@@ -17,7 +17,7 @@ function Analytics() {
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Stat label="Members" value={dash?.members} />
         <Stat label="Memberships" value={dash?.activeMemberships} />
-        <Stat label="Nouri threads" value={dash?.nouriThreads} />
+        <Stat label="Letters" value={dash?.nouriThreads} />
         <Stat label="Binding photos" value={dash?.bindingUploads} />
         <Stat label="Saved recipes" value={extra?.savedRecipes} />
         <Stat label="Page visits" value={extra?.visits} />

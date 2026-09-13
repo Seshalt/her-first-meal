@@ -24,8 +24,8 @@ type ProfileRow = {
   weekly_budget: string | null;
   zip_code: string | null;
   city: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  region: string | null;
+  state_code: string | null;
   location_permission: string;
   onboarding_completed: boolean;
   onboarding_step: number;
@@ -53,8 +53,8 @@ function mapProfile(row: ProfileRow): Profile {
     weeklyBudget: row.weekly_budget,
     zipCode: row.zip_code,
     city: row.city,
-    latitude: row.latitude == null ? null : Number(row.latitude),
-    longitude: row.longitude == null ? null : Number(row.longitude),
+    region: row.region ?? null,
+    stateCode: row.state_code ?? null,
     locationPermission: row.location_permission,
     onboardingCompleted: Boolean(row.onboarding_completed),
     onboardingStep: Number(row.onboarding_step ?? 0),
@@ -216,9 +216,8 @@ export const saveOnboarding = createServerFn({ method: "POST" })
       weeklyBudget?: string;
       zipCode?: string;
       city?: string;
-      latitude?: number | null;
-      longitude?: number | null;
-      locationPermission?: string;
+      stateCode?: string;
+      region?: string;
       complete?: boolean;
       step?: number;
     }) => input,
@@ -242,9 +241,8 @@ export const saveOnboarding = createServerFn({ method: "POST" })
         weekly_budget = coalesce(${data.weeklyBudget ?? null}, weekly_budget),
         zip_code = coalesce(${data.zipCode ?? null}, zip_code),
         city = coalesce(${data.city ?? null}, city),
-        latitude = coalesce(${data.latitude ?? null}, latitude),
-        longitude = coalesce(${data.longitude ?? null}, longitude),
-        location_permission = coalesce(${data.locationPermission ?? null}, location_permission),
+        state_code = coalesce(${data.stateCode ?? null}, state_code),
+        region = coalesce(${data.region ?? null}, region),
         onboarding_step = coalesce(${data.step ?? null}, onboarding_step),
         onboarding_completed = ${data.complete === true},
         updated_at = now()
@@ -276,35 +274,10 @@ export const saveOnboarding = createServerFn({ method: "POST" })
         stores = excluded.stores,
         custom_stores = excluded.custom_stores
     `;
-    return { ok: true };
-  });
-
-export const saveJoinDiets = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
-  .validator((input: { diets?: string[] }) => {
-    const allowed = new Set([
-      "vegan",
-      "vegetarian",
-      "pescatarian",
-      "gluten-free",
-      "dairy-free",
-      "nut-free",
-      "soy-free",
-      "halal",
-      "kosher",
-    ]);
-    return {
-      diets: (input.diets ?? []).filter((d) => typeof d === "string" && allowed.has(d)).slice(0, 12),
-    };
-  })
-  .handler(async ({ context, data }) => {
-    const sql = await getSql();
-    await ensureProfile(context.userId);
-    await sql`
-      insert into dietary_profiles (user_id, diets)
-      values (${context.userId}, ${JSON.stringify(data.diets)}::jsonb)
-      on conflict (user_id) do update set diets = excluded.diets
-    `;
+    if (data.stage || data.diets || data.stateCode || data.complete) {
+      await sql`delete from meal_plans where user_id = ${context.userId}`;
+      await sql`delete from grocery_lists where user_id = ${context.userId}`;
+    }
     return { ok: true };
   });
 
@@ -323,9 +296,8 @@ export const saveProfile = createServerFn({ method: "POST" })
       weeklyBudget?: string;
       zipCode?: string;
       city?: string;
-      latitude?: number | null;
-      longitude?: number | null;
-      locationPermission?: string;
+      stateCode?: string;
+      region?: string;
       themePreference?: string;
       notificationPrefs?: Record<string, boolean>;
       diets?: string[];
@@ -353,9 +325,8 @@ export const saveProfile = createServerFn({ method: "POST" })
         weekly_budget = coalesce(${data.weeklyBudget ?? null}, weekly_budget),
         zip_code = coalesce(${data.zipCode ?? null}, zip_code),
         city = coalesce(${data.city ?? null}, city),
-        latitude = coalesce(${data.latitude ?? null}, latitude),
-        longitude = coalesce(${data.longitude ?? null}, longitude),
-        location_permission = coalesce(${data.locationPermission ?? null}, location_permission),
+        state_code = coalesce(${data.stateCode ?? null}, state_code),
+        region = coalesce(${data.region ?? null}, region),
         theme_preference = coalesce(${data.themePreference ?? null}, theme_preference),
         notification_prefs = coalesce(${data.notificationPrefs ? JSON.stringify(data.notificationPrefs) : null}::jsonb, notification_prefs),
         updated_at = now()
@@ -389,99 +360,12 @@ export const saveProfile = createServerFn({ method: "POST" })
         on conflict (user_id) do update set stores = excluded.stores
       `;
     }
+    if (data.stage || data.diets || data.stateCode) {
+      await sql`delete from meal_plans where user_id = ${context.userId}`;
+      await sql`delete from grocery_lists where user_id = ${context.userId}`;
+    }
     return { ok: true };
   });
-
-export const savePlace = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
-  .validator(
-    (input: {
-      latitude?: number;
-      longitude?: number;
-      permission?: string;
-      city?: string;
-      zipCode?: string;
-      location?: string;
-    }) => input,
-  )
-  .handler(async ({ context, data }) => {
-    const sql = await getSql();
-    await ensureProfile(context.userId);
-    const permission = data.permission ?? (data.latitude != null ? "granted" : "denied");
-    let city = data.city?.trim() || "";
-    let location = data.location?.trim() || "";
-    let zipCode = data.zipCode?.trim() || "";
-    const latitude = Number.isFinite(data.latitude) ? data.latitude : null;
-    const longitude = Number.isFinite(data.longitude) ? data.longitude : null;
-    if (latitude != null && longitude != null && !city) {
-      const geo = await reverseGeocode(latitude, longitude);
-      if (geo) {
-        city = geo.city;
-        location = geo.location;
-        zipCode = geo.zipCode;
-      } else {
-        location = `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
-      }
-    }
-    await sql`
-      update profiles set
-        city = coalesce(${city || null}, city),
-        location = coalesce(${location || null}, location),
-        zip_code = coalesce(${zipCode || null}, zip_code),
-        latitude = coalesce(${latitude}, latitude),
-        longitude = coalesce(${longitude}, longitude),
-        location_permission = ${permission},
-        updated_at = now()
-      where user_id = ${context.userId}
-    `;
-    const rows = await sql<{ city: string | null; location: string | null; zip_code: string | null; location_permission: string }>`
-      select city, location, zip_code, location_permission from profiles where user_id = ${context.userId}
-    `;
-    return {
-      city: rows[0]?.city ?? city,
-      location: rows[0]?.location ?? location,
-      zipCode: rows[0]?.zip_code ?? zipCode,
-      locationPermission: rows[0]?.location_permission ?? permission,
-    };
-  });
-
-async function reverseGeocode(lat: number, lng: number) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 5000);
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(String(lat))}&lon=${encodeURIComponent(String(lng))}&format=json&addressdetails=1`,
-      {
-        signal: ctrl.signal,
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "HerFirstMeal/1.0 (womenarewomen@gmail.com)",
-        },
-      },
-    );
-    if (!res.ok) return null;
-    const body = (await res.json()) as {
-      address?: {
-        city?: string;
-        town?: string;
-        village?: string;
-        hamlet?: string;
-        county?: string;
-        state?: string;
-        postcode?: string;
-        country?: string;
-      };
-    };
-    const a = body.address ?? {};
-    const city = a.city || a.town || a.village || a.hamlet || a.county || "";
-    const location = [city, a.state, a.country].filter(Boolean).join(", ");
-    return { city, location, zipCode: a.postcode || "" };
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 export const saveCheckIn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -553,6 +437,26 @@ export const deleteAccount = createServerFn({ method: "POST" })
     await sql`delete from dietary_profiles where user_id = ${uid}`;
     await sql`delete from grocery_preferences where user_id = ${uid}`;
     await sql`delete from saved_recipes where user_id = ${uid}`;
+    await sql`delete from house_letters where user_id = ${uid}`;
     await sql`delete from profiles where user_id = ${uid}`;
+    return { ok: true };
+  });
+
+export const saveJoinDiets = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator((input: { diets?: string[]; language?: string }) => input)
+  .handler(async ({ context, data }) => {
+    const sql = await getSql();
+    await ensureProfile(context.userId);
+    if (data.language) {
+      await sql`update profiles set language = ${data.language}, updated_at = now() where user_id = ${context.userId}`;
+    }
+    if (data.diets) {
+      await sql`
+        insert into dietary_profiles (user_id, diets)
+        values (${context.userId}, ${JSON.stringify(data.diets)}::jsonb)
+        on conflict (user_id) do update set diets = excluded.diets
+      `;
+    }
     return { ok: true };
   });

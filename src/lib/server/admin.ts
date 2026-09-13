@@ -94,7 +94,7 @@ export const adminDashboard = createServerFn({ method: "GET" })
     const users = await sql<{ count: number }>`select count(*)::int as count from profiles where role = 'member'`;
     const members = await sql<{ count: number }>`select count(*)::int as count from memberships where status = 'active'`;
     const appts = await sql<{ count: number }>`select count(*)::int as count from appointments where status = 'confirmed' and starts_at > now()`;
-    const nouri = await sql<{ count: number }>`select count(*)::int as count from nouri_conversations`;
+    const letters = await sql<{ count: number }>`select count(*)::int as count from house_letters`;
     const binding = await sql<{ count: number }>`select count(*)::int as count from binding_uploads`;
     const settingsRows = await sql<Parameters<typeof mapSettings>[0]>`select * from business_settings where id = 1`;
     const setup = await sql<{ completed: boolean; step: number }>`select completed, step from setup_state where id = 1`;
@@ -102,7 +102,7 @@ export const adminDashboard = createServerFn({ method: "GET" })
       members: Number(users[0]?.count ?? 0),
       activeMemberships: Number(members[0]?.count ?? 0),
       upcomingAppointments: Number(appts[0]?.count ?? 0),
-      nouriThreads: Number(nouri[0]?.count ?? 0),
+      nouriThreads: Number(letters[0]?.count ?? 0),
       bindingUploads: Number(binding[0]?.count ?? 0),
       settings: settingsRows[0] ? mapSettings(settingsRows[0]) : null,
       setupCompleted: Boolean(setup[0]?.completed),

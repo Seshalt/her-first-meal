@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
+import { LiquidArt } from "@/components/layout/liquid-art";
 import { MagneticLink } from "@/components/motion/magnetic-button";
 import { ParallaxFrame, Reveal } from "@/components/motion/parallax";
 import { mergeLanding, type LandingContent } from "@/lib/landing";
@@ -8,6 +10,7 @@ import { yearlySavings } from "@/lib/pricing";
 import { getLanding } from "@/lib/server/public";
 import { lines } from "@/lib/site";
 import { formatCurrency } from "@/lib/utils";
+import { HouseMark } from "@/components/brand/logo";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -32,132 +35,117 @@ function Home() {
   const photoStart = layout?.photo === "left" ? "left" : "right";
 
   return (
-    <div className="landing-cinematic relative isolate">
-      <div className="cine-wash" aria-hidden />
+    <div className="relative isolate">
+      <LiquidArt />
       <div className="relative z-[1]">
-        <a href="#house" className="skip-to-house">
-          Skip to the house
-        </a>
-        <PublicNav overlay={overlayNav} cinematic />
-        <Hero content={content} variant={layout?.hero ?? "cinematic"} />
-        <Manifesto content={content} items={ticker} src={content.images.family} alt={content.alts.family} />
-        <PhotoChapter
-          kicker={content.mealsKicker}
-          title={content.mealsTitle}
-          body={content.mealsBody}
-          src={content.images.meals}
-          alt={content.alts.meals}
-          href="/pricing"
-          linkLabel="See the membership"
-          photo={photoStart}
-          tone="clay"
-        />
-        <PhotoChapter
-          kicker={content.bindingKicker}
-          title={content.bindingTitle}
-          body={content.bindingBody}
-          src={content.images.binding}
-          alt={content.alts.binding}
-          href="/belly-binding"
-          linkLabel="Visit the studio"
-          photo={photoStart === "left" ? "right" : "left"}
-          tone="blush"
-        />
-        <PhotoChapter
-          kicker={content.nouriKicker}
-          title={content.nouriTitle}
-          body={content.nouriBody}
-          src={content.images.nouri}
-          alt={content.alts.nouri}
-          href="/nouri"
-          linkLabel="Meet Nouri"
-          photo={photoStart}
-          tone="plum"
-        />
-        <JourneyBand images={content.images} alts={content.alts} />
-        <PartnerBand src={content.images.grocery} alt={content.alts.grocery} />
-        <MembershipClose content={content} monthly={monthly} yearly={yearly} />
-        <PublicFooter />
+      <PublicNav overlay={overlayNav} />
+      <Hero content={content} variant={layout?.hero ?? "cinematic"} />
+      <Ticker items={ticker} />
+      <Manifesto content={content} />
+      <SplitStory
+        kicker={content.mealsKicker}
+        title={content.mealsTitle}
+        body={content.mealsBody}
+        src={content.images.meals}
+        alt={content.alts.meals}
+        href="/pricing"
+        linkLabel="See the membership"
+        photo={photoStart}
+        tone="clay"
+      />
+      <SplitStory
+        kicker={content.bindingKicker}
+        title={content.bindingTitle}
+        body={content.bindingBody}
+        src={content.images.binding}
+        alt={content.alts.binding}
+        href="/belly-binding"
+        linkLabel="Visit the studio"
+        photo={photoStart === "left" ? "right" : "left"}
+        extraSrc={content.images.bindingStill}
+        extraAlt={content.alts.bindingStill}
+        tone="blush"
+      />
+      <NouriBand content={content} />
+      <JourneyBand images={content.images} alts={content.alts} />
+      <PartnerBand src={content.images.grocery} alt={content.alts.grocery} />
+      <MembershipClose content={content} monthly={monthly} yearly={yearly} />
+      <PublicFooter />
       </div>
     </div>
   );
 }
 
 function Hero({ content, variant }: { content: LandingContent; variant: "cinematic" | "split" | "centered" }) {
-  const centered = variant === "centered";
-  const split = variant === "split";
-
-  if (split) {
+  if (variant === "split") {
     return (
-      <section className="cine-hero grid min-h-[100dvh] lg:grid-cols-2" aria-label="Opening">
-        <div className="relative order-1 min-h-[58vh] lg:order-2 lg:min-h-full">
-          <ParallaxFrame
-            src={content.images.hero}
-            alt={content.alts.hero}
-            speed={0.48}
-            className="absolute inset-0"
-            imgClassName="object-[center_18%]"
-          />
-          <div className="cine-hero-veil pointer-events-none absolute inset-0 lg:hidden" />
-        </div>
-        <div className="order-2 flex flex-col justify-end px-5 py-16 md:px-10 md:py-24 lg:order-1">
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">{content.eyebrow}</p>
-          <h1 className="mt-8 font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[0.98] text-paper">
-            {content.headline}
-            <span className="mt-3 block italic text-gold">{content.headlineAccent}</span>
+      <section className="grid min-h-[100dvh] bg-wash-linen lg:grid-cols-2">
+        <div className="flex flex-col justify-end px-4 py-24 md:px-10 md:py-28">
+          <h1>
+            <HouseMark className="h-20 w-auto max-w-none md:h-24" />
+            <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className="mt-8 max-w-md text-lg leading-relaxed text-paper/86">{content.subhead}</p>
+          <p className="mt-8 font-display text-[clamp(1.8rem,3.6vw,3rem)] leading-[1.1] text-ink">
+            The world celebrates the baby.
+            <span className="mt-2 block italic text-gold">We remember the mother.</span>
+          </p>
+          <p className="mt-8 max-w-lg text-lg leading-relaxed text-ink-soft">{content.subhead}</p>
           <div className="mt-12 flex flex-wrap items-center gap-6">
-            <MagneticLink to="/pricing" className="bg-gold text-ink hover:bg-paper">
+            <MagneticLink to="/pricing" className="bg-primary text-primary-foreground">
               {content.cta}
             </MagneticLink>
-            <Link to="/pricing" className="text-sm text-paper/75 underline-offset-8 hover:text-paper hover:underline">
+            <Link to="/pricing" className="text-sm underline-offset-8 hover:underline">
               {content.secondaryCta}
             </Link>
           </div>
+        </div>
+        <div className="relative min-h-[50vh] lg:min-h-full">
+          <img src={content.images.hero} alt={content.alts.hero} className="media absolute inset-0 h-full w-full object-cover" />
+          <div className="hero-veil pointer-events-none absolute inset-0" />
         </div>
       </section>
     );
   }
 
+  const centered = variant === "centered";
   return (
-    <section className="cine-hero relative min-h-[100dvh] overflow-hidden text-paper" aria-label="Opening">
+    <section className="relative min-h-[100dvh] overflow-hidden text-paper">
       <ParallaxFrame
         src={content.images.hero}
         alt={content.alts.hero}
-        speed={0.55}
+        speed={0.42}
         className="absolute inset-0"
-        imgClassName="object-[center_16%]"
       />
-      <div className="cine-hero-veil pointer-events-none absolute inset-0" />
+      <div className="hero-veil pointer-events-none absolute inset-0" />
       <div
         className={
           centered
-            ? "relative mx-auto flex min-h-[100dvh] max-w-4xl flex-col items-center justify-end px-5 pb-20 pt-32 text-center md:px-10 md:pb-28"
-            : "relative mx-auto flex min-h-[100dvh] max-w-6xl flex-col justify-end px-5 pb-20 pt-32 md:px-10 md:pb-28"
+            ? "relative mx-auto flex min-h-[100dvh] max-w-4xl flex-col items-center justify-center px-4 pb-16 pt-32 text-center md:px-6"
+            : "relative mx-auto flex min-h-[100dvh] max-w-6xl flex-col justify-end px-4 pb-16 pt-32 md:px-6 md:pb-28"
         }
       >
-        <div className={centered ? "stagger max-w-2xl" : "stagger max-w-xl"}>
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">{content.eyebrow}</p>
-          <h1 className="mt-8 font-display text-[clamp(2.5rem,7.2vw,5.8rem)] leading-[0.94] text-paper [text-shadow:0_18px_40px_rgba(8,6,8,0.45)]">
-            {content.headline}
-            <span className="mt-4 block italic text-gold">{content.headlineAccent}</span>
+        <div className={centered ? "stagger max-w-3xl" : "stagger max-w-3xl"}>
+          <h1 className={`overflow-visible ${centered ? "flex flex-col items-center" : ""}`}>
+            <HouseMark className={`h-28 w-auto max-w-none md:h-36 ${centered ? "mx-auto" : ""}`} />
+            <span className="sr-only">Her First Meal</span>
           </h1>
-          <p className={`mt-8 max-w-md text-lg leading-relaxed text-paper/88 md:text-xl ${centered ? "mx-auto" : ""}`}>
+          <p className={`mt-8 font-display text-[clamp(1.7rem,3.8vw,3.1rem)] leading-[1.12] text-paper [text-shadow:0_8px_28px_rgba(12,16,14,0.35)] ${centered ? "text-center" : ""}`}>
+            The world celebrates the baby.
+            <span className="mt-2 block italic text-gold">We remember the mother.</span>
+          </p>
+          <p className={`mt-8 max-w-lg text-lg leading-relaxed text-paper/88 md:text-xl ${centered ? "mx-auto" : ""}`}>
             {content.subhead}
           </p>
           <div className={`mt-12 flex flex-wrap items-center gap-6 ${centered ? "justify-center" : ""}`}>
-            <MagneticLink to="/pricing" className="bg-gold text-ink hover:bg-paper">
+            <MagneticLink to="/pricing" className="bg-paper text-ink hover:bg-cream dark:hover:bg-cream">
               {content.cta}
             </MagneticLink>
-            <Link to="/pricing" className="text-sm text-paper/75 underline-offset-8 hover:text-paper hover:underline">
+            <Link to="/pricing" className="text-sm text-paper/80 underline-offset-8 hover:text-paper hover:underline">
               {content.secondaryCta}
             </Link>
           </div>
         </div>
-        <p
-          className={`mt-16 flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-paper/50 ${centered ? "justify-center" : ""}`}
-        >
+        <p className={`mt-20 flex items-center gap-3 text-xs uppercase tracking-[0.32em] text-paper/55 ${centered ? "justify-center" : ""}`}>
           <ArrowDown className="size-4" />
           Scroll
         </p>
@@ -166,43 +154,98 @@ function Hero({ content, variant }: { content: LandingContent; variant: "cinemat
   );
 }
 
-function Manifesto({
-  content,
-  items,
-  src,
-  alt,
-}: {
-  content: LandingContent;
-  items: string[];
-  src: string;
-  alt: string;
-}) {
-  const held = items.length ? items.slice(0, 6) : ["Personalized meals", "Belly Binding Studio", "Nouri", "Movement", "Partner lane"];
+const OFFER_COPY: Record<string, string> = {
+  "Personalized meals":
+    "Meal plans written for her body, culture, store, pantry, and season — so she is not starting from a blank page each morning.",
+  "Belly Binding Studio":
+    "Wrap education after birth: studio video, wrap comparison, a private journal, and optional review with Maat. Teaching first, never spectacle.",
+  Nouri:
+    "An AI companion inside the membership. Ask what to eat this week, where a wrap lesson lives, or what the house holds next. Not a clinician.",
+  Movement:
+    "Recovery movement matched to trying, pregnancy, or postpartum — walks, rest, and gentle work for the body she is in, not a generic gym plan.",
+  "Grocery lists":
+    "The week’s meals turned into a list for the kitchen she already has and the market she actually walks into.",
+  "Partner lane":
+    "A private place for the person beside her: what to cook, what to buy, and how to help today — without reading her medical chart.",
+  "Week-by-week journey":
+    "Meals, movement, and questions change as the weeks change. The house does not freeze at week twelve.",
+  "Fourth trimester care":
+    "The months after birth stay open: binding studio, recovery plates, and rest that treats postpartum as a season, not a discharge paper.",
+};
+
+function Ticker({ items }: { items: string[] }) {
+  const source = items.length ? items : Object.keys(OFFER_COPY);
+  const shown = source.slice(0, 4);
+  const rootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const cards = [...root.querySelectorAll<HTMLElement>("[data-card]")];
+    let frame = 0;
+    const update = () => {
+      const rect = root.getBoundingClientRect();
+      const travel = Math.max(1, root.offsetHeight - window.innerHeight);
+      const passed = Math.min(travel, Math.max(0, -rect.top));
+      const p = (passed / travel) * (cards.length - 0.001);
+      cards.forEach((card, i) => {
+        const d = Math.abs(p - i);
+        const opacity = Math.max(0, 1 - d * 1.15);
+        card.style.opacity = String(opacity);
+        card.style.transform = `translate3d(0, ${(p - i) * 18}px, 0)`;
+        card.style.pointerEvents = opacity > 0.4 ? "auto" : "none";
+      });
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [shown.join("|")]);
+
   return (
-    <section id="house" className="cine-manifesto">
-      <div className="cine-air mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2 lg:gap-24">
-        <Reveal>
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">A membership, not a feed</p>
-          <div className="editorial-rule mt-8" />
-          <h2 className="mt-10 font-display text-[clamp(2.4rem,5.6vw,4.8rem)] leading-[1.02] text-paper">
-            {content.headlineAccent}
-          </h2>
-          <p className="mt-8 max-w-md text-lg leading-relaxed text-paper/80 md:text-xl">{content.offerLine}</p>
-          <ul className="mt-12 flex flex-wrap gap-x-6 gap-y-3 text-xs uppercase tracking-[0.22em] text-gold/90">
-            {held.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Reveal>
-        <div className="cine-portrait">
-          <ParallaxFrame src={src} alt={alt} speed={0.28} className="absolute inset-0" />
+    <section ref={rootRef} className="offer-reel">
+      <div className="offer-reel-pin">
+        <p className="text-xs uppercase tracking-[0.28em] text-ink/45">What the house holds</p>
+        <div className="offer-reel-stage">
+          {shown.map((item, i) => (
+            <article key={item} data-card className="offer-sheet-card offer-reel-card">
+              <p className="text-xs uppercase tracking-[0.22em] text-ink/40">0{i + 1}</p>
+              <p className="mt-4 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.02]">{item}</p>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft md:text-lg">
+                {OFFER_COPY[item] ?? "Part of the membership house — meals, binding, movement, and care that stay with her."}
+              </p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function PhotoChapter({
+function Manifesto({ content }: { content: LandingContent }) {
+  return (
+    <section className="bg-transparent">
+      <div className="section-air mx-auto max-w-5xl px-4 md:px-6">
+      <Reveal className="glass-panel p-8 md:p-12">
+        <p className="text-xs uppercase tracking-[0.32em] text-clay">A membership, not a feed</p>
+        <h2 className="mt-8 font-display text-[clamp(2.2rem,5.4vw,4.6rem)] leading-[1.05]">{content.manifesto}</h2>
+        <div className="editorial-rule editorial-rule-clay mt-12" />
+        <p className="mt-12 max-w-2xl text-xl leading-relaxed text-ink-soft">{content.offerLine}</p>
+      </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function SplitStory({
   kicker,
   title,
   body,
@@ -211,7 +254,9 @@ function PhotoChapter({
   href,
   linkLabel,
   photo,
-  tone,
+  extraSrc,
+  extraAlt,
+  tone = "sea",
 }: {
   kicker: string;
   title: string;
@@ -221,29 +266,52 @@ function PhotoChapter({
   href: "/pricing" | "/belly-binding" | "/nouri" | "/about";
   linkLabel: string;
   photo: "left" | "right";
-  tone: "sea" | "clay" | "blush" | "plum";
+  extraSrc?: string;
+  extraAlt?: string;
+  tone?: "sea" | "clay" | "blush" | "plum";
 }) {
-  const kickerClass =
-    tone === "clay" ? "text-gold" : tone === "blush" ? "text-blush-light" : tone === "plum" ? "text-plum-light" : "text-aqua";
-  const picture = (
-    <div className="cine-split-photo">
-      <ParallaxFrame src={src} alt={alt} speed={0.5} className="absolute inset-0" />
-    </div>
-  );
+  const kickerColor =
+    tone === "clay"
+      ? "text-clay"
+      : tone === "blush"
+        ? "text-blush"
+        : tone === "plum"
+          ? "text-plum"
+          : "text-sea";
+  const linkColor =
+    tone === "clay"
+      ? "text-clay-deep"
+      : tone === "blush"
+        ? "text-blush-deep"
+        : tone === "plum"
+          ? "text-plum"
+          : "text-primary";
   const copy = (
-    <div className="cine-split-copy">
-      <Reveal className="cine-panel">
-        <p className={`text-xs uppercase tracking-[0.42em] ${kickerClass}`}>{kicker}</p>
-        <h2 className="mt-6 font-display text-[clamp(2.2rem,4.4vw,4.2rem)] leading-[1.04] text-paper">{title}</h2>
-        <p className="mt-8 max-w-md text-lg leading-relaxed text-paper/82 md:text-xl">{body}</p>
-        <Link to={href} className="mt-10 inline-flex min-h-11 items-center gap-2 text-gold hover:text-paper">
-          {linkLabel} <ArrowRight className="size-4" />
-        </Link>
+    <div className="split-copy flex min-h-[58vh] items-center px-1 py-8 lg:min-h-[auto] lg:py-16">
+      <Reveal className="glass-panel w-full max-w-xl p-7 md:p-10">
+      <p className={`text-xs uppercase tracking-[0.32em] ${kickerColor}`}>{kicker}</p>
+      <h2 className="mt-6 font-display text-[clamp(2.4rem,4.5vw,4.4rem)] leading-[1.02]">{title}</h2>
+      <p className="mt-8 max-w-md text-lg leading-relaxed text-ink-soft md:text-xl">{body}</p>
+      <Link to={href} className={`mt-10 inline-flex items-center gap-2 ${linkColor}`}>
+        {linkLabel} <ArrowRight className="size-4" />
+      </Link>
       </Reveal>
     </div>
   );
+  const picture = (
+    <div className="split-photo relative">
+      <ParallaxFrame src={src} alt={alt} speed={0.34} className="absolute inset-0" />
+      {extraSrc ? (
+        <img
+          src={extraSrc}
+          alt={extraAlt ?? ""}
+          className="media absolute bottom-8 right-6 hidden w-40 rounded-3xl object-cover shadow-[var(--shadow-border)] md:block md:h-52 md:w-44"
+        />
+      ) : null}
+    </div>
+  );
   return (
-    <section className={`cine-split ${photo === "left" ? "is-left" : "is-right"}`}>
+    <section className={`split-board grid lg:min-h-[auto] lg:grid-cols-2 ${photo === "left" ? "is-left" : "is-right"}`}>
       {photo === "left" ? (
         <>
           {picture}
@@ -259,6 +327,54 @@ function PhotoChapter({
   );
 }
 
+function NouriBand({ content }: { content: LandingContent }) {
+  const rootRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const photo = root.querySelector<HTMLElement>("[data-nouri-photo]");
+    if (!photo) return;
+    let frame = 0;
+    const update = () => {
+      const rect = root.getBoundingClientRect();
+      const view = window.innerHeight || 1;
+      const progress = Math.min(1, Math.max(0, (view - rect.top) / (view + rect.height * 0.45)));
+      photo.style.transform = `translate3d(0, ${progress * 70}px, 0) scale(${1.04 + progress * 0.18})`;
+    };
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  return (
+    <section ref={rootRef} className="nouri-splash relative min-h-[120vh] overflow-hidden text-paper">
+      <div className="nouri-photo absolute inset-0" data-nouri-photo>
+        <ParallaxFrame src={content.images.nouri} alt={content.alts.nouri} speed={0.18} className="absolute inset-0" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-plum-deep/32" />
+      <div className="relative mx-auto flex min-h-[92vh] max-w-6xl items-end px-4 py-28 md:px-6">
+        <Reveal className="glass-panel max-w-2xl p-7 md:p-10">
+          <p className="text-xs uppercase tracking-[0.32em] text-plum-deep">{content.nouriKicker}</p>
+          <h2 className="mt-5 font-display text-[clamp(2.6rem,6vw,5.2rem)]">{content.nouriTitle}</h2>
+          <p className="mt-8 text-lg leading-relaxed text-ink md:text-xl">{content.nouriBody}</p>
+          <Link to="/nouri" className="mt-10 inline-flex items-center gap-2 text-plum">
+            Write us <ArrowRight className="size-4" />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function JourneyBand({
   images,
   alts,
@@ -267,55 +383,49 @@ function JourneyBand({
   alts: LandingContent["alts"];
 }) {
   const stages = [
-    { w: "Trying", d: "Mineral-rich plates, grocery lists for the kitchen she has, and gentler movement while she waits.", n: "01" },
-    { w: "Pregnancy", d: "Meals that follow appetite and week, iron and broths, walks, and questions worth bringing to the next visit.", n: "02" },
-    { w: "Postpartum", d: "Recovery plates, the Belly Binding Studio, and movement that treats the fourth trimester as a season.", n: "03" },
-    { w: "The table", d: "Household size and culture shape the meals. Partners get a grocery list and a lane that is useful — not her chart.", n: "04" },
+    { w: "Trying", d: "Mineral-rich plates, grocery lists for the kitchen she has, and gentler movement while she waits.", img: images.hydration, alt: alts.hydration, wash: "bg-wash-sea", kicker: "text-sea" },
+    { w: "Pregnancy", d: "Meals that follow appetite and week, iron and broths, walks, and questions worth bringing to the next visit.", img: images.movement, alt: alts.movement, wash: "bg-wash-clay", kicker: "text-clay" },
+    { w: "Postpartum", d: "Recovery plates, the Belly Binding Studio, and movement that treats the fourth trimester as a season.", img: images.rest, alt: alts.rest, wash: "bg-wash-blush", kicker: "text-blush" },
+    { w: "The table", d: "Household size and culture shape the meals. Partners get a grocery list and a lane that is useful — not her chart.", img: images.family, alt: alts.family, wash: "bg-wash-plum", kicker: "text-plum" },
   ];
   return (
-    <section className="cine-journey">
-      <div className="cine-journey-photo">
-        <ParallaxFrame src={images.rest} alt={alts.rest} speed={0.38} className="absolute inset-0" />
-        <div className="cine-journey-veil" />
-      </div>
-      <div className="relative cine-air mx-auto max-w-6xl">
+    <section>
+      <div className="section-air mx-auto max-w-6xl px-4 md:px-6">
         <Reveal>
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">The house grows with you</p>
-          <h2 className="mt-8 max-w-3xl font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05] text-paper">
+          <p className="text-xs uppercase tracking-[0.32em] text-plum">The house grows with you</p>
+          <h2 className="mt-6 max-w-3xl font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05]">
             Meals, movement, and questions change with the week she is in.
           </h2>
         </Reveal>
-        <ol className="mt-20 grid gap-x-16 gap-y-16 md:grid-cols-2">
-          {stages.map((s) => (
-            <li key={s.w}>
-              <Reveal>
-                <p className="font-display text-4xl text-gold/80 md:text-5xl">{s.n}</p>
-                <h3 className="mt-4 font-display text-3xl text-paper md:text-4xl">{s.w}</h3>
-                <p className="mt-5 max-w-sm text-base leading-relaxed text-paper/78 md:text-lg">{s.d}</p>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-16 text-sm text-paper/55">
-          Movement stays gentle: stretching, walks, and work for the body she is in — never a bootcamp.
-        </p>
       </div>
+      {stages.map((s, i) => (
+        <article key={s.w} className="split-board grid lg:grid-cols-2">
+          <div className={i % 2 === 1 ? "split-photo relative lg:order-2" : "split-photo relative"}>
+            <ParallaxFrame src={s.img} alt={s.alt} speed={0.2} className="absolute inset-0" />
+          </div>
+          <Reveal className="split-copy flex items-center px-1 py-10">
+            <div className="glass-panel w-full max-w-xl p-7 md:p-10">
+            <p className={`text-xs uppercase tracking-[0.32em] ${s.kicker}`}>0{i + 1}</p>
+            <h3 className="mt-5 font-display text-4xl md:text-6xl">{s.w}</h3>
+            <p className="mt-6 max-w-md text-lg text-ink-soft md:text-xl">{s.d}</p>
+            </div>
+          </Reveal>
+        </article>
+      ))}
     </section>
   );
 }
 
 function PartnerBand({ src, alt }: { src: string; alt: string }) {
   return (
-    <section className="cine-partner relative min-h-[88vh] overflow-hidden text-paper">
-      <ParallaxFrame src={src} alt={alt} speed={0.42} className="absolute inset-0" />
-      <div className="cine-partner-veil pointer-events-none absolute inset-0" />
-      <div className="relative mx-auto flex min-h-[88vh] max-w-6xl items-end px-5 py-24 md:px-10">
+    <section className="relative min-h-[80vh] overflow-hidden text-paper">
+      <ParallaxFrame src={src} alt={alt} speed={0.22} className="absolute inset-0" />
+      <div className="pointer-events-none absolute inset-0 bg-wine/62" />
+      <div className="relative mx-auto flex min-h-[80vh] max-w-6xl items-end px-4 py-24 md:px-6">
         <Reveal className="max-w-xl">
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">For partners, too</p>
-          <h2 className="mt-6 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[1.04]">
-            A useful, private lane — not her medical chart.
-          </h2>
-          <p className="mt-8 text-lg leading-relaxed text-paper/86 md:text-xl">
+          <p className="text-xs uppercase tracking-[0.32em] text-gold">For partners, too</p>
+          <h2 className="mt-5 font-display text-4xl md:text-6xl">A useful, private lane — not her medical chart.</h2>
+          <p className="mt-6 text-lg leading-relaxed text-paper/85">
             Partners get the week’s grocery list, the meals to cook, and a short note on how to help today. Her record stays hers.
           </p>
         </Reveal>
@@ -335,30 +445,27 @@ function MembershipClose({
 }) {
   const save = yearlySavings(monthly, yearly);
   return (
-    <section className="cine-close px-5 py-32 md:px-10 md:py-44">
+    <section className="bg-sea px-4 py-32 text-primary-foreground md:px-6 md:py-40">
       <div className="mx-auto max-w-3xl text-center">
         <Reveal>
-          <p className="text-xs uppercase tracking-[0.42em] text-gold">Membership</p>
-          <div className="editorial-rule mx-auto mt-8" />
-          <h2 className="mt-10 font-display text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.95] text-paper">
-            {content.closeTitle}
-          </h2>
-          <p className="mx-auto mt-8 max-w-lg text-lg leading-relaxed text-paper/80 md:text-xl">{content.closeBody}</p>
-          <p className="mt-14 font-display text-5xl tabular-nums text-paper">
+          <p className="text-xs uppercase tracking-[0.32em] text-aqua">Membership</p>
+          <h2 className="mt-6 font-display text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.95]">{content.closeTitle}</h2>
+          <p className="mx-auto mt-8 max-w-lg text-lg text-primary-foreground/80 md:text-xl">{content.closeBody}</p>
+          <p className="mt-12 font-display text-5xl tabular-nums">
             {formatCurrency(save.perMonthCents)}
-            <span className="text-2xl text-paper/65"> / month, billed yearly</span>
+            <span className="text-2xl text-primary-foreground/70"> / month, billed yearly</span>
           </p>
-          <p className="mt-4 text-sm text-gold">
+          <p className="mt-3 text-sm text-gold">
             Save {save.percent}% versus monthly · {formatCurrency(yearly)} / year
           </p>
-          <p className="mt-3 text-sm text-paper/60">
+          <p className="mt-2 text-sm text-primary-foreground/70">
             Or {formatCurrency(monthly)} month to month. A private session with Maat is the only extra.
           </p>
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-6">
-            <MagneticLink to="/pricing" className="bg-gold text-ink hover:bg-paper">
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
+            <MagneticLink to="/pricing" className="bg-paper text-ink hover:bg-cream dark:hover:bg-cream">
               {content.cta}
             </MagneticLink>
-            <Link to="/login" search={{}} className="text-sm text-paper/75 underline-offset-8 hover:underline">
+            <Link to="/login" search={{}} className="text-sm text-paper/80 underline-offset-8 hover:underline">
               Already a member? Sign in
             </Link>
           </div>

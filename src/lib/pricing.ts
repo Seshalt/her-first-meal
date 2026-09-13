@@ -4,7 +4,7 @@ export const MEMBERSHIP_INCLUDES = [
   "Grocery lists for the stores she uses",
   "Virtual pantry",
   "Belly Binding Studio",
-  "Nouri, named for nourish",
+  "A letter to Maat",
   "Movement — optional, never punitive",
   "A private lane for her partner",
   "The resource library",

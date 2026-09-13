@@ -15,7 +15,7 @@ function AdminHome() {
     { label: "Members", value: data.members },
     { label: "Active memberships", value: data.activeMemberships },
     { label: "Upcoming visits", value: data.upcomingAppointments },
-    { label: "Nouri threads", value: data.nouriThreads },
+    { label: "Letters", value: data.nouriThreads },
     { label: "Binding uploads", value: data.bindingUploads },
   ];
   return (

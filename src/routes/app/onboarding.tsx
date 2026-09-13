@@ -5,58 +5,62 @@ import { Wordmark } from "@/components/brand/logo";
 import { Pill } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label, Textarea } from "@/components/ui/input";
-import { STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { DietPicks } from "@/components/house/diet-picks";
+import { LocaleSwitch } from "@/components/i18n/locale-switch";
+import { STAGE_LABEL, STORES, readJoinDiets, type Stage } from "@/lib/content/catalog";
+import { US_STATES, stateByCode } from "@/lib/content/places";
 import { altFor } from "@/lib/landing";
 import { getMyHome, saveJoinDiets, saveOnboarding } from "@/lib/server/profile";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
-import { PlaceAsk } from "@/components/house/place";
-import { DietPicks, readJoinDiets, rememberJoinDiets } from "@/components/house/diet-picks";
+import { useI18n } from "@/lib/i18n/provider";
+import type { MsgKey } from "@/lib/i18n/en";
 
 export const Route = createFileRoute("/app/onboarding")({ component: Onboarding });
 
 const STEPS = [
   {
     label: "You",
-    kicker: "Welcome",
-    title: "What shall we call you?",
-    body: "A name, and how she eats. Vegan, pescatarian, gluten-free — the kitchen starts here.",
+    kicker: "onboarding.youKicker",
+    title: "onboarding.youTitle",
+    body: "onboarding.youBody",
     src: "/images/hero-kitchen.jpg",
     alt: altFor("/images/hero-kitchen.jpg"),
   },
   {
     label: "Season",
-    kicker: "The journey",
-    title: "Where is the body in this story?",
-    body: "Trying, pregnant, or postpartum — the house grows from here.",
+    kicker: "onboarding.seasonKicker",
+    title: "onboarding.seasonTitle",
+    body: "onboarding.seasonBody",
     src: "/images/postpartum-rest.jpg",
     alt: altFor("/images/postpartum-rest.jpg"),
   },
   {
     label: "Plate",
-    kicker: "Nourish",
-    title: "Vegan, pescatarian, or something else?",
-    body: "Tap every way she eats. Loves, avoids, allergies. We cook from this, not a generic week.",
+    kicker: "onboarding.plateKicker",
+    title: "onboarding.plateTitle",
+    body: "onboarding.plateBody",
     src: "/images/meal-bowl.jpg",
     alt: altFor("/images/meal-bowl.jpg"),
   },
   {
     label: "Market",
-    kicker: "The list",
-    title: "Where do you shop?",
-    body: "Choose stores, then share a place so Nouri can build grocery lists from your market — not a generic aisle.",
+    kicker: "onboarding.marketKicker",
+    title: "onboarding.marketTitle",
+    body: "onboarding.marketBody",
     src: "/images/grocery-partner.jpg",
     alt: altFor("/images/grocery-partner.jpg"),
   },
-];
+] as const;
 
 function Onboarding() {
   const user = useCurrentUser();
   const navigate = useNavigate();
+  const { t, locale, setLocale } = useI18n();
   const [step, setStep] = useState(0);
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [location, setLocation] = useState("");
+  const [stateCode, setStateCode] = useState("");
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  const [language, setLanguage] = useState("en");
   const [stage, setStage] = useState<Stage | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [babyBirthday, setBabyBirthday] = useState("");
@@ -73,55 +77,25 @@ function Onboarding() {
   const [householdSize, setHouseholdSize] = useState(2);
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [zipCode, setZipCode] = useState("");
-  const [city, setCity] = useState("");
-  const [placePermission, setPlacePermission] = useState("");
   const [busy, setBusy] = useState(false);
-  const [draftReady, setDraftReady] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    const stored = readJoinDiets();
+    if (stored.length) setDiets(stored);
     void getMyHome()
       .then((home) => {
-        if (cancelled) return;
         if (home.profile.displayName) setDisplayName(home.profile.displayName);
-        if (home.profile.location) setLocation(home.profile.location);
-        if (home.profile.timezone) setTimezone(home.profile.timezone);
-        if (home.profile.language) setLanguage(home.profile.language);
+        if (home.profile.language) setLocale(home.profile.language as typeof locale);
         if (home.profile.stage) setStage(home.profile.stage);
-        if (home.profile.city) setCity(home.profile.city);
-        if (home.profile.zipCode) setZipCode(home.profile.zipCode);
-        setPlacePermission(home.profile.locationPermission || "");
-        const stored = readJoinDiets();
-        const fromHome = home.diet.diets;
-        const next = fromHome.length ? fromHome : stored;
-        setDiets(next);
-        if (home.diet.allergies.length) setAllergies(home.diet.allergies.join(", "));
-        if (home.diet.avoids) setAvoids(home.diet.avoids);
-        if (home.diet.dislikes) setDislikes(home.diet.dislikes);
-        if (home.diet.loves) setLoves(home.diet.loves);
-        if (home.diet.cuisines.length) setCuisines(home.diet.cuisines.join(", "));
-        if (home.grocery.stores.length) setStores(home.grocery.stores);
-        if (next.length && !fromHome.length) {
-          rememberJoinDiets(next);
-          void saveJoinDiets({ data: { diets: next } });
-        }
+        if (home.profile.stateCode) setStateCode(home.profile.stateCode);
+        if (home.profile.city) setLocation(home.profile.city);
+        if (home.diet.diets.length) setDiets(home.diet.diets);
+        else if (stored.length) void saveJoinDiets({ data: { diets: stored, language: locale } });
       })
       .catch(() => {
-        const stored = readJoinDiets();
-        if (stored.length) setDiets(stored);
-      })
-      .finally(() => {
-        if (!cancelled) setDraftReady(true);
+        if (stored.length) void saveJoinDiets({ data: { diets: stored, language: locale } });
       });
-    return () => {
-      cancelled = true;
-    };
   }, []);
-
-  function pickDiets(next: string[]) {
-    setDiets(next);
-    rememberJoinDiets(next);
-  }
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
     set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
@@ -133,9 +107,9 @@ function Onboarding() {
       await saveOnboarding({
         data: {
           displayName,
-          location,
+          location: stateByCode(stateCode)?.name ?? location,
           timezone,
-          language,
+          language: locale,
           stage,
           dueDate: dueDate || null,
           babyBirthday: babyBirthday || null,
@@ -158,7 +132,9 @@ function Onboarding() {
           householdSize,
           weeklyBudget,
           zipCode,
-          city,
+          city: location,
+          stateCode: stateCode || undefined,
+          region: stateByCode(stateCode)?.region,
           complete,
           step: nextStep,
         },
@@ -187,10 +163,10 @@ function Onboarding() {
           <Wordmark to="/" className="text-paper" />
           <div className="pb-8 lg:pb-12">
             <p className="text-xs uppercase tracking-[0.32em] text-aqua">
-              {current.kicker} · {step + 1} of {STEPS.length}
+              {t(current.kicker as MsgKey)} · {step + 1} of {STEPS.length}
             </p>
-            <h1 className="mt-5 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[0.95]">{current.title}</h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-paper/88">{current.body}</p>
+            <h1 className="mt-5 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[0.95]">{t(current.title as MsgKey)}</h1>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-paper/88">{t(current.body as MsgKey)}</p>
           </div>
         </div>
       </div>
@@ -203,29 +179,14 @@ function Onboarding() {
 
         {step === 0 ? (
           <div className="mt-8 space-y-4">
-            <Field label="Name" value={displayName} onChange={setDisplayName} />
+            <Field label={t("join.name")} value={displayName} onChange={setDisplayName} />
+            <Field label={t("onboarding.city")} value={location} onChange={setLocation} optional />
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-earth">How she eats</p>
-              <p className="mt-2 text-sm text-ink-soft">
-                Vegan, vegetarian, pescatarian, gluten-free — tap every way that fits. Skip if she eats everything.
-              </p>
-              <div className="mt-3">
-                <DietPicks value={diets} onChange={pickDiets} tone="clay" />
+              <Label>{t("join.language")}</Label>
+              <div className="mt-2">
+                <LocaleSwitch tone="gold" />
               </div>
             </div>
-            <Field label="Location" value={location} onChange={setLocation} optional />
-            <PlaceAsk
-              label={[city, location, zipCode].filter(Boolean).join(" · ")}
-              permission={placePermission}
-              onSaved={(place) => {
-                setCity(place.city);
-                setLocation(place.location || location);
-                setZipCode(place.zipCode || zipCode);
-                setPlacePermission(place.locationPermission);
-              }}
-            />
-            <Field label="Time zone" value={timezone} onChange={setTimezone} />
-            <Field label="Language" value={language} onChange={setLanguage} />
           </div>
         ) : null}
 
@@ -234,7 +195,7 @@ function Onboarding() {
             <div className="flex flex-wrap gap-2">
               {(Object.keys(STAGE_LABEL) as Stage[]).map((s) => (
                 <Pill key={s} active={stage === s} onClick={() => setStage(s)}>
-                  {STAGE_LABEL[s]}
+                  {t(`stage.${s}` as MsgKey)}
                 </Pill>
               ))}
             </div>
@@ -263,8 +224,7 @@ function Onboarding() {
 
         {step === 2 ? (
           <div className="mt-8 space-y-4">
-            <p className="text-xs uppercase tracking-[0.28em] text-earth">Diet</p>
-            <DietPicks value={diets} onChange={pickDiets} tone="clay" />
+            <DietPicks value={diets} onChange={setDiets} />
             <Field label="Allergies (comma separated)" value={allergies} onChange={setAllergies} optional />
             <div>
               <Label>What foods do you avoid?</Label>
@@ -284,6 +244,21 @@ function Onboarding() {
 
         {step === 3 ? (
           <div className="mt-8 space-y-4">
+            <div>
+              <Label>{t("onboarding.state")}</Label>
+              <select
+                className="mt-2 h-12 w-full rounded-xl border border-border bg-transparent px-3"
+                value={stateCode}
+                onChange={(e) => setStateCode(e.target.value)}
+              >
+                <option value="">—</option>
+                {US_STATES.map((s) => (
+                  <option key={s.code} value={s.code}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="flex flex-wrap gap-2">
               {STORES.map((s) => (
                 <Pill key={s} active={stores.includes(s)} onClick={() => toggle(stores, s, setStores)}>
@@ -291,18 +266,7 @@ function Onboarding() {
                 </Pill>
               ))}
             </div>
-            <PlaceAsk
-              label={[city, location, zipCode].filter(Boolean).join(" · ")}
-              permission={placePermission}
-              onSaved={(place) => {
-                setCity(place.city);
-                setLocation(place.location || location);
-                setZipCode(place.zipCode || zipCode);
-                setPlacePermission(place.locationPermission);
-              }}
-            />
             <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
-            <Field label="City" value={city} onChange={setCity} optional />
             <Field
               label="Household size"
               value={String(householdSize)}
@@ -316,16 +280,16 @@ function Onboarding() {
         <div className="mt-10 flex flex-wrap gap-3">
           {step > 0 ? (
             <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-              Back
+              {t("back")}
             </Button>
           ) : null}
           {step < STEPS.length - 1 ? (
-            <Button type="button" disabled={busy || !draftReady || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
-              Continue
+            <Button type="button" disabled={busy || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
+              {t("continue")}
             </Button>
           ) : (
             <Button type="button" disabled={busy} onClick={() => void persist(true, step)}>
-              {busy ? "Opening the door…" : "Enter Today's Journey"}
+              {busy ? t("onboarding.opening") : t("onboarding.enter")}
             </Button>
           )}
         </div>

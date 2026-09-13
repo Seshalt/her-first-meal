@@ -6,127 +6,127 @@ export const LANDING_IMAGE_SLOTS = [
     id: "hero",
     label: "Home · full-screen opening",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
   },
   {
     id: "meals",
     label: "Home · meals",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Ceramic bowl of vegetable soup with tofu, herbs, and a spoon",
+    alt: "Bowl of golden soup with herbs on a wooden table",
   },
   {
     id: "binding",
     label: "Home · belly binding",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
   },
   {
     id: "bindingStill",
     label: "Home · wrap still life",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded patterned cloths and scarves prepared for wrapping",
+    alt: "Folded cream linen cloth laid on a bed",
   },
   {
     id: "rest",
     label: "Home · postpartum rest",
     fallback: "/images/postpartum-rest.jpg",
-    alt: "Mother lying in bed holding her newborn against her chest",
+    alt: "Latina mother standing outside, holding her baby close",
   },
   {
     id: "movement",
     label: "Home · movement",
     fallback: "/images/movement.jpg",
-    alt: "Pregnant woman stretching on a yoga ball in her living room",
+    alt: "Asian woman in a yoga pose on a mat",
   },
   {
     id: "nouri",
     label: "Home · Nouri",
     fallback: "/images/nouri-drop.jpg",
-    alt: "Cup of herbal tea with ginger and lemon on a wooden tray",
+    alt: "Hot tea pouring into a ceramic cup",
   },
   {
     id: "family",
     label: "Home · family table",
     fallback: "/images/family-table.jpg",
-    alt: "Family sharing a meal together at the table",
+    alt: "East Asian family sitting together at a dining table",
   },
   {
     id: "grocery",
     label: "Home · grocery / partner",
     fallback: "/images/grocery-partner.jpg",
-    alt: "Couple cooking a meal together in a home kitchen",
+    alt: "Hands holding a bag of fresh produce at a market",
   },
   {
     id: "hydration",
     label: "Home · hydration",
     fallback: "/images/hydration.jpg",
-    alt: "Glass of lemon water on a wooden board",
+    alt: "Glass of lemon water on a sunlit table",
   },
   {
     id: "about",
     label: "About · Maat",
     fallback: "/images/about-portrait.jpg",
-    alt: "African woman smiling in warm, moody light",
+    alt: "Indian woman cooking at a stove",
   },
   {
     id: "login",
     label: "Sign in · photograph",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
   },
   {
     id: "join",
     label: "Join · photograph",
     fallback: "/images/family-table.jpg",
-    alt: "Family sharing a meal together at the table",
+    alt: "East Asian family sitting together at a dining table",
   },
   {
     id: "pricing",
     label: "Membership · background",
     fallback: "/images/hero-kitchen.jpg",
-    alt: "African American pregnant woman with an afro, eyes closed, photographed in a dark studio",
+    alt: "African American pregnant woman in a kitchen, one hand on her belly",
   },
   {
     id: "checkout",
     label: "Checkout · side photograph",
     fallback: "/images/meal-bowl.jpg",
-    alt: "Ceramic bowl of vegetable soup with tofu, herbs, and a spoon",
+    alt: "Bowl of golden soup with herbs on a wooden table",
   },
   {
     id: "bindHero",
     label: "Belly binding page · hero",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded patterned cloths and scarves prepared for wrapping",
+    alt: "Folded cream linen cloth laid on a bed",
   },
   {
     id: "bindStep1",
     label: "Binding step 1",
     fallback: "/images/binding-still.jpg",
-    alt: "Folded patterned cloths and scarves prepared for wrapping",
+    alt: "Folded cream linen cloth laid on a bed",
   },
   {
     id: "bindStep2",
     label: "Binding step 2",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
   },
   {
     id: "bindStep3",
     label: "Binding step 3",
     fallback: "/images/binding-hands.jpg",
-    alt: "Pregnant belly draped in sheer floral cloth, the wrap held with care",
+    alt: "Pregnant woman in a white dress standing outdoors, both hands on her belly",
   },
   {
     id: "bindStep4",
     label: "Binding step 4",
     fallback: "/images/postpartum-rest.jpg",
-    alt: "Mother lying in bed holding her newborn against her chest",
+    alt: "Latina mother standing outside, holding her baby close",
   },
   {
     id: "nouriHero",
     label: "Nouri page · photograph",
     fallback: "/images/nouri-drop.jpg",
-    alt: "Cup of herbal tea with ginger and lemon on a wooden tray",
+    alt: "Hot tea pouring into a ceramic cup",
   },
 ] as const;
 
@@ -134,7 +134,7 @@ export type LandingImageSlot = (typeof LANDING_IMAGE_SLOTS)[number]["id"];
 
 /** Alt text keyed to the photo file, so every page uses the same words. */
 export const IMAGE_ALT: Record<string, string> = {
-  ...Object.fromEntries(LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback.split("?")[0], s.alt])),
+  ...Object.fromEntries(LANDING_IMAGE_SLOTS.filter((s) => s.fallback).map((s) => [s.fallback, s.alt])),
   ...RECIPE_IMAGE_ALT,
 };
 
@@ -175,11 +175,11 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
-    "A membership home for pregnancy and postpartum — meals for her body, a belly binding studio, movement, grocery intelligence, and Nouri. Not a course. Not a blog. A house you return to.",
+    "A membership home for pregnancy and postpartum — meals for her body, a belly binding studio, movement, grocery lists for her market, and a letter to Maat. Not a course. Not a blog. A house you return to.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
   offerLine:
-    "One membership opens the house: personalized meals, grocery and pantry planning, belly binding education, movement for her stage, week-by-week guidance, a partner lane, and Nouri. A private session with Maat is the only extra.",
+    "One membership opens the house: personalized meals, grocery and pantry planning, belly binding education, movement for her stage, week-by-week guidance, and a partner lane. A private session with Maat is the only extra.",
   manifesto:
     "Before we ask what the baby needs, we set the table for the woman who grew them — with meals, wrapping education, recovery movement, and a partner who finally has somewhere useful to stand.",
   mealsKicker: "Nourishment",
@@ -190,13 +190,13 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   bindingTitle: "Belly binding, held with care.",
   bindingBody:
     "The Belly Binding Studio holds wrap education: studio video, wrap comparison, a private journal, and a live Zoom review when you want Maat’s eyes on the cloth. Teaching — never a diagnosis.",
-  nouriKicker: "Companion",
-  nouriTitle: "Need help? Ask Nouri.",
+  nouriKicker: "The house answers",
+  nouriTitle: "A question still has a person behind it.",
   nouriBody:
-    "Nouri is the AI companion inside Her First Meal. She remembers your week, your plate, your stores, and your last conversation, and helps you find the meals, studio, and guidance already in the house. She will not pretend to be your clinician.",
+    "There is no chatbot in this house. Meals, grocery lists, and season guidance follow the stage, diet, and state you share. When you need a human, write Maat — she reads every letter.",
   closeTitle: "What does her body need?",
   closeBody:
-    "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, the partner lane, and Nouri. The only extra is a private meeting with Maat.",
+    "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, and the partner lane. The only extra is a private meeting with Maat.",
 };
 
 export type LandingContent = LandingCopy & {
@@ -205,9 +205,10 @@ export type LandingContent = LandingCopy & {
 };
 
 export function defaultImages(): Record<LandingImageSlot, string> {
-  return Object.fromEntries(
-    LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback ? `${s.fallback.split("?")[0]}?v=9` : s.fallback]),
-  ) as Record<LandingImageSlot, string>;
+  return Object.fromEntries(LANDING_IMAGE_SLOTS.map((s) => [s.id, s.fallback])) as Record<
+    LandingImageSlot,
+    string
+  >;
 }
 
 export function defaultAlts(): Record<LandingImageSlot, string> {
@@ -260,3 +261,4 @@ export const OFFER_TICKER = [
   "Week-by-week journey",
   "Fourth trimester care",
 ];
+

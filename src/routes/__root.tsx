@@ -9,6 +9,7 @@ import { CookieConsent } from "@/components/security/cookie-consent";
 import { ConsentTags } from "@/components/security/consent-tags";
 import { ScrollReset } from "@/components/layout/scroll-reset";
 import { restoreOwnerToken } from "@/lib/session-ready";
+import { LocaleProvider } from "@/lib/i18n/provider";
 import appCss from "../styles.css?url";
 
 restoreOwnerToken();
@@ -24,7 +25,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The world celebrates the baby. We remember the mother. Pregnancy and postpartum meals, belly binding studio, movement, grocery planning, and Nouri.",
+          "The world celebrates the baby. We remember the mother. Pregnancy and postpartum meals, belly binding studio, movement, grocery planning, and a letter to Maat.",
       },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Her First Meal" },
@@ -64,6 +65,7 @@ function RootDocument() {
         <GlassDefs />
         <PreviewHostBridge />
         <AuthProvider>
+          <LocaleProvider>
           <ThemeProvider>
             <ThemePaint />
             <ScrollReset />
@@ -84,6 +86,7 @@ function RootDocument() {
               }}
             />
           </ThemeProvider>
+          </LocaleProvider>
         </AuthProvider>
         <Scripts />
       </body>
