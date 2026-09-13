@@ -420,6 +420,102 @@ export const markNotificationsRead = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const savePlace = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator(
+    (input: {
+      latitude?: number;
+      longitude?: number;
+      permission?: string;
+      city?: string;
+      zipCode?: string;
+      location?: string;
+    }) => input,
+  )
+  .handler(async ({ context, data }) => {
+    const sql = await getSql();
+    await ensureProfile(context.userId);
+    const permission = data.permission ?? (data.latitude != null ? "granted" : "denied");
+    let city = data.city?.trim() || "";
+    let location = data.location?.trim() || "";
+    let zipCode = data.zipCode?.trim() || "";
+    const latitude = Number.isFinite(data.latitude) ? data.latitude : null;
+    const longitude = Number.isFinite(data.longitude) ? data.longitude : null;
+    if (latitude != null && longitude != null && !city) {
+      const geo = await reverseGeocode(latitude, longitude);
+      if (geo) {
+        city = geo.city;
+        location = geo.location;
+        zipCode = geo.zipCode;
+      } else {
+        location = `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
+      }
+    }
+    await sql`
+      update profiles set
+        city = coalesce(${city || null}, city),
+        location = coalesce(${location || null}, location),
+        zip_code = coalesce(${zipCode || null}, zip_code),
+        latitude = coalesce(${latitude}, latitude),
+        longitude = coalesce(${longitude}, longitude),
+        location_permission = ${permission},
+        updated_at = now()
+      where user_id = ${context.userId}
+    `;
+    const rows = await sql<{
+      city: string | null;
+      location: string | null;
+      zip_code: string | null;
+      location_permission: string;
+    }>`
+      select city, location, zip_code, location_permission from profiles where user_id = ${context.userId}
+    `;
+    return {
+      city: rows[0]?.city ?? city,
+      location: rows[0]?.location ?? location,
+      zipCode: rows[0]?.zip_code ?? zipCode,
+      locationPermission: rows[0]?.location_permission ?? permission,
+    };
+  });
+
+async function reverseGeocode(lat: number, lng: number) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 5000);
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(String(lat))}&lon=${encodeURIComponent(String(lng))}&format=json&addressdetails=1`,
+      {
+        signal: ctrl.signal,
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "HerFirstMeal/1.0 (hello@herfirstmeal.com)",
+        },
+      },
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      address?: {
+        city?: string;
+        town?: string;
+        village?: string;
+        hamlet?: string;
+        county?: string;
+        state?: string;
+        postcode?: string;
+        country?: string;
+      };
+    };
+    const a = body.address ?? {};
+    const city = a.city || a.town || a.village || a.hamlet || a.county || "";
+    const location = [city, a.state, a.country].filter(Boolean).join(", ");
+    return { city, location, zipCode: a.postcode || "" };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export const deleteAccount = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {

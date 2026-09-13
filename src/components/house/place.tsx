@@ -48,7 +48,7 @@ export function PlaceAsk({
       () => {
         void savePlace({ data: { permission: "denied" } }).catch(() => undefined);
         setBusy(false);
-        toast.error("Location stayed private. A city or ZIP still lets Nouri build a list.");
+        toast.error("Location stayed private. A city, ZIP, or U.S. state still builds the list.");
       },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 10 * 60 * 1000 },
     );
@@ -63,7 +63,7 @@ export function PlaceAsk({
           {known ? label : "Share a place so lists come from your market."}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          Nouri uses this for grocery lists and plates — never for ads, never sold. A typed city or ZIP is enough if you would rather not share the pin.
+          The kitchen uses this for grocery lists and seasonal produce — never for ads, never sold. A typed city, ZIP, or state is enough if you would rather not share the pin.
         </p>
       </div>
       <Button type="button" variant={known ? "outline" : "gold"} disabled={busy} onClick={() => void share()}>
