@@ -5,7 +5,7 @@ export const DEFAULT_SITE_COPY = {
   brandTagline: "We remember the mother.",
   navAbout: "About",
   navBinding: "Belly binding",
-  navNouri: "Ask Nouri",
+  navNouri: "Support",
   navMembership: "Membership",
   navSignIn: "Sign in",
   navHome: "Your home",
@@ -17,7 +17,7 @@ export const DEFAULT_SITE_COPY = {
   footerEnter: "Enter",
   footerStory: "Maat's story",
   footerStudio: "Belly Binding Studio",
-  footerNouri: "Ask Nouri",
+  footerNouri: "Support",
   footerMembership: "Membership",
   footerSignIn: "Sign in",
   footerOwner: "Owner atelier",
@@ -51,7 +51,7 @@ export const DEFAULT_SITE_COPY = {
   contactNote: "Membership questions, belly binding reviews, and press all come through this door.",
 
   ticker:
-    "Personalized meals\nBelly Binding Studio\nAsk Nouri\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
+    "Personalized meals\nBelly Binding Studio\nHuman support\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
 
   aboutKicker: "Founder",
   aboutTitle: "Maat, and the table she kept setting.",
@@ -61,7 +61,7 @@ export const DEFAULT_SITE_COPY = {
     "She learned, as so many mothers do, that celebration can be loud for the baby and thin for the woman who grew them. Meals arrived as afterthoughts. Wrapping traditions were whispered, not taught. Partners wanted to help and did not know where to stand.",
   aboutQuote: "The world celebrates the baby. We remember the mother.",
   aboutP3:
-    "Her First Meal is the house she wished had been lit for her: nourishment that respects culture and constraint, belly binding held as education rather than spectacle, Nouri for calm guidance between appointments, direct access to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
+    "Her First Meal is the house she wished had been lit for her: a deep built-in nourishment library that respects culture and constraint, belly binding held as education rather than spectacle, stage-right guidance, practical grocery and pantry tools, direct access to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
   aboutP4: "When we nourish mothers, we nourish generations.",
   aboutCta: "Start your journey today",
 
@@ -96,13 +96,13 @@ export const DEFAULT_SITE_COPY = {
   faq4a:
     "Only with your surgical team's guidance. We offer education on placement that avoids incision pressure — never a protocol that overrules your clinician.",
 
-  nouriPageKicker: "Your wellness companion",
-  nouriPageTitle: "Meet Nouri.",
+  nouriPageKicker: "Personal support",
+  nouriPageTitle: "Smart personalization without generative AI.",
   nouriPageBody:
-    "Nouri is the AI companion inside Her First Meal — grounded in your stage, dietary preferences, approved house resources, and the context you choose to share. Ask about meals, groceries, pregnancy milestones, movement, belly binding education, or where to go next. Nouri does not diagnose or replace your healthcare professional.",
+    "Meals, groceries, stage guidance, movement, and resources are organized from Her First Meal's built-in library and the preferences you choose to save. When you want a person, send Maat a private note or book a live Zoom session.",
   nouriPageCta: "Start your journey",
   nouriPills:
-    "Meals for this season of the body\nGrocery swaps for her actual stores\nPregnancy-week guidance\nBelly binding education\nMovement matched to energy\nHuman support from Maat when you want it",
+    "Meals for this season of the body\nGrocery planning for her actual stores\nPregnancy-week guidance\nBelly binding education\nMovement matched to energy\nHuman support from Maat",
 
   pricingKicker: "Membership",
   pricingTitle: "One house. Two ways to pay.",
@@ -117,7 +117,7 @@ export const DEFAULT_SITE_COPY = {
   pricingYearlyCta: "Join yearly",
   pricingMeetingCta: "Members book inside",
   pricingIncludes:
-    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nNouri AI wellness companion\nMovement — optional, never punitive\nA private lane for her partner\nThe resource library",
+    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nStage and week guidance\nMovement — optional, never punitive\nA private lane for her partner\nHuman support and the resource library",
   pricingFoot:
     "You do not unlock more by choosing yearly. You unlock the same house — meals, studio, pantry, partner lane — and keep a kinder bill when you pay the year.",
   meetingPoints:
@@ -159,13 +159,15 @@ export function mergeSite(partial: Partial<SiteCopy> | null | undefined): SiteCo
     const value = partial[key];
     if (typeof value !== "string") continue;
     const trimmed = value.trim();
-    // Migrate the short-lived anti-AI brand direction in existing production settings.
-    if ((key === "nouriPageBody" || key === "nouriPageTitle") && /no chatbot|reads every letter/i.test(trimmed)) continue;
-    if ((key === "navNouri" || key === "footerNouri") && trimmed === "Write us") continue;
-    if (key === "ticker" && trimmed.includes("Write to Maat")) continue;
-    if (key === "nouriPageKicker" && trimmed === "Write the house") continue;
-    if (key === "nouriPageCta" && trimmed === "Write us") continue;
-    if (key === "nouriPills" && trimmed.includes("A letter to Maat when you need a human")) continue;
+
+    // Refuse legacy AI-era copy from persisted production settings so the no-AI launch
+    // cannot silently regress when owner-editable fields are merged from the database.
+    if ((key === "navNouri" || key === "footerNouri") && /nouri|ask nouri/i.test(trimmed)) continue;
+    if (key === "ticker" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+    if ((key === "nouriPageKicker" || key === "nouriPageTitle" || key === "nouriPageBody") && /nouri|\bai\b|chatbot|companion/i.test(trimmed)) continue;
+    if (key === "pricingIncludes" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+    if (key === "aboutP3" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+
     out[key] = value;
   }
   return out;
@@ -176,174 +178,4 @@ export function lines(value: string): string[] {
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
-}
-
-export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: SiteCopyKey; label: string; multiline?: boolean }[] }[] = [
-  {
-    id: "nav",
-    label: "Navigation & footer",
-    fields: [
-      { key: "brandName", label: "Logo · name next to the mark" },
-      { key: "brandTagline", label: "Logo · small line under the name (footer)" },
-      { key: "navAbout", label: "Nav · About" },
-      { key: "navBinding", label: "Nav · Belly binding" },
-      { key: "navNouri", label: "Nav · Nouri" },
-      { key: "navMembership", label: "Nav · Membership" },
-      { key: "navSignIn", label: "Nav · Sign in" },
-      { key: "navHome", label: "Nav · signed-in home" },
-      { key: "navCta", label: "Nav · button" },
-      { key: "navOwner", label: "Nav · owner link" },
-      { key: "contactNav", label: "Nav · Contact" },
-      { key: "footerBlurb", label: "Footer blurb", multiline: true },
-      { key: "footerVisit", label: "Footer · Visit heading" },
-      { key: "footerEnter", label: "Footer · Enter heading" },
-      { key: "footerConnect", label: "Footer · Connect heading" },
-      { key: "footerStory", label: "Footer · story link" },
-      { key: "footerStudio", label: "Footer · studio link" },
-      { key: "footerNouri", label: "Footer · Nouri link" },
-      { key: "footerMembership", label: "Footer · membership link" },
-      { key: "footerContact", label: "Footer · Contact us link" },
-      { key: "footerSignIn", label: "Footer · sign in" },
-      { key: "footerOwner", label: "Footer · owner" },
-      { key: "footerPrivacy", label: "Footer · privacy" },
-      { key: "footerLegal", label: "Footer legal line", multiline: true },
-      { key: "footerCopyright", label: "Copyright line" },
-      { key: "instagramLabel", label: "Instagram button text" },
-      { key: "instagramUrl", label: "Instagram URL (https://…)" },
-      { key: "tiktokLabel", label: "TikTok button text" },
-      { key: "tiktokUrl", label: "TikTok URL (https://…)" },
-    ],
-  },
-  {
-    id: "about",
-    label: "About",
-    fields: [
-      { key: "aboutKicker", label: "Kicker" },
-      { key: "aboutTitle", label: "Title", multiline: true },
-      { key: "aboutP1", label: "Paragraph 1", multiline: true },
-      { key: "aboutP2", label: "Paragraph 2", multiline: true },
-      { key: "aboutQuote", label: "Quoted line", multiline: true },
-      { key: "aboutP3", label: "Paragraph 3", multiline: true },
-      { key: "aboutP4", label: "Closing sentence", multiline: true },
-      { key: "aboutCta", label: "Button" },
-    ],
-  },
-  {
-    id: "binding",
-    label: "Belly binding page",
-    fields: [
-      { key: "bindPageKicker", label: "Kicker" },
-      { key: "bindPageTitle", label: "Title" },
-      { key: "bindPageBody", label: "Introduction", multiline: true },
-      { key: "bindPageCta", label: "Button" },
-      { key: "bindQuestions", label: "FAQ heading" },
-      { key: "bindStep1Title", label: "Step 1 title" },
-      { key: "bindStep1Body", label: "Step 1 body", multiline: true },
-      { key: "bindStep2Title", label: "Step 2 title" },
-      { key: "bindStep2Body", label: "Step 2 body", multiline: true },
-      { key: "bindStep3Title", label: "Step 3 title" },
-      { key: "bindStep3Body", label: "Step 3 body", multiline: true },
-      { key: "bindStep4Title", label: "Step 4 title" },
-      { key: "bindStep4Body", label: "Step 4 body", multiline: true },
-      { key: "faq1q", label: "FAQ 1 question", multiline: true },
-      { key: "faq1a", label: "FAQ 1 answer", multiline: true },
-      { key: "faq2q", label: "FAQ 2 question", multiline: true },
-      { key: "faq2a", label: "FAQ 2 answer", multiline: true },
-      { key: "faq3q", label: "FAQ 3 question", multiline: true },
-      { key: "faq3a", label: "FAQ 3 answer", multiline: true },
-      { key: "faq4q", label: "FAQ 4 question", multiline: true },
-      { key: "faq4a", label: "FAQ 4 answer", multiline: true },
-    ],
-  },
-  {
-    id: "nouri",
-    label: "Nouri page",
-    fields: [
-      { key: "nouriPageKicker", label: "Kicker" },
-      { key: "nouriPageTitle", label: "Title" },
-      { key: "nouriPageBody", label: "Body", multiline: true },
-      { key: "nouriPageCta", label: "Button" },
-      { key: "nouriPills", label: "What Nouri helps with (one line each)", multiline: true },
-    ],
-  },
-  {
-    id: "pricing",
-    label: "Membership",
-    fields: [
-      { key: "pricingKicker", label: "Kicker" },
-      { key: "pricingTitle", label: "Title", multiline: true },
-      { key: "pricingBody", label: "Supporting copy", multiline: true },
-      { key: "pricingToggleOn", label: "Yearly toggle label" },
-      { key: "pricingMonthlyName", label: "Monthly card name" },
-      { key: "pricingYearlyName", label: "Yearly card name" },
-      { key: "pricingMeetingName", label: "Meeting card name" },
-      { key: "pricingMeetingSub", label: "Meeting subtitle" },
-      { key: "pricingMonthlyCta", label: "Monthly button" },
-      { key: "pricingYearlyCta", label: "Yearly button" },
-      { key: "pricingMeetingCta", label: "Meeting button" },
-      { key: "pricingIncludes", label: "What the house includes (one line each)", multiline: true },
-      { key: "meetingPoints", label: "Meeting bullets (one line each)", multiline: true },
-      { key: "pricingFoot", label: "Footnote", multiline: true },
-      { key: "ticker", label: "Home ticker (one line each)", multiline: true },
-    ],
-  },
-  {
-    id: "doors",
-    label: "Sign in, join, checkout",
-    fields: [
-      { key: "loginKicker", label: "Sign in · photo kicker" },
-      { key: "loginPhotoLine", label: "Sign in · photo line", multiline: true },
-      { key: "loginEyebrow", label: "Sign in · eyebrow" },
-      { key: "loginTitle", label: "Sign in · title" },
-      { key: "loginBody", label: "Sign in · body", multiline: true },
-      { key: "joinKicker", label: "Join · photo kicker" },
-      { key: "joinPhotoLine", label: "Join · photo line", multiline: true },
-      { key: "joinEyebrow", label: "Join · eyebrow" },
-      { key: "joinTitle", label: "Join · title" },
-      { key: "joinBody", label: "Join · body", multiline: true },
-      { key: "factorKicker", label: "Email code · kicker" },
-      { key: "factorTitle", label: "Email code · title" },
-      { key: "factorBody", label: "Email code · body ({email} becomes the masked address)", multiline: true },
-      { key: "factorLabel", label: "Email code · field label" },
-      { key: "factorCta", label: "Email code · button" },
-      { key: "factorResend", label: "Email code · send again" },
-      { key: "factorNoMail", label: "Email code · no mail key", multiline: true },
-      { key: "factorSendFail", label: "Email code · send failed", multiline: true },
-      { key: "checkoutKicker", label: "Checkout · kicker" },
-      { key: "checkoutTitle", label: "Checkout · title" },
-      { key: "checkoutAside", label: "Checkout · aside heading" },
-    ],
-  },
-  {
-    id: "contact",
-    label: "Contact page",
-    fields: [
-      { key: "contactKicker", label: "Kicker" },
-      { key: "contactTitle", label: "Title" },
-      { key: "contactIntro", label: "Introduction", multiline: true },
-      { key: "contactStudioLabel", label: "Studio label" },
-      { key: "contactStudioName", label: "Studio name" },
-      { key: "contactEmailLabel", label: "Email label" },
-      { key: "contactEmail", label: "Email address" },
-      { key: "contactPhoneLabel", label: "Phone label" },
-      { key: "contactPhone", label: "Phone number" },
-      { key: "contactHoursLabel", label: "Hours label" },
-      { key: "contactHours", label: "Hours", multiline: true },
-      { key: "contactAddressLabel", label: "Address label" },
-      { key: "contactAddress", label: "Address", multiline: true },
-      { key: "contactNote", label: "Closing note", multiline: true },
-    ],
-  },
-];
-
-export function publicHttpUrl(value: string): string | null {
-  const trimmed = value.trim();
-  if (!/^https?:\/\//i.test(trimmed)) return null;
-  try {
-    const url = new URL(trimmed);
-    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
 }
