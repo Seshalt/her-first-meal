@@ -25,7 +25,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The world celebrates the baby. We remember the mother. Personalized pregnancy and postpartum nourishment, belly binding education, movement, grocery planning, and Nouri AI wellness support.",
+          "The world celebrates the baby. We remember the mother. Personalized pregnancy and postpartum meals, grocery planning, pantry tools, movement, belly binding education, and human support.",
       },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Her First Meal" },
@@ -66,26 +66,26 @@ function RootDocument() {
         <PreviewHostBridge />
         <AuthProvider>
           <LocaleProvider>
-          <ThemeProvider>
-            <ThemePaint />
-            <ScrollReset />
-            <Outlet />
-            <CookieConsent />
-            <ConsentTags />
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                className: "font-sans",
-                classNames: {
-                  toast: "bg-paper text-ink border border-ink/10 shadow-lg",
-                  title: "text-ink font-medium",
-                  description: "text-ink",
-                  error: "bg-clay text-paper border-clay-deep",
-                  success: "bg-sea text-paper border-sea-deep",
-                },
-              }}
-            />
-          </ThemeProvider>
+            <ThemeProvider>
+              <ThemePaint />
+              <ScrollReset />
+              <Outlet />
+              <CookieConsent />
+              <ConsentTags />
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  className: "font-sans",
+                  classNames: {
+                    toast: "bg-paper text-ink border border-ink/10 shadow-lg",
+                    title: "text-ink font-medium",
+                    description: "text-ink",
+                    error: "bg-clay text-paper border-clay-deep",
+                    success: "bg-sea text-paper border-sea-deep",
+                  },
+                }}
+              />
+            </ThemeProvider>
           </LocaleProvider>
         </AuthProvider>
         <Scripts />
