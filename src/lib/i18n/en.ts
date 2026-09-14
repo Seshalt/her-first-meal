@@ -17,7 +17,7 @@ export const EN = {
 
   "nav.about": "About",
   "nav.binding": "Belly binding",
-  "nav.write": "Write us",
+  "nav.write": "Ask Nouri",
   "nav.membership": "Membership",
   "nav.contact": "Contact",
   "nav.signIn": "Sign in",
@@ -25,7 +25,7 @@ export const EN = {
 
   "footer.blurb": "When we nourish mothers, we nourish generations.",
   "footer.visit": "Visit",
-  "footer.write": "Write us",
+  "footer.write": "Ask Nouri",
   "footer.story": "Maat's story",
   "footer.studio": "Belly Binding Studio",
   "footer.membership": "Membership",
@@ -99,9 +99,9 @@ export const EN = {
   "today.grocery": "This week's market list",
   "today.groceryBody": "Built from her plates, pantry, and what is in season where she lives.",
   "today.openGrocery": "Open the list",
-  "today.write": "A question for Maat",
-  "today.writeBody": "The house has no chatbot. Write the owner, or open the guidance for this season.",
-  "today.writeLink": "Write us",
+  "today.write": "Ask Nouri",
+  "today.writeBody": "Ask Nouri about meals, grocery swaps, your stage, movement, belly binding education, or what to explore next.",
+  "today.writeLink": "Ask Nouri",
   "today.begin": "Begin onboarding",
   "today.before": "Let us know you first.",
   "today.beforeBody": "A short welcome so meals, wrapping, and the grocery list meet you where you are.",
@@ -133,11 +133,11 @@ export const EN = {
   "grocery.building": "Building your list…",
   "grocery.empty": "Open meals first so the list can be built from this week's plates.",
 
-  "ask.kicker": "Write the house",
-  "ask.title": "Maat reads every letter.",
-  "ask.body": "There is no chatbot here. Guidance for this season is written below. A question still goes to the owner.",
-  "ask.send": "Send to Maat",
-  "ask.thanks": "Your letter is with the house.",
+  "ask.kicker": "Nouri",
+  "ask.title": "What do you need today?",
+  "ask.body": "Nouri is your calm AI wellness companion. Ask about meals, groceries, your pregnancy or postpartum stage, movement, belly binding education, or how to use Her First Meal. Nouri does not diagnose or replace your healthcare professional.",
+  "ask.send": "Ask Nouri",
+  "ask.thanks": "Nouri is here with you.",
   "ask.placeholder": "What do you need help with?",
   "ask.guidance": "For this season",
 
@@ -157,16 +157,16 @@ export const EN = {
   "room.pantry": "Pantry",
   "room.binding": "Binding",
   "room.move": "Move",
-  "room.write": "Write us",
+  "room.write": "Nouri",
   "room.appointments": "Appointments",
   "room.resources": "Resources",
   "room.meeting": "Meeting",
   "room.partner": "Partner",
   "room.profile": "Profile",
 
-  "privacy.aiTitle": "No artificial intelligence",
+  "privacy.aiTitle": "How Nouri uses AI",
   "privacy.aiBody":
-    "This house does not send your notes to an AI model. Meals, grocery lists, and season guidance are written in the catalog and chosen from the stage, diet, and state you share. Questions go to Maat by letter.",
+    "Nouri uses a secure server-side AI connection. Secret keys are never exposed in the browser. Nouri only receives the context the application authorizes for your request, does not diagnose, and is not a replacement for professional medical care.",
 } as const;
 
 export type MsgKey = keyof typeof EN;
