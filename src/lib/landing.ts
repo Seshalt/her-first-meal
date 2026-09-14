@@ -40,7 +40,7 @@ export const LANDING_IMAGE_SLOTS = [
   },
   {
     id: "nouri",
-    label: "Home · Nouri",
+    label: "Home · personal support",
     fallback: "/images/nouri-drop.jpg",
     alt: "Hot tea pouring into a ceramic cup",
   },
@@ -124,7 +124,7 @@ export const LANDING_IMAGE_SLOTS = [
   },
   {
     id: "nouriHero",
-    label: "Nouri page · photograph",
+    label: "Support page · photograph",
     fallback: "/images/nouri-drop.jpg",
     alt: "Hot tea pouring into a ceramic cup",
   },
@@ -175,7 +175,7 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
-    "A personalized pregnancy and postpartum wellness home — nourishing meals, smart grocery support, belly binding education, movement, and Nouri, your calm AI companion. Not a course. Not a blog. Care that grows with you.",
+    "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery and pantry planning, belly binding education, movement, week-by-week guidance, and real human support. No generative AI. Care that grows with you.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
   offerLine:
@@ -185,15 +185,15 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   mealsKicker: "Nourishment",
   mealsTitle: "Meals that bow to her real kitchen.",
   mealsBody:
-    "Members receive personalized meal guidance for pregnancy and postpartum — built around her culture, appetite, household size, budget, pantry, and the store she actually walks into. Not a default Western plate. Not a dump of recipes on day one.",
+    "Members receive personalized meal guidance for pregnancy and postpartum — chosen from a deep built-in recipe library around her culture, appetite, household size, budget, pantry, and the way she eats. Vegan, pescatarian, vegetarian, gluten-free, dairy-free, halal, kosher, and more can be selected during onboarding.",
   bindingKicker: "Flagship practice",
   bindingTitle: "Belly binding, held with care.",
   bindingBody:
     "The Belly Binding Studio holds wrap education: studio video, wrap comparison, a private journal, and a live Zoom review when you want Maat’s eyes on the cloth. Teaching — never a diagnosis.",
-  nouriKicker: "Meet Nouri",
-  nouriTitle: "A calm companion for the questions between appointments.",
+  nouriKicker: "Personal support",
+  nouriTitle: "A real person behind the questions that matter.",
   nouriBody:
-    "Nouri is your private AI wellness companion inside Her First Meal. Ask about this week’s meals, grocery swaps, your pregnancy journey, movement, belly binding education, or where to find a resource. Nouri uses only the context you authorize, never diagnoses, and always knows when to point you back to your healthcare professional.",
+    "Your meals, market list, stage guide, pantry suggestions, and movement library are organized from Her First Meal’s built-in content and the preferences you choose. When you want a person, send Maat a private note or book a live Zoom session.",
   closeTitle: "What does her body need?",
   closeBody:
     "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, and the partner lane. The only extra is a private meeting with Maat.",
@@ -248,10 +248,10 @@ function pickCopy(copy: Partial<LandingCopy> | null | undefined): Partial<Landin
     const value = copy[key];
     if (typeof value === "string" && value.trim()) {
       const trimmed = value.trim();
-      // Migrate the short-lived anti-AI copy without overwriting future owner edits.
-      if (key === "nouriBody" && /no chatbot/i.test(trimmed)) continue;
-      if (key === "nouriTitle" && trimmed === "A question still has a person behind it.") continue;
-      if (key === "nouriKicker" && trimmed === "The house answers") continue;
+      // Migrate any legacy Nouri/AI marketing copy stored in the database.
+      if ((key === "nouriBody" || key === "subhead") && /\b(ai|nouri|chatbot)\b/i.test(trimmed)) continue;
+      if (key === "nouriTitle" && /nouri|companion|questions between appointments/i.test(trimmed)) continue;
+      if (key === "nouriKicker" && /nouri/i.test(trimmed)) continue;
       out[key] = value;
     }
   }
@@ -261,11 +261,10 @@ function pickCopy(copy: Partial<LandingCopy> | null | undefined): Partial<Landin
 export const OFFER_TICKER = [
   "Personalized meals",
   "Belly Binding Studio",
-  "Nouri",
+  "Human support",
   "Movement",
   "Grocery lists",
   "Partner lane",
   "Week-by-week journey",
   "Fourth trimester care",
 ];
-
