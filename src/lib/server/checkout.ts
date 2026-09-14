@@ -4,7 +4,7 @@ import { authMiddleware } from "@/lib/auth/middleware";
 import { uid } from "@/lib/utils";
 import { ensureProfile } from "./profile";
 import { assertHuman, rateLimit } from "./abuse";
-import { createStripeCheckout, stripeConfigured, stripeSessionPaid } from "./stripe";
+import { createStripeCheckout, stripeConfigured, stripePublishableKey, stripeSessionPaid } from "./stripe";
 
 export const startMembershipCheckout = createServerFn({ method: "POST" })
   .validator((input: {
@@ -46,7 +46,7 @@ export const startMembershipCheckout = createServerFn({ method: "POST" })
       insert into memberships (email, plan, status, price_cents, checkout_token, expires_at)
       values (${data.email}, ${data.plan}, 'pending', ${price}, ${token}, ${expiresAt.toISOString()})
     `;
-    const origin = (process.env.APP_URL || process.env.BETTER_AUTH_URL || "https://her-first-meal-now.vercel.app").replace(/\/$/, "");
+    const origin = (process.env.APP_URL || process.env.BETTER_AUTH_URL || "https://www.herfirstmeal.app").replace(/\/$/, "");
     if (stripeConfigured()) {
       const session = await createStripeCheckout({
         token,
@@ -56,12 +56,28 @@ export const startMembershipCheckout = createServerFn({ method: "POST" })
         priceCents: price,
         origin,
       });
-      if ("url" in session) {
-        return { token, email: data.email, name: data.name, plan: data.plan, priceCents: price, stripeUrl: session.url };
-      }
-      throw new Error(session.error);
+      if ("error" in session) throw new Error(session.error);
+      return {
+        token,
+        email: data.email,
+        name: data.name,
+        plan: data.plan,
+        priceCents: price,
+        stripeUrl: session.url ?? null,
+        stripeClientSecret: session.clientSecret ?? null,
+        stripePublishableKey: session.clientSecret ? (stripePublishableKey() ?? null) : null,
+      };
     }
-    return { token, email: data.email, name: data.name, plan: data.plan, priceCents: price, stripeUrl: null as string | null };
+    return {
+      token,
+      email: data.email,
+      name: data.name,
+      plan: data.plan,
+      priceCents: price,
+      stripeUrl: null as string | null,
+      stripeClientSecret: null as string | null,
+      stripePublishableKey: null as string | null,
+    };
   });
 
 export const confirmStripeCheckout = createServerFn({ method: "POST" })

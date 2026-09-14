@@ -5,7 +5,7 @@ export const DEFAULT_SITE_COPY = {
   brandTagline: "We remember the mother.",
   navAbout: "About",
   navBinding: "Belly binding",
-  navNouri: "Ask Nouri",
+  navNouri: "Support",
   navMembership: "Membership",
   navSignIn: "Sign in",
   navHome: "Your home",
@@ -17,7 +17,7 @@ export const DEFAULT_SITE_COPY = {
   footerEnter: "Enter",
   footerStory: "Maat's story",
   footerStudio: "Belly Binding Studio",
-  footerNouri: "Ask Nouri",
+  footerNouri: "Support",
   footerMembership: "Membership",
   footerSignIn: "Sign in",
   footerOwner: "Owner atelier",
@@ -51,7 +51,7 @@ export const DEFAULT_SITE_COPY = {
   contactNote: "Membership questions, belly binding reviews, and press all come through this door.",
 
   ticker:
-    "Personalized meals\nBelly Binding Studio\nAsk Nouri\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
+    "Personalized meals\nBelly Binding Studio\nHuman support\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
 
   aboutKicker: "Founder",
   aboutTitle: "Maat, and the table she kept setting.",
@@ -61,7 +61,7 @@ export const DEFAULT_SITE_COPY = {
     "She learned, as so many mothers do, that celebration can be loud for the baby and thin for the woman who grew them. Meals arrived as afterthoughts. Wrapping traditions were whispered, not taught. Partners wanted to help and did not know where to stand.",
   aboutQuote: "The world celebrates the baby. We remember the mother.",
   aboutP3:
-    "Her First Meal is the house she wished had been lit for her: nourishment that respects culture and constraint, belly binding held as education rather than spectacle, Nouri for calm guidance between appointments, direct access to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
+    "Her First Meal is the house she wished had been lit for her: a deep built-in nourishment library that respects culture and constraint, belly binding held as education rather than spectacle, stage-right guidance, practical grocery and pantry tools, direct access to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
   aboutP4: "When we nourish mothers, we nourish generations.",
   aboutCta: "Start your journey today",
 
@@ -96,13 +96,13 @@ export const DEFAULT_SITE_COPY = {
   faq4a:
     "Only with your surgical team's guidance. We offer education on placement that avoids incision pressure — never a protocol that overrules your clinician.",
 
-  nouriPageKicker: "Your wellness companion",
-  nouriPageTitle: "Meet Nouri.",
+  nouriPageKicker: "Personal support",
+  nouriPageTitle: "Smart personalization without generative AI.",
   nouriPageBody:
-    "Nouri is the AI companion inside Her First Meal — grounded in your stage, dietary preferences, approved house resources, and the context you choose to share. Ask about meals, groceries, pregnancy milestones, movement, belly binding education, or where to go next. Nouri does not diagnose or replace your healthcare professional.",
+    "Meals, groceries, stage guidance, movement, and resources are organized from Her First Meal's built-in library and the preferences you choose to save. When you want a person, send Maat a private note or book a live Zoom session.",
   nouriPageCta: "Start your journey",
   nouriPills:
-    "Meals for this season of the body\nGrocery swaps for her actual stores\nPregnancy-week guidance\nBelly binding education\nMovement matched to energy\nHuman support from Maat when you want it",
+    "Meals for this season of the body\nGrocery planning for her actual stores\nPregnancy-week guidance\nBelly binding education\nMovement matched to energy\nHuman support from Maat",
 
   pricingKicker: "Membership",
   pricingTitle: "One house. Two ways to pay.",
@@ -117,7 +117,7 @@ export const DEFAULT_SITE_COPY = {
   pricingYearlyCta: "Join yearly",
   pricingMeetingCta: "Members book inside",
   pricingIncludes:
-    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nNouri AI wellness companion\nMovement — optional, never punitive\nA private lane for her partner\nThe resource library",
+    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nStage and week guidance\nMovement — optional, never punitive\nA private lane for her partner\nHuman support and the resource library",
   pricingFoot:
     "You do not unlock more by choosing yearly. You unlock the same house — meals, studio, pantry, partner lane — and keep a kinder bill when you pay the year.",
   meetingPoints:
@@ -159,13 +159,11 @@ export function mergeSite(partial: Partial<SiteCopy> | null | undefined): SiteCo
     const value = partial[key];
     if (typeof value !== "string") continue;
     const trimmed = value.trim();
-    // Migrate the short-lived anti-AI brand direction in existing production settings.
-    if ((key === "nouriPageBody" || key === "nouriPageTitle") && /no chatbot|reads every letter/i.test(trimmed)) continue;
-    if ((key === "navNouri" || key === "footerNouri") && trimmed === "Write us") continue;
-    if (key === "ticker" && trimmed.includes("Write to Maat")) continue;
-    if (key === "nouriPageKicker" && trimmed === "Write the house") continue;
-    if (key === "nouriPageCta" && trimmed === "Write us") continue;
-    if (key === "nouriPills" && trimmed.includes("A letter to Maat when you need a human")) continue;
+    if ((key === "navNouri" || key === "footerNouri") && /nouri|ask nouri/i.test(trimmed)) continue;
+    if (key === "ticker" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+    if ((key === "nouriPageKicker" || key === "nouriPageTitle" || key === "nouriPageBody") && /nouri|\bai\b|chatbot|companion/i.test(trimmed)) continue;
+    if (key === "pricingIncludes" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+    if (key === "aboutP3" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
     out[key] = value;
   }
   return out;
@@ -187,7 +185,7 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "brandTagline", label: "Logo · small line under the name (footer)" },
       { key: "navAbout", label: "Nav · About" },
       { key: "navBinding", label: "Nav · Belly binding" },
-      { key: "navNouri", label: "Nav · Nouri" },
+      { key: "navNouri", label: "Nav · Support" },
       { key: "navMembership", label: "Nav · Membership" },
       { key: "navSignIn", label: "Nav · Sign in" },
       { key: "navHome", label: "Nav · signed-in home" },
@@ -200,7 +198,7 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "footerConnect", label: "Footer · Connect heading" },
       { key: "footerStory", label: "Footer · story link" },
       { key: "footerStudio", label: "Footer · studio link" },
-      { key: "footerNouri", label: "Footer · Nouri link" },
+      { key: "footerNouri", label: "Footer · Support link" },
       { key: "footerMembership", label: "Footer · membership link" },
       { key: "footerContact", label: "Footer · Contact us link" },
       { key: "footerSignIn", label: "Footer · sign in" },
@@ -256,14 +254,14 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
     ],
   },
   {
-    id: "nouri",
-    label: "Nouri page",
+    id: "support",
+    label: "Support page",
     fields: [
       { key: "nouriPageKicker", label: "Kicker" },
       { key: "nouriPageTitle", label: "Title" },
       { key: "nouriPageBody", label: "Body", multiline: true },
       { key: "nouriPageCta", label: "Button" },
-      { key: "nouriPills", label: "What Nouri helps with (one line each)", multiline: true },
+      { key: "nouriPills", label: "Support features (one line each)", multiline: true },
     ],
   },
   {

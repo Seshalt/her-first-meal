@@ -2,6 +2,14 @@ function stripeKey(): string | undefined {
   return process.env.STRIPE_SECRET_KEY?.trim() || undefined;
 }
 
+export function stripePublishableKey(): string | undefined {
+  return (
+    process.env.STRIPE_PUBLISHABLE_KEY?.trim() ||
+    process.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim() ||
+    undefined
+  );
+}
+
 export function stripeConfigured(): boolean {
   return Boolean(stripeKey());
 }
@@ -11,10 +19,12 @@ export function publicOrigin(): string {
   if (explicit) return explicit.replace(/\/$/, "");
   const host = (process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || "").replace(/^https?:\/\//, "");
   if (host) return `https://${host.replace(/\/$/, "")}`;
-  return "https://her-first-meal-now.vercel.app";
+  return "https://www.herfirstmeal.app";
 }
 
-async function stripeSession(body: URLSearchParams): Promise<{ url: string } | { error: string }> {
+type StripeSessionResult = { url?: string; clientSecret?: string } | { error: string };
+
+async function stripeSession(body: URLSearchParams): Promise<StripeSessionResult> {
   const key = stripeKey();
   if (!key) return { error: "Stripe is not connected yet." };
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
@@ -25,9 +35,13 @@ async function stripeSession(body: URLSearchParams): Promise<{ url: string } | {
     },
     body,
   });
-  const json = (await res.json()) as { url?: string; error?: { message?: string } };
-  if (!res.ok || !json.url) return { error: json.error?.message ?? "Stripe could not start checkout." };
-  return { url: json.url };
+  const json = (await res.json()) as { url?: string | null; client_secret?: string | null; error?: { message?: string } };
+  if (!res.ok) return { error: json.error?.message ?? "Stripe could not start checkout." };
+  if (!json.url && !json.client_secret) return { error: "Stripe did not return a checkout session." };
+  return {
+    url: json.url || undefined,
+    clientSecret: json.client_secret || undefined,
+  };
 }
 
 export async function createStripeCheckout(input: {
@@ -37,13 +51,11 @@ export async function createStripeCheckout(input: {
   plan: "monthly" | "yearly";
   priceCents: number;
   origin: string;
-}): Promise<{ url: string } | { error: string }> {
+}): Promise<StripeSessionResult> {
   const body = new URLSearchParams();
   body.set("mode", "subscription");
   body.set("customer_email", input.email);
   body.set("client_reference_id", input.token);
-  body.set("success_url", `${input.origin}/checkout?paid=1&plan=${input.plan}&session_id={CHECKOUT_SESSION_ID}`);
-  body.set("cancel_url", `${input.origin}/checkout?plan=${input.plan}`);
   body.set("metadata[token]", input.token);
   body.set("metadata[plan]", input.plan);
   body.set("line_items[0][quantity]", "1");
@@ -53,6 +65,15 @@ export async function createStripeCheckout(input: {
   body.set("line_items[0][price_data][product_data][name]", "Her First Meal membership");
   body.set("line_items[0][price_data][product_data][description]", input.plan === "yearly" ? "Yearly membership" : "Monthly membership");
   body.set("subscription_data[metadata][token]", input.token);
+
+  if (stripePublishableKey()) {
+    body.set("ui_mode", "embedded");
+    body.set("return_url", `${input.origin}/checkout?paid=1&plan=${input.plan}&session_id={CHECKOUT_SESSION_ID}`);
+  } else {
+    body.set("success_url", `${input.origin}/checkout?paid=1&plan=${input.plan}&session_id={CHECKOUT_SESSION_ID}`);
+    body.set("cancel_url", `${input.origin}/checkout?plan=${input.plan}`);
+  }
+
   return stripeSession(body);
 }
 
@@ -85,7 +106,10 @@ export async function createStripeMeetingCheckout(input: {
     "line_items[0][price_data][product_data][description]",
     input.startsAt ? "One 45-minute live session — billed on Stripe, then the time is held." : "One 45-minute live session with Maat.",
   );
-  return stripeSession(body);
+  const session = await stripeSession(body);
+  if ("error" in session) return session;
+  if (!session.url) return { error: "Stripe did not return the meeting checkout URL." };
+  return { url: session.url };
 }
 
 export async function stripeSessionPaid(sessionId: string): Promise<{
