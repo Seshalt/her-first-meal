@@ -17,7 +17,7 @@ export const EN = {
 
   "nav.about": "About",
   "nav.binding": "Belly binding",
-  "nav.write": "Ask Nouri",
+  "nav.write": "Support",
   "nav.membership": "Membership",
   "nav.contact": "Contact",
   "nav.signIn": "Sign in",
@@ -25,7 +25,7 @@ export const EN = {
 
   "footer.blurb": "When we nourish mothers, we nourish generations.",
   "footer.visit": "Visit",
-  "footer.write": "Ask Nouri",
+  "footer.write": "Support",
   "footer.story": "Maat's story",
   "footer.studio": "Belly Binding Studio",
   "footer.membership": "Membership",
@@ -99,9 +99,9 @@ export const EN = {
   "today.grocery": "This week's market list",
   "today.groceryBody": "Built from her plates, pantry, and what is in season where she lives.",
   "today.openGrocery": "Open the list",
-  "today.write": "Ask Nouri",
-  "today.writeBody": "Ask Nouri about meals, grocery swaps, your stage, movement, belly binding education, or what to explore next.",
-  "today.writeLink": "Ask Nouri",
+  "today.write": "Personal support",
+  "today.writeBody": "Open your stage guide or send a private note to Maat when you want a human response.",
+  "today.writeLink": "Open support",
   "today.begin": "Begin onboarding",
   "today.before": "Let us know you first.",
   "today.beforeBody": "A short welcome so meals, wrapping, and the grocery list meet you where you are.",
@@ -133,12 +133,12 @@ export const EN = {
   "grocery.building": "Building your list…",
   "grocery.empty": "Open meals first so the list can be built from this week's plates.",
 
-  "ask.kicker": "Nouri",
-  "ask.title": "What do you need today?",
-  "ask.body": "Nouri is your calm AI wellness companion. Ask about meals, groceries, your pregnancy or postpartum stage, movement, belly binding education, or how to use Her First Meal. Nouri does not diagnose or replace your healthcare professional.",
-  "ask.send": "Ask Nouri",
-  "ask.thanks": "Nouri is here with you.",
-  "ask.placeholder": "What do you need help with?",
+  "ask.kicker": "Personal support",
+  "ask.title": "Guidance for your season, plus a real person when you need one.",
+  "ask.body": "Your meals, grocery list, and stage guidance come from Her First Meal's built-in library and the preferences you choose. Send Maat a private note when you want human support.",
+  "ask.send": "Send to Maat",
+  "ask.thanks": "Your note is with the house.",
+  "ask.placeholder": "What would you like help with?",
   "ask.guidance": "For this season",
 
   "profile.kicker": "Settings",
@@ -157,16 +157,16 @@ export const EN = {
   "room.pantry": "Pantry",
   "room.binding": "Binding",
   "room.move": "Move",
-  "room.write": "Nouri",
+  "room.write": "Support",
   "room.appointments": "Appointments",
   "room.resources": "Resources",
   "room.meeting": "Meeting",
   "room.partner": "Partner",
   "room.profile": "Profile",
 
-  "privacy.aiTitle": "How Nouri uses AI",
+  "privacy.aiTitle": "No generative AI",
   "privacy.aiBody":
-    "Nouri uses a secure server-side AI connection. Secret keys are never exposed in the browser. Nouri only receives the context the application authorizes for your request, does not diagnose, and is not a replacement for professional medical care.",
+    "Her First Meal does not send your questions, profile, meals, or grocery data to a generative AI model. Personalization is created from the built-in content library and the stage, dietary preferences, stores, and location details you choose to save.",
 } as const;
 
 export type MsgKey = keyof typeof EN;
