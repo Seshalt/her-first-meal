@@ -1,26 +1,8 @@
-User-agent: Googlebot
-Allow: /
-Allow: /pricing
-Allow: /about
-Allow: /belly-binding
-Allow: /nouri
-Allow: /privacy
-Allow: /contact
-Allow: /terms
-Disallow: /admin
-Disallow: /app
-Disallow: /api
-Disallow: /login
-Disallow: /join
-Disallow: /checkout
-Disallow: /hearth
-
 User-agent: *
 Allow: /
 Allow: /pricing
 Allow: /about
 Allow: /belly-binding
-Allow: /nouri
 Allow: /privacy
 Allow: /contact
 Allow: /terms
@@ -35,4 +17,4 @@ Disallow: /join
 Disallow: /checkout
 Disallow: /hearth
 
-Sitemap: https://her-first-meal-now.vercel.app/sitemap.xml
+Sitemap: https://www.herfirstmeal.app/sitemap.xml
