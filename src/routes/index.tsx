@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { LiquidArt } from "@/components/layout/liquid-art";
 import { MagneticLink } from "@/components/motion/magnetic-button";
@@ -367,7 +367,7 @@ function NouriBand({ content }: { content: LandingContent }) {
           <h2 className="mt-5 font-display text-[clamp(2.6rem,6vw,5.2rem)]">{content.nouriTitle}</h2>
           <p className="mt-8 text-lg leading-relaxed text-ink md:text-xl">{content.nouriBody}</p>
           <Link to="/nouri" className="mt-10 inline-flex items-center gap-2 text-plum">
-            Write us <ArrowRight className="size-4" />
+            Meet Nouri <ArrowRight className="size-4" />
           </Link>
         </Reveal>
       </div>

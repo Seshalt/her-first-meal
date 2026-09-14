@@ -11,7 +11,6 @@ import { useT } from "@/lib/i18n/provider";
 
 export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { site } = usePublicSite();
   const t = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -102,7 +101,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
                 ink,
               )}
             >
-              {site.navSignIn}
+              {t("nav.signIn")}
             </Link>
           </SignedOut>
           <SignedIn>
@@ -113,7 +112,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
                 ink,
               )}
             >
-              {site.navHome}
+              {t("nav.home")}
             </Link>
           </SignedIn>
           <Link
@@ -123,7 +122,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
               onHero || stayDark ? "bg-gold text-ink hover:bg-paper" : "bg-primary text-primary-foreground hover:bg-sea-deep",
             )}
           >
-            {site.navCta}
+            {t("cta")}
           </Link>
           <button
             type="button"
@@ -169,16 +168,16 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
               onClick={() => setOpen(false)}
               className="mt-6 rounded-full bg-primary px-5 py-4 text-center text-base font-medium text-primary-foreground"
             >
-              {site.navCta}
+              {t("cta")}
             </Link>
             <SignedOut>
               <Link to="/login" search={{}} onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
-                {site.navSignIn}
+                {t("nav.signIn")}
               </Link>
             </SignedOut>
             <SignedIn>
               <Link to="/app" onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
-                {site.navHome}
+                {t("nav.home")}
               </Link>
             </SignedIn>
           </nav>
@@ -200,14 +199,14 @@ export function PublicFooter() {
         <div className="md:col-span-2">
           <Wordmark stacked className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
-            {content.headlineAccent} {site.footerBlurb}
+            {content.headlineAccent} {t("footer.blurb")}
           </p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerVisit}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
             <li>
-              <Link to="/about">{site.footerStory}</Link>
+              <Link to="/about">{t("footer.story")}</Link>
             </li>
             <li>
               <Link to="/belly-binding">{site.footerStudio}</Link>
@@ -216,10 +215,10 @@ export function PublicFooter() {
               <Link to="/nouri">{t("footer.write")}</Link>
             </li>
             <li>
-              <Link to="/pricing">{site.footerMembership}</Link>
+              <Link to="/pricing">{t("footer.membership")}</Link>
             </li>
             <li>
-              <Link to="/contact">{site.footerContact}</Link>
+              <Link to="/contact">{t("footer.contact")}</Link>
             </li>
           </ul>
         </div>
@@ -241,7 +240,7 @@ export function PublicFooter() {
               </li>
             ) : null}
             <li>
-              <Link to="/contact">{site.footerContact}</Link>
+              <Link to="/contact">{t("footer.contact")}</Link>
             </li>
             <li>
               <Link to="/login" search={{}}>
@@ -249,7 +248,7 @@ export function PublicFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/privacy">{site.footerPrivacy}</Link>
+              <Link to="/privacy">{t("footer.privacy")}</Link>
             </li>
             <li>
               <Link to="/terms">Terms</Link>

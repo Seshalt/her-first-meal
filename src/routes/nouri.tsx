@@ -30,7 +30,7 @@ function NouriMarketing() {
             <h1 className="mt-3 font-display text-5xl">{site.nouriPageTitle}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{site.nouriPageBody}</p>
             <Button asChild className="mt-8" variant="plum">
-              <Link to="/contact">{site.nouriPageCta}</Link>
+              <Link to="/pricing">{site.nouriPageCta}</Link>
             </Button>
           </div>
           <img src={content.images.nouriHero} alt={content.alts.nouriHero} className="media h-80 w-full rounded-[32px] object-cover" />

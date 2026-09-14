@@ -25,20 +25,20 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The world celebrates the baby. We remember the mother. Pregnancy and postpartum meals, belly binding studio, movement, grocery planning, and a letter to Maat.",
+          "The world celebrates the baby. We remember the mother. Personalized pregnancy and postpartum nourishment, belly binding education, movement, grocery planning, and Nouri AI wellness support.",
       },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Her First Meal" },
       { property: "og:description", content: "The world celebrates the baby. We remember the mother." },
       { property: "og:image", content: "/og.jpg" },
-      { property: "og:url", content: "https://her-first-meal-now.vercel.app/" },
+      { property: "og:url", content: "https://www.herfirstmeal.app/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Her First Meal" },
       { name: "twitter:description", content: "The world celebrates the baby. We remember the mother." },
       { name: "theme-color", content: "#1F5F8A" },
     ],
     links: [
-      { rel: "canonical", href: "https://her-first-meal-now.vercel.app/" },
+      { rel: "canonical", href: "https://www.herfirstmeal.app/" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png?v=hfm8" },
       { rel: "icon", type: "image/png", sizes: "180x180", href: "/icon-180.png?v=hfm8" },
       { rel: "apple-touch-icon", href: "/icon-180.png" },

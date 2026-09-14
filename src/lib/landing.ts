@@ -175,7 +175,7 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
-    "A membership home for pregnancy and postpartum — meals for her body, a belly binding studio, movement, grocery lists for her market, and a letter to Maat. Not a course. Not a blog. A house you return to.",
+    "A personalized pregnancy and postpartum wellness home — nourishing meals, smart grocery support, belly binding education, movement, and Nouri, your calm AI companion. Not a course. Not a blog. Care that grows with you.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
   offerLine:
@@ -190,10 +190,10 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   bindingTitle: "Belly binding, held with care.",
   bindingBody:
     "The Belly Binding Studio holds wrap education: studio video, wrap comparison, a private journal, and a live Zoom review when you want Maat’s eyes on the cloth. Teaching — never a diagnosis.",
-  nouriKicker: "The house answers",
-  nouriTitle: "A question still has a person behind it.",
+  nouriKicker: "Meet Nouri",
+  nouriTitle: "A calm companion for the questions between appointments.",
   nouriBody:
-    "There is no chatbot in this house. Meals, grocery lists, and season guidance follow the stage, diet, and state you share. When you need a human, write Maat — she reads every letter.",
+    "Nouri is your private AI wellness companion inside Her First Meal. Ask about this week’s meals, grocery swaps, your pregnancy journey, movement, belly binding education, or where to find a resource. Nouri uses only the context you authorize, never diagnoses, and always knows when to point you back to your healthcare professional.",
   closeTitle: "What does her body need?",
   closeBody:
     "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, and the partner lane. The only extra is a private meeting with Maat.",
@@ -246,7 +246,14 @@ function pickCopy(copy: Partial<LandingCopy> | null | undefined): Partial<Landin
   const out: Partial<LandingCopy> = {};
   for (const key of Object.keys(DEFAULT_LANDING_COPY) as (keyof LandingCopy)[]) {
     const value = copy[key];
-    if (typeof value === "string" && value.trim()) out[key] = value;
+    if (typeof value === "string" && value.trim()) {
+      const trimmed = value.trim();
+      // Migrate the short-lived anti-AI copy without overwriting future owner edits.
+      if (key === "nouriBody" && /no chatbot/i.test(trimmed)) continue;
+      if (key === "nouriTitle" && trimmed === "A question still has a person behind it.") continue;
+      if (key === "nouriKicker" && trimmed === "The house answers") continue;
+      out[key] = value;
+    }
   }
   return out;
 }
