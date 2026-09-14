@@ -5,7 +5,7 @@ export const DEFAULT_SITE_COPY = {
   brandTagline: "We remember the mother.",
   navAbout: "About",
   navBinding: "Belly binding",
-  navNouri: "Write us",
+  navNouri: "Ask Nouri",
   navMembership: "Membership",
   navSignIn: "Sign in",
   navHome: "Your home",
@@ -17,7 +17,7 @@ export const DEFAULT_SITE_COPY = {
   footerEnter: "Enter",
   footerStory: "Maat's story",
   footerStudio: "Belly Binding Studio",
-  footerNouri: "Write us",
+  footerNouri: "Ask Nouri",
   footerMembership: "Membership",
   footerSignIn: "Sign in",
   footerOwner: "Owner atelier",
@@ -51,7 +51,7 @@ export const DEFAULT_SITE_COPY = {
   contactNote: "Membership questions, belly binding reviews, and press all come through this door.",
 
   ticker:
-    "Personalized meals\nBelly Binding Studio\nWrite to Maat\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
+    "Personalized meals\nBelly Binding Studio\nAsk Nouri\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
 
   aboutKicker: "Founder",
   aboutTitle: "Maat, and the table she kept setting.",
@@ -61,7 +61,7 @@ export const DEFAULT_SITE_COPY = {
     "She learned, as so many mothers do, that celebration can be loud for the baby and thin for the woman who grew them. Meals arrived as afterthoughts. Wrapping traditions were whispered, not taught. Partners wanted to help and did not know where to stand.",
   aboutQuote: "The world celebrates the baby. We remember the mother.",
   aboutP3:
-    "Her First Meal is the house she wished had been lit for her: nourishment that respects culture and constraint, belly binding held as education rather than spectacle, a letter to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
+    "Her First Meal is the house she wished had been lit for her: nourishment that respects culture and constraint, belly binding held as education rather than spectacle, Nouri for calm guidance between appointments, direct access to Maat when you need a person, and a membership that treats postpartum as a season — not a discharge summary.",
   aboutP4: "When we nourish mothers, we nourish generations.",
   aboutCta: "Start your journey today",
 
@@ -96,13 +96,13 @@ export const DEFAULT_SITE_COPY = {
   faq4a:
     "Only with your surgical team's guidance. We offer education on placement that avoids incision pressure — never a protocol that overrules your clinician.",
 
-  nouriPageKicker: "Write the house",
-  nouriPageTitle: "Maat reads every letter.",
+  nouriPageKicker: "Your wellness companion",
+  nouriPageTitle: "Meet Nouri.",
   nouriPageBody:
-    "There is no chatbot here. Meals and grocery lists follow the stage, diet, and state you share. A question still goes to a person — Maat, who keeps this house.",
-  nouriPageCta: "Write us",
+    "Nouri is the AI companion inside Her First Meal — grounded in your stage, dietary preferences, approved house resources, and the context you choose to share. Ask about meals, groceries, pregnancy milestones, movement, belly binding education, or where to go next. Nouri does not diagnose or replace your healthcare professional.",
+  nouriPageCta: "Start your journey",
   nouriPills:
-    "Meals for this season of the body\nGrocery lists for her actual stores\nPregnancy week guidance, written\nBelly binding education\nMovement when energy is thin\nA letter to Maat when you need a human",
+    "Meals for this season of the body\nGrocery swaps for her actual stores\nPregnancy-week guidance\nBelly binding education\nMovement matched to energy\nHuman support from Maat when you want it",
 
   pricingKicker: "Membership",
   pricingTitle: "One house. Two ways to pay.",
@@ -117,7 +117,7 @@ export const DEFAULT_SITE_COPY = {
   pricingYearlyCta: "Join yearly",
   pricingMeetingCta: "Members book inside",
   pricingIncludes:
-    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nA letter to Maat\nMovement — optional, never punitive\nA private lane for her partner\nThe resource library",
+    "Today's Journey, unlocking by week\nPersonalized meals for her real kitchen\nGrocery lists for the stores she uses\nVirtual pantry\nBelly Binding Studio\nNouri AI wellness companion\nMovement — optional, never punitive\nA private lane for her partner\nThe resource library",
   pricingFoot:
     "You do not unlock more by choosing yearly. You unlock the same house — meals, studio, pantry, partner lane — and keep a kinder bill when you pay the year.",
   meetingPoints:
@@ -157,7 +157,16 @@ export function mergeSite(partial: Partial<SiteCopy> | null | undefined): SiteCo
   if (!partial) return out;
   for (const key of Object.keys(DEFAULT_SITE_COPY) as SiteCopyKey[]) {
     const value = partial[key];
-    if (typeof value === "string") out[key] = value;
+    if (typeof value !== "string") continue;
+    const trimmed = value.trim();
+    // Migrate the short-lived anti-AI brand direction in existing production settings.
+    if ((key === "nouriPageBody" || key === "nouriPageTitle") && /no chatbot|reads every letter/i.test(trimmed)) continue;
+    if ((key === "navNouri" || key === "footerNouri") && trimmed === "Write us") continue;
+    if (key === "ticker" && trimmed.includes("Write to Maat")) continue;
+    if (key === "nouriPageKicker" && trimmed === "Write the house") continue;
+    if (key === "nouriPageCta" && trimmed === "Write us") continue;
+    if (key === "nouriPills" && trimmed.includes("A letter to Maat when you need a human")) continue;
+    out[key] = value;
   }
   return out;
 }
