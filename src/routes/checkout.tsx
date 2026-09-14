@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Check } from "lucide-react";
+import { Check, LockKeyhole } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
@@ -14,6 +14,32 @@ import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
 import { ReceiptPrinter } from "@/components/commerce/receipt-printer";
 import { isMemberWalk } from "@/lib/preview-mode";
+
+type EmbeddedCheckout = { mount: (selector: string) => void; destroy: () => void };
+type StripeInstance = { initEmbeddedCheckout: (input: { clientSecret: string }) => Promise<EmbeddedCheckout> };
+type StripeFactory = (publishableKey: string) => StripeInstance;
+
+declare global {
+  interface Window {
+    Stripe?: StripeFactory;
+  }
+}
+
+function loadStripeJs(): Promise<StripeFactory> {
+  if (window.Stripe) return Promise.resolve(window.Stripe);
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>('script[src="https://js.stripe.com/v3/"]');
+    const script = existing ?? document.createElement("script");
+    const done = () => (window.Stripe ? resolve(window.Stripe) : reject(new Error("Stripe.js did not load.")));
+    script.addEventListener("load", done, { once: true });
+    script.addEventListener("error", () => reject(new Error("Stripe.js could not load.")), { once: true });
+    if (!existing) {
+      script.src = "https://js.stripe.com/v3/";
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  });
+}
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -39,6 +65,7 @@ function Checkout() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [embedded, setEmbedded] = useState<{ clientSecret: string; publishableKey: string } | null>(null);
   const price = plan === "yearly" ? yearly : monthly;
   const guard = useFormGuard();
 
@@ -65,6 +92,27 @@ function Checkout() {
       .catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    if (!embedded) return;
+    let checkout: EmbeddedCheckout | null = null;
+    let cancelled = false;
+    void loadStripeJs()
+      .then((factory) => factory(embedded.publishableKey).initEmbeddedCheckout({ clientSecret: embedded.clientSecret }))
+      .then((instance) => {
+        if (cancelled) {
+          instance.destroy();
+          return;
+        }
+        checkout = instance;
+        instance.mount("#stripe-embedded-checkout");
+      })
+      .catch((err) => toast.error(err instanceof Error ? err.message : "Secure payment form could not load."));
+    return () => {
+      cancelled = true;
+      checkout?.destroy();
+    };
+  }, [embedded]);
+
   async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -84,9 +132,14 @@ function Checkout() {
           human: guard.human,
         },
       });
-      toast.success(res.stripeUrl ? "Opening Stripe…" : "Membership reserved.");
       setJoinToken(res.token);
+      if (res.stripeClientSecret && res.stripePublishableKey) {
+        setEmbedded({ clientSecret: res.stripeClientSecret, publishableKey: res.stripePublishableKey });
+        toast.success("Secure Stripe checkout is ready below.");
+        return;
+      }
       if (res.stripeUrl) {
+        toast.success("Opening secure Stripe checkout…");
         window.location.assign(res.stripeUrl);
         return;
       }
@@ -117,82 +170,89 @@ function Checkout() {
           />
         </div>
       ) : (
-      <div className="mx-auto grid max-w-5xl gap-10 px-4 py-16 md:grid-cols-[1fr_0.9fr]">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
-          <h1 className="mt-3 font-display text-4xl">{site.checkoutTitle}</h1>
-          <p className="mt-3 text-muted-foreground">
-            {plan === "yearly" ? "Yearly membership" : "Monthly membership"} — {formatCurrency(price)}
-            {plan === "yearly"
-              ? ` (${formatCurrency(yearlySavings(monthly, yearly).perMonthCents)}/month, save ${yearlySavings(monthly, yearly).percent}%).`
-              : "."}{" "}
-            Payment is taken by Stripe. After it clears, a receipt prints and you create your account.
-          </p>
-          <form onSubmit={submit} className="mt-8 space-y-4">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <div>
-              <Label htmlFor="code">Discount or gift code</Label>
-              <Input id="code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Optional" />
-            </div>
-            <HumanCheck
-              checked={guard.human}
-              onChecked={guard.setHuman}
-              honey={guard.honey}
-              onHoney={guard.setHoney}
-            />
-            <Button type="submit" className="w-full" disabled={busy || !guard.human}>
-              {busy ? "Reserving…" : `Complete membership · ${formatCurrency(price)}`}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Payment is taken by Stripe. Completing checkout means you agree to the{" "}
-              <Link to="/terms" className="underline">
-                terms
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="underline">
-                privacy
-              </Link>{" "}
-              pages. This house uses AI. It is not medical care.
+        <div className="mx-auto grid max-w-5xl gap-10 px-4 py-16 md:grid-cols-[1fr_0.9fr]">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
+            <h1 className="mt-3 font-display text-4xl">{site.checkoutTitle}</h1>
+            <p className="mt-3 text-muted-foreground">
+              {plan === "yearly" ? "Yearly membership" : "Monthly membership"} — {formatCurrency(price)}
+              {plan === "yearly"
+                ? ` (${formatCurrency(yearlySavings(monthly, yearly).perMonthCents)}/month, save ${yearlySavings(monthly, yearly).percent}%).`
+                : "."}{" "}
+              Payment is securely processed by Stripe. After it clears, a receipt prints and you create your account.
             </p>
-          </form>
+
+            {embedded ? (
+              <section className="mt-8 overflow-hidden rounded-[28px] border border-border bg-card p-3 shadow-[0_28px_80px_-35px_rgba(20,30,28,.45)]">
+                <div className="flex items-center gap-2 px-3 py-3 text-sm text-muted-foreground">
+                  <LockKeyhole className="size-4 text-primary" /> Secure embedded Stripe checkout
+                </div>
+                <div id="stripe-embedded-checkout" className="min-h-[520px]" />
+                <Button type="button" variant="ghost" className="mt-2" onClick={() => setEmbedded(null)}>
+                  Change membership details
+                </Button>
+              </section>
+            ) : (
+              <form onSubmit={submit} className="mt-8 space-y-4">
+                <div>
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="code">Discount or gift code</Label>
+                  <Input id="code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Optional" />
+                </div>
+                <HumanCheck
+                  checked={guard.human}
+                  onChecked={guard.setHuman}
+                  honey={guard.honey}
+                  onHoney={guard.setHoney}
+                />
+                <Button type="submit" className="w-full" disabled={busy || !guard.human}>
+                  {busy ? "Preparing secure checkout…" : `Continue to payment · ${formatCurrency(price)}`}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Payment is processed by Stripe. Completing checkout means you agree to the{" "}
+                  <Link to="/terms" className="underline">terms</Link>{" "}
+                  and{" "}
+                  <Link to="/privacy" className="underline">privacy</Link>{" "}
+                  pages. Her First Meal uses a built-in content library and saved preferences for personalization; it does not use generative AI. It is not medical care.
+                </p>
+              </form>
+            )}
+          </div>
+          <aside className="rounded-[28px] bg-card p-6 shadow-[var(--shadow-border)]">
+            <h2 className="font-display text-2xl">{site.checkoutAside}</h2>
+            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+              {(lines(site.pricingIncludes).length ? lines(site.pricingIncludes) : MEMBERSHIP_INCLUDES).map((item) => (
+                <li key={item} className="flex gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-clay" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 rounded-2xl bg-wash-blush px-4 py-3 text-sm text-blush-deep">
+              The only extra after this is a private meeting with Maat — {formatCurrency(meeting)} per session,
+              booked inside the house. Nothing else is billed on top of membership.
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Want the other cadence?{" "}
+              <Link to="/pricing" className="text-primary">Compare monthly and yearly</Link>
+            </p>
+            <img src={content.images.checkout} alt={content.alts.checkout} className="media mt-6 h-48 w-full rounded-2xl object-cover" />
+          </aside>
         </div>
-        <aside className="rounded-[28px] bg-card p-6 shadow-[var(--shadow-border)]">
-          <h2 className="font-display text-2xl">{site.checkoutAside}</h2>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            {(lines(site.pricingIncludes).length ? lines(site.pricingIncludes) : MEMBERSHIP_INCLUDES).map((item) => (
-              <li key={item} className="flex gap-2">
-                <Check className="mt-0.5 size-4 shrink-0 text-clay" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 rounded-2xl bg-wash-blush px-4 py-3 text-sm text-blush-deep">
-            The only extra after this is a private meeting with Maat — {formatCurrency(meeting)} per session,
-            booked inside the house. Nothing else is billed on top of membership.
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Want the other cadence?{" "}
-            <Link to="/pricing" className="text-primary">
-              Compare monthly and yearly
-            </Link>
-          </p>
-          <img src={content.images.checkout} alt={content.alts.checkout} className="media mt-6 h-48 w-full rounded-2xl object-cover" />
-        </aside>
-      </div>
       )}
       <PublicFooter />
     </div>
