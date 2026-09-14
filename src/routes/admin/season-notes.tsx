@@ -1,0 +1,30 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { adminDashboard, adminSaveSettings } from "@/lib/server/admin";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/input";
+
+export const Route = createFileRoute("/admin/season-notes")({ component: AdminNotes });
+
+function AdminNotes() {
+  const [notes, setNotes] = useState("");
+  useEffect(() => {
+    void adminDashboard().then((d) => setNotes(d.settings?.nouriSystemNotes ?? ""));
+  }, []);
+  return (
+    <div className="max-w-2xl">
+      <h1 className="font-display text-4xl">Season notes</h1>
+      <p className="mt-2 text-sm text-white/60">
+        Internal notes for Maat about seasonal guidance and member support. They stay in the owner atelier.
+      </p>
+      <Textarea className="mt-6 min-h-48 bg-white/8 text-[#efe6d6]" value={notes} onChange={(e) => setNotes(e.target.value)} />
+      <Button
+        className="mt-4"
+        onClick={() => void adminSaveSettings({ data: { nouriNotes: notes } }).then(() => toast.success("Notes saved."))}
+      >
+        Save notes
+      </Button>
+    </div>
+  );
+}
