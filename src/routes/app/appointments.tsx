@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CalendarDays, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
@@ -37,6 +38,7 @@ function Appointments() {
     void listMyAppointments().then(setMine);
     void listOpenSlots({ data: {} }).then(setOpen);
   }
+
   useEffect(() => {
     reload();
   }, []);
@@ -60,45 +62,73 @@ function Appointments() {
   return (
     <div>
       <RoomHero
-        kicker="The only extra"
+        kicker="Live care"
         title="A time with Maat"
-        body="Membership already includes the house. Holding a live session opens Stripe so you pay for real — we will not mark it paid on a click."
+        body="Book a private live session, pay securely through Stripe, and join your Zoom room from the same member space."
         src="/images/family-table.jpg"
         alt={altFor("/images/family-table.jpg")}
         tone="gold"
       />
       <RoomBody>
-        <p className="rounded-2xl bg-wash-blush px-5 py-4 text-sm leading-relaxed text-blush-deep">
-          {formatCurrency(open?.meetingPriceCents ?? 12000)} per session. Nothing else in the house is billed on top of
-          membership.
-          {(open?.credits ?? 0) > 0
-            ? ` You have ${open?.credits} unused paid session${open?.credits === 1 ? "" : "s"} ready to hold a time.`
-            : ""}
-        </p>
-        {!open?.stripeReady && !(open?.credits ?? 0) ? (
-          <p className="mt-4 text-sm text-ink-soft">
-            Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel before a meeting can be billed.
-          </p>
-        ) : null}
-        <div className="mt-8 flex flex-wrap gap-2">
+        <section className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+          <div className="overflow-hidden rounded-[32px] border border-border/60 bg-ink shadow-[0_30px_90px_-40px_rgba(0,0,0,.65)]">
+            <div className="relative aspect-video bg-gradient-to-br from-sea-deep via-ink to-plum p-6 text-paper">
+              <div className="absolute inset-0 opacity-20 [background:radial-gradient(circle_at_70%_20%,white,transparent_26%)]" />
+              <div className="relative flex h-full flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-black/25 px-3 py-1 text-xs backdrop-blur">Zoom room preview</span>
+                  <Video className="size-5" />
+                </div>
+                <div>
+                  <div className="grid size-20 place-items-center rounded-full bg-paper/15 font-display text-4xl ring-1 ring-paper/25 backdrop-blur">M</div>
+                  <p className="mt-4 font-display text-3xl">Private session with Maat</p>
+                  <p className="mt-1 text-sm text-paper/70">Your real meeting link appears on a confirmed booking.</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-card p-4 text-sm text-muted-foreground">
+              <span className="size-2 rounded-full bg-primary" /> Camera and microphone stay off until you join the real Zoom meeting.
+            </div>
+          </div>
+
+          <div className="rounded-[32px] border border-border/60 bg-card p-6 shadow-[0_24px_70px_-36px_rgba(30,42,38,.45)]">
+            <CalendarDays className="size-5 text-gold" />
+            <p className="mt-4 text-xs uppercase tracking-[0.24em] text-gold">Session price</p>
+            <p className="mt-2 font-display text-5xl">{formatCurrency(open?.meetingPriceCents ?? 12000)}</p>
+            <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+              One private live session. Membership features stay included; this is the only optional live-service charge.
+              {(open?.credits ?? 0) > 0
+                ? ` You have ${open?.credits} unused paid session${open?.credits === 1 ? "" : "s"} ready to schedule.`
+                : ""}
+            </p>
+            {!open?.stripeReady && !(open?.credits ?? 0) ? (
+              <p className="mt-4 rounded-2xl bg-wash-blush p-4 text-sm text-blush-deep">
+                Stripe setup is not available to this deployment yet, so live-session payment is temporarily disabled.
+              </p>
+            ) : null}
+          </div>
+        </section>
+
+        <div className="mt-12 flex flex-wrap gap-2">
           {(open?.types ?? mine?.types ?? []).map((t) => (
             <Pill key={t.id} active={type === t.id} onClick={() => setType(t.id)}>
               {t.label}
             </Pill>
           ))}
         </div>
+
         <h2 className="mt-16 font-display text-4xl md:text-5xl">Open times</h2>
         <div className="editorial-rule mt-6" />
-        <ul className="mt-2">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {(open?.slots ?? []).length === 0 ? (
             <li className="py-8 text-lg text-ink-soft">No open times in the next two weeks.</li>
           ) : (
             (open?.slots ?? []).map((s) => (
-              <li key={s.startsAt} className="border-b border-border">
+              <li key={s.startsAt}>
                 <button
                   type="button"
                   disabled={holding === s.startsAt}
-                  className="flex min-h-16 w-full items-center justify-between py-5 text-left disabled:opacity-60"
+                  className="w-full rounded-[24px] border border-border/70 bg-card p-5 text-left shadow-[0_16px_40px_-30px_rgba(20,30,28,.5)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_-30px_rgba(20,30,28,.55)] disabled:opacity-60"
                   onClick={() => {
                     setHolding(s.startsAt);
                     void bookAppointment({ data: { type, startsAt: s.startsAt } })
@@ -111,7 +141,7 @@ function Appointments() {
                         else
                           toast.success(
                             res.usedCredit
-                              ? "Held with the session you already paid for. That time is no longer open."
+                              ? "Held with the session you already paid for."
                               : "Held. That time is no longer open.",
                           );
                         reload();
@@ -120,7 +150,7 @@ function Appointments() {
                   }}
                 >
                   <span className="font-display text-2xl">{new Date(s.startsAt).toLocaleString()}</span>
-                  <span className="text-sm text-primary">
+                  <span className="mt-3 block text-sm text-primary">
                     {holding === s.startsAt
                       ? "Opening…"
                       : (open?.credits ?? 0) > 0
@@ -132,7 +162,8 @@ function Appointments() {
             ))
           )}
         </ul>
-        <h2 className="mt-20 font-display text-4xl md:text-5xl">Yours</h2>
+
+        <h2 className="mt-20 font-display text-4xl md:text-5xl">Your sessions</h2>
         <div className="editorial-rule mt-6" />
         <ul>
           {(mine?.appointments ?? []).length === 0 ? (
@@ -140,17 +171,19 @@ function Appointments() {
           ) : (
             (mine?.appointments ?? []).map((a) => (
               <li key={a.id} className="border-b border-border py-8">
-                <p className="font-display text-3xl capitalize">{a.type.replace("-", " ")}</p>
-                <p className="mt-2 text-ink-soft">
-                  {new Date(a.starts_at).toLocaleString()} · {a.status}
-                </p>
-                {a.zoom_link ? (
-                  <a href={a.zoom_link} className="mt-3 inline-block text-sm text-primary" target="_blank" rel="noreferrer">
-                    Join Zoom
-                  </a>
-                ) : (
-                  <p className="mt-3 text-sm text-muted-foreground">Zoom link appears when the owner adds it.</p>
-                )}
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p className="font-display text-3xl capitalize">{a.type.replace("-", " ")}</p>
+                    <p className="mt-2 text-ink-soft">{new Date(a.starts_at).toLocaleString()} · {a.status}</p>
+                  </div>
+                  {a.zoom_link ? (
+                    <Button asChild>
+                      <a href={a.zoom_link} target="_blank" rel="noreferrer"><Video className="mr-2 size-4" /> Join Zoom</a>
+                    </Button>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Zoom link appears here when Maat adds it.</span>
+                  )}
+                </div>
                 {a.status === "confirmed" ? (
                   <Button size="sm" variant="ghost" className="mt-3" onClick={() => void cancelAppointment({ data: { id: a.id } }).then(reload)}>
                     Cancel
