@@ -1,4 +1,5 @@
 # Her First Meal production crawl policy
+# Redeploy trigger 2026-09-14
 User-agent: *
 Allow: /
 Allow: /pricing
