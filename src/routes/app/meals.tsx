@@ -4,8 +4,9 @@ import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { getMealWeek, swapMeal, toggleFavoriteRecipe } from "@/lib/server/meals";
 import { Button } from "@/components/ui/button";
+import { CoverFlowCarousel, type CoverFlowItem } from "@/components/ui/3-d-coverflow-carousel";
 import { altFor } from "@/lib/landing";
-import { RECIPE_IMAGE_ALT, type Recipe } from "@/lib/content/catalog";
+import { RECIPE_IMAGE_ALT, STAGE_LABEL, type Recipe } from "@/lib/content/catalog";
 import { useT } from "@/lib/i18n/provider";
 
 export const Route = createFileRoute("/app/meals")({ component: Meals });
@@ -26,6 +27,25 @@ function Meals() {
   }, []);
 
   const todayMeal = useMemo(() => data?.meals.find((m) => m.day === todayDay()) ?? data?.meals[0], [data]);
+  const recipeSlides = useMemo<CoverFlowItem[]>(
+    () =>
+      (data?.catalog ?? []).map((recipe) => ({
+        id: recipe.id,
+        tag: recipe.diets.slice(0, 2).join(" · ") || "Her First Meal",
+        title: recipe.title,
+        subtitle: recipe.stage[0] ? STAGE_LABEL[recipe.stage[0]] : "Built-in recipe",
+        description: recipe.summary,
+        image: recipe.image,
+        alt: RECIPE_IMAGE_ALT[recipe.image] ?? recipe.title,
+        meta: `${recipe.minutes} min · ${recipe.servings} servings`,
+        ctaText: "Open recipe",
+      })),
+    [data],
+  );
+  const selectedLibraryRecipe = useMemo(
+    () => (openLibrary ? data?.catalog.find((recipe) => recipe.id === openLibrary) ?? null : null),
+    [data, openLibrary],
+  );
 
   if (!data) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">{t("meals.planning")}</p>;
 
@@ -116,30 +136,77 @@ function Meals() {
 
       <RoomBody>
         <p className="text-xs uppercase tracking-[0.28em] text-clay">{t("meals.start")}</p>
-        <h2 className="mt-4 font-display text-[clamp(2rem,4vw,3.4rem)]">{t("meals.library")}</h2>
-        <p className="mt-4 max-w-xl text-lg text-ink-soft">{t("meals.libraryBody")}</p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {data.catalog.map((r) => {
-            const open = openLibrary === r.id;
-            return (
-              <article key={r.id} className="kitchen-card overflow-hidden rounded-[28px] bg-wash-clay">
-                <button type="button" className="w-full text-left" onClick={() => setOpenLibrary(open ? null : r.id)}>
-                  <img src={r.image} alt={RECIPE_IMAGE_ALT[r.image] ?? r.title} className="h-44 w-full object-cover" />
-                  <div className="p-5">
-                    <h3 className="font-display text-2xl leading-snug">{r.title}</h3>
-                    <p className="mt-2 text-sm text-ink-soft">{r.summary}</p>
-                    <p className="mt-3 text-xs uppercase tracking-[0.18em] text-clay">{t("meals.how")}</p>
-                  </div>
-                </button>
-                {open ? (
-                  <div className="px-5 pb-6">
-                    <RecipeMethod recipe={r} />
-                  </div>
-                ) : null}
-              </article>
-            );
-          })}
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <h2 className="font-display text-[clamp(2rem,4vw,3.4rem)]">{t("meals.library")}</h2>
+            <p className="mt-4 max-w-2xl text-lg text-ink-soft">{t("meals.libraryBody")}</p>
+          </div>
+          <p className="rounded-full border border-border bg-background/70 px-4 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            {data.catalog.length} built-in recipes
+          </p>
         </div>
+
+        <CoverFlowCarousel
+          className="mt-10"
+          items={recipeSlides}
+          sectionLabel="Explore the recipe library"
+          onCtaClick={(item) => {
+            setOpenLibrary(item.id);
+            window.requestAnimationFrame(() => {
+              document.getElementById("recipe-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+          }}
+        />
+
+        {selectedLibraryRecipe ? (
+          <article id="recipe-detail" className="mt-8 scroll-mt-28 overflow-hidden rounded-[32px] border border-border bg-wash-clay shadow-sm">
+            <div className="grid lg:grid-cols-[minmax(0,.82fr)_minmax(0,1.18fr)]">
+              <div className="relative min-h-[360px] lg:min-h-[620px]">
+                <img
+                  src={selectedLibraryRecipe.image}
+                  alt={RECIPE_IMAGE_ALT[selectedLibraryRecipe.image] ?? selectedLibraryRecipe.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent lg:bg-gradient-to-r" />
+                <div className="absolute inset-x-0 bottom-0 p-6 text-white lg:hidden">
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/70">Recipe selected</p>
+                  <h3 className="mt-2 font-display text-4xl leading-none">{selectedLibraryRecipe.title}</h3>
+                </div>
+              </div>
+              <div className="p-6 md:p-10 lg:p-12">
+                <p className="text-xs uppercase tracking-[0.24em] text-clay">Recipe selected</p>
+                <h3 className="mt-3 hidden font-display text-[clamp(2.4rem,5vw,4.8rem)] leading-[.92] lg:block">
+                  {selectedLibraryRecipe.title}
+                </h3>
+                <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">{selectedLibraryRecipe.summary}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {selectedLibraryRecipe.diets.map((diet) => (
+                    <span key={diet} className="rounded-full border border-border bg-background/70 px-3 py-1.5 text-xs capitalize text-ink-soft">
+                      {diet}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Button
+                    size="sm"
+                    variant="gold"
+                    onClick={() =>
+                      void toggleFavoriteRecipe({ data: { recipeId: selectedLibraryRecipe.id } }).then((r) =>
+                        toast.success(r.favorite ? t("meals.saved") : t("meals.removed")),
+                      )
+                    }
+                  >
+                    {t("meals.save")}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setOpenLibrary(null)}>
+                    {t("meals.close")}
+                  </Button>
+                </div>
+                <RecipeMethod recipe={selectedLibraryRecipe} />
+              </div>
+            </div>
+          </article>
+        ) : null}
       </RoomBody>
     </div>
   );
