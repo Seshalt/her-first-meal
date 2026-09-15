@@ -1,13 +1,14 @@
 # Her First Meal production crawl policy
-# Redeploy trigger 2026-09-15
 User-agent: *
 Allow: /
 Allow: /pricing
 Allow: /about
 Allow: /belly-binding
 Allow: /privacy
-Allow: /contact
 Allow: /terms
+Allow: /cookies
+Allow: /accessibility
+Allow: /contact
 Disallow: /admin
 Disallow: /admin/
 Disallow: /app
