@@ -97,7 +97,7 @@ export const DEFAULT_SITE_COPY = {
     "Only with your surgical team's guidance. We offer education on placement that avoids incision pressure — never a protocol that overrules your clinician.",
 
   nouriPageKicker: "Personal support",
-  nouriPageTitle: "Smart personalization without generative AI.",
+  nouriPageTitle: "Personalized support for the season you're in.",
   nouriPageBody:
     "Meals, groceries, stage guidance, movement, and resources are organized from Her First Meal's built-in library and the preferences you choose to save. When you want a person, send Maat a private note or book a live Zoom session.",
   nouriPageCta: "Start your journey",
