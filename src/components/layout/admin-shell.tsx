@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NoIndex } from "@/components/security/noindex";
 import { signOut } from "@/lib/auth/client";
 import { clearOwnerToken } from "@/lib/session-ready";
+import { setWalkMode } from "@/lib/preview-mode";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -20,6 +21,11 @@ const NAV = [
   { to: "/admin/analytics", label: "Analytics" },
   { to: "/admin/launch", label: "Launch list" },
 ] as const;
+
+function openMemberFlow() {
+  setWalkMode("member");
+  window.location.assign("/pricing?preview=1");
+}
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -48,6 +54,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
+          <div className="mt-5 px-3">
+            <button
+              type="button"
+              className="w-full rounded-xl border border-[#d3a34d]/35 bg-[#d3a34d]/8 px-3 py-2.5 text-left text-sm text-[#efc56d] hover:bg-[#d3a34d]/14"
+              onClick={openMemberFlow}
+            >
+              Preview member flow
+            </button>
+          </div>
           <div className="mt-8 px-4">
             <ThemeToggle />
             <button
@@ -69,6 +84,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 {n.label}
               </Link>
             ))}
+            <button
+              type="button"
+              className="shrink-0 rounded-full border border-[#d3a34d]/30 px-3 py-2 text-xs text-[#efc56d]"
+              onClick={openMemberFlow}
+            >
+              Member flow
+            </button>
           </header>
           <main className="px-4 py-8 md:px-10">{children}</main>
         </div>
