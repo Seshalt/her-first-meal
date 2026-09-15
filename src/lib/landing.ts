@@ -175,7 +175,7 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
   headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
-    "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery and pantry planning, belly binding education, movement, week-by-week guidance, and real human support. No generative AI. Care that grows with you.",
+    "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery and pantry planning, belly binding education, movement, week-by-week guidance, and real human support. Care that grows with you.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
   offerLine:
