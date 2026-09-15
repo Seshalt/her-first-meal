@@ -10,14 +10,14 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/clients", label: "Clients" },
-  { to: "/admin/landing", label: "Website" },
+  { to: "/admin/preview", label: "Website" },
+  { to: "/admin/landing", label: "Website advanced" },
   { to: "/admin/ai", label: "Letters" },
   { to: "/admin/content", label: "Content" },
   { to: "/admin/calendar", label: "Calendar" },
   { to: "/admin/nouri", label: "Season notes" },
   { to: "/admin/business", label: "Business" },
   { to: "/admin/analytics", label: "Analytics" },
-  { to: "/admin/preview", label: "Member trail" },
   { to: "/admin/launch", label: "Launch list" },
 ] as const;
 
