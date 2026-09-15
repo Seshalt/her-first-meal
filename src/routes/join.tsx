@@ -24,6 +24,21 @@ export const Route = createFileRoute("/join")({
   component: Join,
 });
 
+const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+async function waitForSession() {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    try {
+      const session = await authClient.getSession();
+      if (session.data?.user) return true;
+    } catch {
+      /* session store can lag for a moment after signup */
+    }
+    await wait(220 + attempt * 140);
+  }
+  return false;
+}
+
 function Join() {
   const { token } = Route.useSearch();
   const navigate = useNavigate();
@@ -35,6 +50,7 @@ function Join() {
   const [password, setPassword] = useState("");
   const [diets, setDiets] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
+  const [manualSignup, setManualSignup] = useState(false);
   const [factor, setFactor] = useState<{
     needed: boolean;
     sent: boolean;
@@ -51,11 +67,19 @@ function Join() {
   }, [token]);
 
   useEffect(() => {
-    if (isPending || !user || factor?.needed) return;
-    void claimMembership({ data: { token: token || undefined } }).then(() => {
-      void navigate({ to: "/app/onboarding" });
-    });
-  }, [isPending, user, token, navigate, factor?.needed]);
+    if (manualSignup || busy || isPending || !user || factor?.needed) return;
+    let live = true;
+    void claimMembership({ data: { token: token || undefined } })
+      .then(() => {
+        if (live) void navigate({ to: "/app/onboarding" });
+      })
+      .catch((err) => {
+        if (live) toast.error(err instanceof Error ? err.message : "Could not open your account yet.");
+      });
+    return () => {
+      live = false;
+    };
+  }, [busy, factor?.needed, isPending, manualSignup, navigate, token, user]);
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
@@ -65,6 +89,7 @@ function Join() {
       return;
     }
     setBusy(true);
+    setManualSignup(true);
     try {
       const { error } = await authClient.signUp.email({
         email,
@@ -73,11 +98,21 @@ function Join() {
         callbackURL: token ? `/join?token=${encodeURIComponent(token)}` : "/app/onboarding",
       });
       if (error) throw new Error(error.message);
+
       try {
         sessionStorage.setItem(JOIN_DIETS_STORAGE, JSON.stringify(diets));
       } catch {
         /* ignore */
       }
+
+      let sessionReady = await waitForSession();
+      if (!sessionReady) {
+        const { error: signInError } = await authClient.signIn.email({ email, password });
+        if (signInError) throw new Error(signInError.message ?? "Your account was created, but sign-in did not finish.");
+        sessionReady = await waitForSession();
+      }
+      if (!sessionReady) throw new Error("Your account was created, but the secure session is still starting. Please sign in once and continue.");
+
       toast.success("Account created.");
       await claimMembership({ data: { token: token || undefined } });
       await saveJoinDiets({ data: { diets, language: locale } }).catch(() => undefined);
@@ -190,7 +225,7 @@ function Join() {
               onHoney={guard.setHoney}
             />
             <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
-              {busy ? t("join.creating") : t("join.submit")}
+              {busy ? "Securing your account…" : t("join.submit")}
             </Button>
           </form>
           )}
