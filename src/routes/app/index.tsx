@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -9,7 +9,6 @@ import {
   MapPin,
   Sparkles,
   StretchHorizontal,
-  UtensilsCrossed,
 } from "lucide-react";
 import { getMyHome, saveCheckIn } from "@/lib/server/profile";
 import { AFFIRMATIONS, STAGE_LABEL, type Stage } from "@/lib/content/catalog";
@@ -309,7 +308,7 @@ function RoomCard({
   eyebrow: string;
   title: string;
   body: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }) {
   return (
     <Link to={to} className="member-room-card member-reveal">
