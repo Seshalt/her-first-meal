@@ -205,54 +205,24 @@ export function PublicFooter() {
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerVisit}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
-            <li>
-              <Link to="/about">{t("footer.story")}</Link>
-            </li>
-            <li>
-              <Link to="/belly-binding">{site.footerStudio}</Link>
-            </li>
-            <li>
-              <Link to="/nouri">{t("footer.write")}</Link>
-            </li>
-            <li>
-              <Link to="/pricing">{t("footer.membership")}</Link>
-            </li>
-            <li>
-              <Link to="/contact">{t("footer.contact")}</Link>
-            </li>
+            <li><Link to="/about">{t("footer.story")}</Link></li>
+            <li><Link to="/belly-binding">{site.footerStudio}</Link></li>
+            <li><Link to="/nouri">{t("footer.write")}</Link></li>
+            <li><Link to="/pricing">{t("footer.membership")}</Link></li>
+            <li><Link to="/contact">{t("footer.contact")}</Link></li>
           </ul>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerConnect}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
-            {instagram ? (
-              <li>
-                <a href={instagram} target="_blank" rel="noreferrer">
-                  {site.instagramLabel}
-                </a>
-              </li>
-            ) : null}
-            {tiktok ? (
-              <li>
-                <a href={tiktok} target="_blank" rel="noreferrer">
-                  {site.tiktokLabel}
-                </a>
-              </li>
-            ) : null}
-            <li>
-              <Link to="/contact">{t("footer.contact")}</Link>
-            </li>
-            <li>
-              <Link to="/login" search={{}}>
-                {site.footerSignIn}
-              </Link>
-            </li>
-            <li>
-              <Link to="/privacy">{t("footer.privacy")}</Link>
-            </li>
-            <li>
-              <Link to="/terms">Terms</Link>
-            </li>
+            {instagram ? <li><a href={instagram} target="_blank" rel="noreferrer">{site.instagramLabel}</a></li> : null}
+            {tiktok ? <li><a href={tiktok} target="_blank" rel="noreferrer">{site.tiktokLabel}</a></li> : null}
+            <li><Link to="/contact">{t("footer.contact")}</Link></li>
+            <li><Link to="/login" search={{}}>{site.footerSignIn}</Link></li>
+            <li><Link to="/privacy">{t("footer.privacy")}</Link></li>
+            <li><Link to="/terms">Terms</Link></li>
+            <li><Link to="/cookies">Cookies</Link></li>
+            <li><Link to="/accessibility">Accessibility</Link></li>
           </ul>
         </div>
       </div>
