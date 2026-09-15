@@ -9,6 +9,7 @@ import {
   Mail,
   Menu,
   ShoppingBag,
+  Sparkles,
   StretchHorizontal,
   UserRound,
   UtensilsCrossed,
@@ -40,18 +41,19 @@ type RoomTo =
   | "/app/partner"
   | "/app/profile";
 
-const GROUPS: { label: string; tone: string; items: { to: RoomTo; label: string; icon: typeof Home }[] }[] = [
+type RoomItem = { to: RoomTo; label: string; icon: typeof Home };
+
+const GROUPS: { label: string; items: RoomItem[] }[] = [
   {
-    label: "Today",
-    tone: "text-sea",
+    label: "Your day",
     items: [
       { to: "/app", label: "Today", icon: Home },
       { to: "/app/journey", label: "Journey", icon: StretchHorizontal },
+      { to: "/app/resources", label: "Daily readings", icon: Sparkles },
     ],
   },
   {
     label: "Nourish",
-    tone: "text-clay",
     items: [
       { to: "/app/meals", label: "Meals", icon: UtensilsCrossed },
       { to: "/app/grocery", label: "Grocery", icon: Apple },
@@ -60,35 +62,38 @@ const GROUPS: { label: string; tone: string; items: { to: RoomTo; label: string;
   },
   {
     label: "Care",
-    tone: "text-blush",
     items: [
-      { to: "/app/binding", label: "Binding", icon: HeartHandshake },
-      { to: "/app/move", label: "Move", icon: StretchHorizontal },
-      { to: "/app/nouri", label: "Write us", icon: Mail },
+      { to: "/app/binding", label: "Belly binding", icon: HeartHandshake },
+      { to: "/app/move", label: "Movement", icon: StretchHorizontal },
       { to: "/app/appointments", label: "Appointments", icon: Calendar },
+      { to: "/app/nouri", label: "Support", icon: Mail },
     ],
   },
   {
-    label: "House",
-    tone: "text-plum",
+    label: "Your house",
     items: [
-      { to: "/app/resources", label: "Resources", icon: Library },
-      { to: "/app/store", label: "Meeting", icon: ShoppingBag },
       { to: "/app/partner", label: "Partner", icon: HeartHandshake },
-      { to: "/app/profile", label: "Profile", icon: UserRound },
+      { to: "/app/store", label: "Private meeting", icon: ShoppingBag },
+      { to: "/app/profile", label: "Settings", icon: UserRound },
     ],
   },
 ];
 
-const PRIMARY: { to: RoomTo; label: string }[] = [
-  { to: "/app", label: "Today" },
-  { to: "/app/meals", label: "Meals" },
-  { to: "/app/binding", label: "Binding" },
-  { to: "/app/nouri", label: "Write us" },
+const PRIMARY: RoomItem[] = [
+  { to: "/app", label: "Today", icon: Home },
+  { to: "/app/meals", label: "Meals", icon: UtensilsCrossed },
+  { to: "/app/grocery", label: "Grocery", icon: Apple },
+  { to: "/app/journey", label: "Journey", icon: StretchHorizontal },
+  { to: "/app/resources", label: "Readings", icon: Library },
 ];
 
-const FLAT = GROUPS.flatMap((g) => g.items);
-const MOBILE_PRIMARY = [FLAT[0], FLAT[2], FLAT[5], FLAT[7], FLAT[12]];
+const MOBILE_PRIMARY: RoomItem[] = [
+  { to: "/app", label: "Today", icon: Home },
+  { to: "/app/meals", label: "Meals", icon: UtensilsCrossed },
+  { to: "/app/grocery", label: "Grocery", icon: Apple },
+  { to: "/app/resources", label: "Read", icon: Library },
+  { to: "/app/profile", label: "You", icon: UserRound },
+];
 
 export function AppShell({ children, hideNouri = false }: { children: ReactNode; hideNouri?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -97,7 +102,6 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     void getMyRole()
@@ -112,63 +116,39 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
     };
   }, [open]);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   function isActive(to: string) {
     return to === "/app" ? pathname === "/app" : pathname.startsWith(to);
   }
 
-  const onHero = !scrolled && !open;
-  const ink = onHero ? "text-paper" : "text-foreground";
-
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="member-shell">
       <NoIndex />
-      <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-[80] transition-[background-color,border-color,color] duration-300",
-          onHero
-            ? "border-b border-transparent bg-gradient-to-b from-ink/55 to-transparent"
-            : "border-b border-border/70 bg-background/95 text-foreground backdrop-blur-md",
-        )}
-      >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:h-[4.75rem] md:px-6">
-          <Wordmark to="/app" className={cn("min-w-0", ink)} />
-          <nav className="hidden items-center gap-8 lg:flex" aria-label="Member">
+      <header className="member-topbar">
+        <div className="mx-auto flex h-[4.65rem] max-w-[86rem] items-center justify-between gap-3 px-4 md:px-7">
+          <Wordmark to="/app" className="min-w-0 text-[var(--member-text)]" />
+
+          <nav className="hidden items-center gap-6 xl:flex" aria-label="Member">
             {PRIMARY.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className={cn(
-                  "text-sm tracking-wide transition-colors",
-                  onHero ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
-                  isActive(item.to) && (onHero ? "text-paper" : "text-foreground"),
-                )}
+                className={cn("member-nav-link", isActive(item.to) && "is-active")}
               >
-                {item.to === "/app" ? t("room.today") : item.to === "/app/meals" ? t("room.meals") : item.to === "/app/binding" ? t("room.binding") : t("room.write")}
+                {item.label}
               </Link>
             ))}
           </nav>
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-            <LocaleSwitch tone={onHero ? "paper" : "ink"} className="hidden md:inline-flex" />
-            <Link
-              to="/app/profile"
-              className={cn(
-                "hidden h-11 items-center px-2 text-sm underline-offset-4 hover:underline sm:inline-flex",
-                ink,
-              )}
-            >
-              {t("room.profile")}
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <LocaleSwitch tone="ink" className="hidden lg:inline-flex" />
+            <Link to="/app/profile" className="member-profile-link hidden items-center px-3 text-sm sm:inline-flex">
+              {user?.displayName?.split(" ")[0] ?? t("room.profile")}
             </Link>
             <button
               type="button"
-              className={cn("grid size-12 place-items-center rounded-full", ink)}
-              aria-label={open ? "Close house" : "Open house"}
+              className="member-menu-button grid size-11 place-items-center"
+              aria-label={open ? "Close navigation" : "Open navigation"}
+              aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
             >
               {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -178,51 +158,49 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
       </header>
 
       {open ? (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background">
-          <div className="flex h-16 items-center justify-between px-4 md:h-[4.75rem] md:px-6">
-            <Wordmark to="/app" />
+        <div className="member-map">
+          <div className="mx-auto flex h-[4.65rem] w-full max-w-[86rem] items-center justify-between px-4 md:px-7">
+            <Wordmark to="/app" className="text-[var(--member-text)]" />
             <button
               type="button"
-              className="grid size-12 place-items-center rounded-full"
-              aria-label="Close house"
+              className="member-menu-button grid size-11 place-items-center"
+              aria-label="Close navigation"
               onClick={() => setOpen(false)}
             >
               <X className="size-5" />
             </button>
           </div>
-          <nav className="mx-auto flex w-full max-w-5xl flex-1 overflow-y-auto px-5 pb-24 pt-6 md:px-10" aria-label="House">
-            <div className="grid w-full gap-12 md:grid-cols-2">
+
+          <nav className="mx-auto w-full max-w-[86rem] flex-1 overflow-y-auto px-5 pb-20 pt-6 md:px-8" aria-label="All member rooms">
+            <div className="grid gap-x-16 gap-y-12 md:grid-cols-2 xl:grid-cols-4">
               {GROUPS.map((group) => (
-                <div key={group.label}>
-                  <p className={`text-xs uppercase tracking-[0.32em] ${group.tone}`}>{group.label}</p>
-                  <div className="editorial-rule mt-4" />
-                  <div className="mt-6 space-y-1">
+                <section key={group.label} className="member-menu-group">
+                  <p className="member-menu-title text-[11px] font-semibold uppercase tracking-[0.24em]">{group.label}</p>
+                  <div className="mt-5">
                     {group.items.map((item) => (
                       <Link
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className={cn(
-                          "block py-2 font-display text-4xl leading-[1.05] md:text-5xl",
-                          isActive(item.to) ? "text-sea italic" : "text-foreground",
-                        )}
+                        className={cn("member-menu-link", isActive(item.to) && "is-active")}
                       >
                         {item.label}
                       </Link>
                     ))}
                   </div>
-                </div>
+                </section>
               ))}
             </div>
           </nav>
-          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-5 pb-8 md:px-10">
-            <div>
+
+          <div className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-4 border-t border-[var(--member-line)] px-5 py-5 md:px-8">
+            <div className="min-w-0">
               {isAdmin ? (
-                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm text-primary">
+                <Link to="/admin" onClick={() => setOpen(false)} className="block text-sm font-semibold text-[var(--member-teal)]">
                   Owner atelier
                 </Link>
               ) : null}
-              <p className="truncate text-xs text-muted-foreground">{user?.displayName ?? user?.primaryEmail}</p>
+              <p className="truncate text-xs text-[var(--member-muted)]">{user?.primaryEmail}</p>
             </div>
             <button
               type="button"
@@ -231,7 +209,7 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
                 setSigningOut(true);
                 void signOut("/").catch(() => setSigningOut(false));
               }}
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="min-h-11 rounded-full border border-[var(--member-line)] px-4 text-sm text-[var(--member-text)] transition hover:bg-[var(--member-surface-2)] active:scale-95 disabled:opacity-50"
             >
               {signingOut ? t("signingOut") : t("signOut")}
             </button>
@@ -239,30 +217,23 @@ export function AppShell({ children, hideNouri = false }: { children: ReactNode;
         </div>
       ) : null}
 
-      <main className="min-w-0" aria-hidden={open || undefined}>{children}</main>
+      <main className="min-w-0" aria-hidden={open || undefined}>
+        {children}
+      </main>
 
-      <nav
-        className="sticky bottom-0 z-30 grid grid-cols-5 border-t border-border bg-background/90 px-1 py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden"
-        aria-label="Primary mobile"
-      >
+      <nav className="member-mobile-dock md:hidden" aria-label="Primary mobile">
         {MOBILE_PRIMARY.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.to);
           return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex min-h-12 flex-col items-center justify-center gap-1 text-[10px]",
-                active ? "text-primary" : "text-muted-foreground",
-              )}
-            >
+            <Link key={item.to} to={item.to} className={cn("member-mobile-item", active && "is-active")}>
               <Icon className="size-4" />
               {item.label}
             </Link>
           );
         })}
       </nav>
+
       {hideNouri ? null : <NouriFab />}
     </div>
   );
