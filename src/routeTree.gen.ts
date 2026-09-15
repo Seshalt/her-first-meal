@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccessibilityRouteImport } from './routes/accessibility'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as BellyBindingRouteImport } from './routes/belly-binding'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as HearthRouteImport } from './routes/hearth'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
@@ -52,225 +54,61 @@ import { Route as AppStoreRouteImport } from './routes/app/store'
 import { Route as AdminClientsUserIdRouteImport } from './routes/admin/clients.$userId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BellyBindingRoute = BellyBindingRouteImport.update({
-  id: '/belly-binding',
-  path: '/belly-binding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HearthRoute = HearthRouteImport.update({
-  id: '/hearth',
-  path: '/hearth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinRoute = JoinRouteImport.update({
-  id: '/join',
-  path: '/join',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NouriRoute = NouriRouteImport.update({
-  id: '/nouri',
-  path: '/nouri',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAiRoute = AdminAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminBusinessRoute = AdminBusinessRouteImport.update({
-  id: '/business',
-  path: '/business',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCalendarRoute = AdminCalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminClientsRoute = AdminClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentRoute = AdminContentRouteImport.update({
-  id: '/content',
-  path: '/content',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLandingRoute = AdminLandingRouteImport.update({
-  id: '/landing',
-  path: '/landing',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLaunchRoute = AdminLaunchRouteImport.update({
-  id: '/launch',
-  path: '/launch',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNouriRoute = AdminNouriRouteImport.update({
-  id: '/nouri',
-  path: '/nouri',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPreviewRoute = AdminPreviewRouteImport.update({
-  id: '/preview',
-  path: '/preview',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSetupRoute = AdminSetupRouteImport.update({
-  id: '/setup',
-  path: '/setup',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppAppointmentsRoute = AppAppointmentsRouteImport.update({
-  id: '/appointments',
-  path: '/appointments',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppBindingRoute = AppBindingRouteImport.update({
-  id: '/binding',
-  path: '/binding',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppGroceryRoute = AppGroceryRouteImport.update({
-  id: '/grocery',
-  path: '/grocery',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppJourneyRoute = AppJourneyRouteImport.update({
-  id: '/journey',
-  path: '/journey',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMealsRoute = AppMealsRouteImport.update({
-  id: '/meals',
-  path: '/meals',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMoveRoute = AppMoveRouteImport.update({
-  id: '/move',
-  path: '/move',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppNouriRoute = AppNouriRouteImport.update({
-  id: '/nouri',
-  path: '/nouri',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppOnboardingRoute = AppOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPantryRoute = AppPantryRouteImport.update({
-  id: '/pantry',
-  path: '/pantry',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPartnerRoute = AppPartnerRouteImport.update({
-  id: '/partner',
-  path: '/partner',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppProfileRoute = AppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppResourcesRoute = AppResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppStoreRoute = AppStoreRouteImport.update({
-  id: '/store',
-  path: '/store',
-  getParentRoute: () => AppRoute,
-} as any)
-const AdminClientsUserIdRoute = AdminClientsUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => AdminClientsRoute,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
+const AboutRoute = AboutRouteImport.update({ id: '/about', path: '/about', getParentRoute: () => rootRouteImport } as any)
+const AccessibilityRoute = AccessibilityRouteImport.update({ id: '/accessibility', path: '/accessibility', getParentRoute: () => rootRouteImport } as any)
+const AdminRoute = AdminRouteImport.update({ id: '/admin', path: '/admin', getParentRoute: () => rootRouteImport } as any)
+const AppRoute = AppRouteImport.update({ id: '/app', path: '/app', getParentRoute: () => rootRouteImport } as any)
+const BellyBindingRoute = BellyBindingRouteImport.update({ id: '/belly-binding', path: '/belly-binding', getParentRoute: () => rootRouteImport } as any)
+const CheckoutRoute = CheckoutRouteImport.update({ id: '/checkout', path: '/checkout', getParentRoute: () => rootRouteImport } as any)
+const ContactRoute = ContactRouteImport.update({ id: '/contact', path: '/contact', getParentRoute: () => rootRouteImport } as any)
+const CookiesRoute = CookiesRouteImport.update({ id: '/cookies', path: '/cookies', getParentRoute: () => rootRouteImport } as any)
+const HearthRoute = HearthRouteImport.update({ id: '/hearth', path: '/hearth', getParentRoute: () => rootRouteImport } as any)
+const JoinRoute = JoinRouteImport.update({ id: '/join', path: '/join', getParentRoute: () => rootRouteImport } as any)
+const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
+const NouriRoute = NouriRouteImport.update({ id: '/nouri', path: '/nouri', getParentRoute: () => rootRouteImport } as any)
+const PricingRoute = PricingRouteImport.update({ id: '/pricing', path: '/pricing', getParentRoute: () => rootRouteImport } as any)
+const PrivacyRoute = PrivacyRouteImport.update({ id: '/privacy', path: '/privacy', getParentRoute: () => rootRouteImport } as any)
+const TermsRoute = TermsRouteImport.update({ id: '/terms', path: '/terms', getParentRoute: () => rootRouteImport } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => AdminRoute } as any)
+const AdminAiRoute = AdminAiRouteImport.update({ id: '/ai', path: '/ai', getParentRoute: () => AdminRoute } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({ id: '/analytics', path: '/analytics', getParentRoute: () => AdminRoute } as any)
+const AdminBusinessRoute = AdminBusinessRouteImport.update({ id: '/business', path: '/business', getParentRoute: () => AdminRoute } as any)
+const AdminCalendarRoute = AdminCalendarRouteImport.update({ id: '/calendar', path: '/calendar', getParentRoute: () => AdminRoute } as any)
+const AdminClientsRoute = AdminClientsRouteImport.update({ id: '/clients', path: '/clients', getParentRoute: () => AdminRoute } as any)
+const AdminContentRoute = AdminContentRouteImport.update({ id: '/content', path: '/content', getParentRoute: () => AdminRoute } as any)
+const AdminLandingRoute = AdminLandingRouteImport.update({ id: '/landing', path: '/landing', getParentRoute: () => AdminRoute } as any)
+const AdminLaunchRoute = AdminLaunchRouteImport.update({ id: '/launch', path: '/launch', getParentRoute: () => AdminRoute } as any)
+const AdminNouriRoute = AdminNouriRouteImport.update({ id: '/nouri', path: '/nouri', getParentRoute: () => AdminRoute } as any)
+const AdminPreviewRoute = AdminPreviewRouteImport.update({ id: '/preview', path: '/preview', getParentRoute: () => AdminRoute } as any)
+const AdminSetupRoute = AdminSetupRouteImport.update({ id: '/setup', path: '/setup', getParentRoute: () => AdminRoute } as any)
+const AppIndexRoute = AppIndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => AppRoute } as any)
+const AppAppointmentsRoute = AppAppointmentsRouteImport.update({ id: '/appointments', path: '/appointments', getParentRoute: () => AppRoute } as any)
+const AppBindingRoute = AppBindingRouteImport.update({ id: '/binding', path: '/binding', getParentRoute: () => AppRoute } as any)
+const AppGroceryRoute = AppGroceryRouteImport.update({ id: '/grocery', path: '/grocery', getParentRoute: () => AppRoute } as any)
+const AppJourneyRoute = AppJourneyRouteImport.update({ id: '/journey', path: '/journey', getParentRoute: () => AppRoute } as any)
+const AppMealsRoute = AppMealsRouteImport.update({ id: '/meals', path: '/meals', getParentRoute: () => AppRoute } as any)
+const AppMoveRoute = AppMoveRouteImport.update({ id: '/move', path: '/move', getParentRoute: () => AppRoute } as any)
+const AppNouriRoute = AppNouriRouteImport.update({ id: '/nouri', path: '/nouri', getParentRoute: () => AppRoute } as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({ id: '/onboarding', path: '/onboarding', getParentRoute: () => AppRoute } as any)
+const AppPantryRoute = AppPantryRouteImport.update({ id: '/pantry', path: '/pantry', getParentRoute: () => AppRoute } as any)
+const AppPartnerRoute = AppPartnerRouteImport.update({ id: '/partner', path: '/partner', getParentRoute: () => AppRoute } as any)
+const AppProfileRoute = AppProfileRouteImport.update({ id: '/profile', path: '/profile', getParentRoute: () => AppRoute } as any)
+const AppResourcesRoute = AppResourcesRouteImport.update({ id: '/resources', path: '/resources', getParentRoute: () => AppRoute } as any)
+const AppStoreRoute = AppStoreRouteImport.update({ id: '/store', path: '/store', getParentRoute: () => AppRoute } as any)
+const AdminClientsUserIdRoute = AdminClientsUserIdRouteImport.update({ id: '/$userId', path: '/$userId', getParentRoute: () => AdminClientsRoute } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({ id: '/api/auth/$', path: '/api/auth/$', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -310,9 +148,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -353,11 +193,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
   '/admin': typeof AdminRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/belly-binding': typeof BellyBindingRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
@@ -399,11 +241,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/accessibility'
     | '/admin'
     | '/app'
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/hearth'
     | '/join'
     | '/login'
@@ -443,9 +287,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/accessibility'
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/hearth'
     | '/join'
     | '/login'
@@ -485,11 +331,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/accessibility'
     | '/admin'
     | '/app'
     | '/belly-binding'
     | '/checkout'
     | '/contact'
+    | '/cookies'
     | '/hearth'
     | '/join'
     | '/login'
@@ -530,11 +378,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AccessibilityRoute: typeof AccessibilityRoute
   AdminRoute: typeof AdminRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   BellyBindingRoute: typeof BellyBindingRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   HearthRoute: typeof HearthRoute
   JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
@@ -547,314 +397,56 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/belly-binding': {
-      id: '/belly-binding'
-      path: '/belly-binding'
-      fullPath: '/belly-binding'
-      preLoaderRoute: typeof BellyBindingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hearth': {
-      id: '/hearth'
-      path: '/hearth'
-      fullPath: '/hearth'
-      preLoaderRoute: typeof HearthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join': {
-      id: '/join'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof JoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nouri': {
-      id: '/nouri'
-      path: '/nouri'
-      fullPath: '/nouri'
-      preLoaderRoute: typeof NouriRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/ai': {
-      id: '/admin/ai'
-      path: '/ai'
-      fullPath: '/admin/ai'
-      preLoaderRoute: typeof AdminAiRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/analytics': {
-      id: '/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/business': {
-      id: '/admin/business'
-      path: '/business'
-      fullPath: '/admin/business'
-      preLoaderRoute: typeof AdminBusinessRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/calendar': {
-      id: '/admin/calendar'
-      path: '/calendar'
-      fullPath: '/admin/calendar'
-      preLoaderRoute: typeof AdminCalendarRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/clients': {
-      id: '/admin/clients'
-      path: '/clients'
-      fullPath: '/admin/clients'
-      preLoaderRoute: typeof AdminClientsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/content': {
-      id: '/admin/content'
-      path: '/content'
-      fullPath: '/admin/content'
-      preLoaderRoute: typeof AdminContentRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/landing': {
-      id: '/admin/landing'
-      path: '/landing'
-      fullPath: '/admin/landing'
-      preLoaderRoute: typeof AdminLandingRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/launch': {
-      id: '/admin/launch'
-      path: '/launch'
-      fullPath: '/admin/launch'
-      preLoaderRoute: typeof AdminLaunchRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/nouri': {
-      id: '/admin/nouri'
-      path: '/nouri'
-      fullPath: '/admin/nouri'
-      preLoaderRoute: typeof AdminNouriRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/preview': {
-      id: '/admin/preview'
-      path: '/preview'
-      fullPath: '/admin/preview'
-      preLoaderRoute: typeof AdminPreviewRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/setup': {
-      id: '/admin/setup'
-      path: '/setup'
-      fullPath: '/admin/setup'
-      preLoaderRoute: typeof AdminSetupRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/app/': {
-      id: '/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/appointments': {
-      id: '/app/appointments'
-      path: '/appointments'
-      fullPath: '/app/appointments'
-      preLoaderRoute: typeof AppAppointmentsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/binding': {
-      id: '/app/binding'
-      path: '/binding'
-      fullPath: '/app/binding'
-      preLoaderRoute: typeof AppBindingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/grocery': {
-      id: '/app/grocery'
-      path: '/grocery'
-      fullPath: '/app/grocery'
-      preLoaderRoute: typeof AppGroceryRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/journey': {
-      id: '/app/journey'
-      path: '/journey'
-      fullPath: '/app/journey'
-      preLoaderRoute: typeof AppJourneyRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/meals': {
-      id: '/app/meals'
-      path: '/meals'
-      fullPath: '/app/meals'
-      preLoaderRoute: typeof AppMealsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/move': {
-      id: '/app/move'
-      path: '/move'
-      fullPath: '/app/move'
-      preLoaderRoute: typeof AppMoveRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/nouri': {
-      id: '/app/nouri'
-      path: '/nouri'
-      fullPath: '/app/nouri'
-      preLoaderRoute: typeof AppNouriRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/onboarding': {
-      id: '/app/onboarding'
-      path: '/onboarding'
-      fullPath: '/app/onboarding'
-      preLoaderRoute: typeof AppOnboardingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/pantry': {
-      id: '/app/pantry'
-      path: '/pantry'
-      fullPath: '/app/pantry'
-      preLoaderRoute: typeof AppPantryRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/partner': {
-      id: '/app/partner'
-      path: '/partner'
-      fullPath: '/app/partner'
-      preLoaderRoute: typeof AppPartnerRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/profile': {
-      id: '/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/resources': {
-      id: '/app/resources'
-      path: '/resources'
-      fullPath: '/app/resources'
-      preLoaderRoute: typeof AppResourcesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/store': {
-      id: '/app/store'
-      path: '/store'
-      fullPath: '/app/store'
-      preLoaderRoute: typeof AppStoreRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/admin/clients/$userId': {
-      id: '/admin/clients/$userId'
-      path: '/$userId'
-      fullPath: '/admin/clients/$userId'
-      preLoaderRoute: typeof AdminClientsUserIdRouteImport
-      parentRoute: typeof AdminClientsRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
+    '/about': { id: '/about'; path: '/about'; fullPath: '/about'; preLoaderRoute: typeof AboutRouteImport; parentRoute: typeof rootRouteImport }
+    '/accessibility': { id: '/accessibility'; path: '/accessibility'; fullPath: '/accessibility'; preLoaderRoute: typeof AccessibilityRouteImport; parentRoute: typeof rootRouteImport }
+    '/admin': { id: '/admin'; path: '/admin'; fullPath: '/admin'; preLoaderRoute: typeof AdminRouteImport; parentRoute: typeof rootRouteImport }
+    '/app': { id: '/app'; path: '/app'; fullPath: '/app'; preLoaderRoute: typeof AppRouteImport; parentRoute: typeof rootRouteImport }
+    '/belly-binding': { id: '/belly-binding'; path: '/belly-binding'; fullPath: '/belly-binding'; preLoaderRoute: typeof BellyBindingRouteImport; parentRoute: typeof rootRouteImport }
+    '/checkout': { id: '/checkout'; path: '/checkout'; fullPath: '/checkout'; preLoaderRoute: typeof CheckoutRouteImport; parentRoute: typeof rootRouteImport }
+    '/contact': { id: '/contact'; path: '/contact'; fullPath: '/contact'; preLoaderRoute: typeof ContactRouteImport; parentRoute: typeof rootRouteImport }
+    '/cookies': { id: '/cookies'; path: '/cookies'; fullPath: '/cookies'; preLoaderRoute: typeof CookiesRouteImport; parentRoute: typeof rootRouteImport }
+    '/hearth': { id: '/hearth'; path: '/hearth'; fullPath: '/hearth'; preLoaderRoute: typeof HearthRouteImport; parentRoute: typeof rootRouteImport }
+    '/join': { id: '/join'; path: '/join'; fullPath: '/join'; preLoaderRoute: typeof JoinRouteImport; parentRoute: typeof rootRouteImport }
+    '/login': { id: '/login'; path: '/login'; fullPath: '/login'; preLoaderRoute: typeof LoginRouteImport; parentRoute: typeof rootRouteImport }
+    '/nouri': { id: '/nouri'; path: '/nouri'; fullPath: '/nouri'; preLoaderRoute: typeof NouriRouteImport; parentRoute: typeof rootRouteImport }
+    '/pricing': { id: '/pricing'; path: '/pricing'; fullPath: '/pricing'; preLoaderRoute: typeof PricingRouteImport; parentRoute: typeof rootRouteImport }
+    '/privacy': { id: '/privacy'; path: '/privacy'; fullPath: '/privacy'; preLoaderRoute: typeof PrivacyRouteImport; parentRoute: typeof rootRouteImport }
+    '/terms': { id: '/terms'; path: '/terms'; fullPath: '/terms'; preLoaderRoute: typeof TermsRouteImport; parentRoute: typeof rootRouteImport }
+    '/admin/': { id: '/admin/'; path: '/'; fullPath: '/admin/'; preLoaderRoute: typeof AdminIndexRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/ai': { id: '/admin/ai'; path: '/ai'; fullPath: '/admin/ai'; preLoaderRoute: typeof AdminAiRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/analytics': { id: '/admin/analytics'; path: '/analytics'; fullPath: '/admin/analytics'; preLoaderRoute: typeof AdminAnalyticsRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/business': { id: '/admin/business'; path: '/business'; fullPath: '/admin/business'; preLoaderRoute: typeof AdminBusinessRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/calendar': { id: '/admin/calendar'; path: '/calendar'; fullPath: '/admin/calendar'; preLoaderRoute: typeof AdminCalendarRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/clients': { id: '/admin/clients'; path: '/clients'; fullPath: '/admin/clients'; preLoaderRoute: typeof AdminClientsRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/content': { id: '/admin/content'; path: '/content'; fullPath: '/admin/content'; preLoaderRoute: typeof AdminContentRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/landing': { id: '/admin/landing'; path: '/landing'; fullPath: '/admin/landing'; preLoaderRoute: typeof AdminLandingRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/launch': { id: '/admin/launch'; path: '/launch'; fullPath: '/admin/launch'; preLoaderRoute: typeof AdminLaunchRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/nouri': { id: '/admin/nouri'; path: '/nouri'; fullPath: '/admin/nouri'; preLoaderRoute: typeof AdminNouriRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/preview': { id: '/admin/preview'; path: '/preview'; fullPath: '/admin/preview'; preLoaderRoute: typeof AdminPreviewRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/setup': { id: '/admin/setup'; path: '/setup'; fullPath: '/admin/setup'; preLoaderRoute: typeof AdminSetupRouteImport; parentRoute: typeof AdminRoute }
+    '/app/': { id: '/app/'; path: '/'; fullPath: '/app/'; preLoaderRoute: typeof AppIndexRouteImport; parentRoute: typeof AppRoute }
+    '/app/appointments': { id: '/app/appointments'; path: '/appointments'; fullPath: '/app/appointments'; preLoaderRoute: typeof AppAppointmentsRouteImport; parentRoute: typeof AppRoute }
+    '/app/binding': { id: '/app/binding'; path: '/binding'; fullPath: '/app/binding'; preLoaderRoute: typeof AppBindingRouteImport; parentRoute: typeof AppRoute }
+    '/app/grocery': { id: '/app/grocery'; path: '/grocery'; fullPath: '/app/grocery'; preLoaderRoute: typeof AppGroceryRouteImport; parentRoute: typeof AppRoute }
+    '/app/journey': { id: '/app/journey'; path: '/journey'; fullPath: '/app/journey'; preLoaderRoute: typeof AppJourneyRouteImport; parentRoute: typeof AppRoute }
+    '/app/meals': { id: '/app/meals'; path: '/meals'; fullPath: '/app/meals'; preLoaderRoute: typeof AppMealsRouteImport; parentRoute: typeof AppRoute }
+    '/app/move': { id: '/app/move'; path: '/move'; fullPath: '/app/move'; preLoaderRoute: typeof AppMoveRouteImport; parentRoute: typeof AppRoute }
+    '/app/nouri': { id: '/app/nouri'; path: '/nouri'; fullPath: '/app/nouri'; preLoaderRoute: typeof AppNouriRouteImport; parentRoute: typeof AppRoute }
+    '/app/onboarding': { id: '/app/onboarding'; path: '/onboarding'; fullPath: '/app/onboarding'; preLoaderRoute: typeof AppOnboardingRouteImport; parentRoute: typeof AppRoute }
+    '/app/pantry': { id: '/app/pantry'; path: '/pantry'; fullPath: '/app/pantry'; preLoaderRoute: typeof AppPantryRouteImport; parentRoute: typeof AppRoute }
+    '/app/partner': { id: '/app/partner'; path: '/partner'; fullPath: '/app/partner'; preLoaderRoute: typeof AppPartnerRouteImport; parentRoute: typeof AppRoute }
+    '/app/profile': { id: '/app/profile'; path: '/profile'; fullPath: '/app/profile'; preLoaderRoute: typeof AppProfileRouteImport; parentRoute: typeof AppRoute }
+    '/app/resources': { id: '/app/resources'; path: '/resources'; fullPath: '/app/resources'; preLoaderRoute: typeof AppResourcesRouteImport; parentRoute: typeof AppRoute }
+    '/app/store': { id: '/app/store'; path: '/store'; fullPath: '/app/store'; preLoaderRoute: typeof AppStoreRouteImport; parentRoute: typeof AppRoute }
+    '/admin/clients/$userId': { id: '/admin/clients/$userId'; path: '/$userId'; fullPath: '/admin/clients/$userId'; preLoaderRoute: typeof AdminClientsUserIdRouteImport; parentRoute: typeof AdminClientsRoute }
+    '/api/auth/$': { id: '/api/auth/$'; path: '/api/auth/$'; fullPath: '/api/auth/$'; preLoaderRoute: typeof ApiAuthSplatRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
-interface AdminClientsRouteChildren {
-  AdminClientsUserIdRoute: typeof AdminClientsUserIdRoute
-}
-
-const AdminClientsRouteChildren: AdminClientsRouteChildren = {
-  AdminClientsUserIdRoute: AdminClientsUserIdRoute,
-}
-
-const AdminClientsRouteWithChildren = AdminClientsRoute._addFileChildren(
-  AdminClientsRouteChildren,
-)
+interface AdminClientsRouteChildren { AdminClientsUserIdRoute: typeof AdminClientsUserIdRoute }
+const AdminClientsRouteChildren: AdminClientsRouteChildren = { AdminClientsUserIdRoute: AdminClientsUserIdRoute }
+const AdminClientsRouteWithChildren = AdminClientsRoute._addFileChildren(AdminClientsRouteChildren)
 
 interface AdminRouteChildren {
   AdminAiRoute: typeof AdminAiRoute
@@ -870,22 +462,11 @@ interface AdminRouteChildren {
   AdminSetupRoute: typeof AdminSetupRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
-
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAiRoute: AdminAiRoute,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminBusinessRoute: AdminBusinessRoute,
-  AdminCalendarRoute: AdminCalendarRoute,
-  AdminClientsRoute: AdminClientsRouteWithChildren,
-  AdminContentRoute: AdminContentRoute,
-  AdminLandingRoute: AdminLandingRoute,
-  AdminLaunchRoute: AdminLaunchRoute,
-  AdminNouriRoute: AdminNouriRoute,
-  AdminPreviewRoute: AdminPreviewRoute,
-  AdminSetupRoute: AdminSetupRoute,
-  AdminIndexRoute: AdminIndexRoute,
+  AdminAiRoute, AdminAnalyticsRoute, AdminBusinessRoute, AdminCalendarRoute,
+  AdminClientsRoute: AdminClientsRouteWithChildren, AdminContentRoute, AdminLandingRoute,
+  AdminLaunchRoute, AdminNouriRoute, AdminPreviewRoute, AdminSetupRoute, AdminIndexRoute,
 }
-
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
@@ -904,46 +485,33 @@ interface AppRouteChildren {
   AppStoreRoute: typeof AppStoreRoute
   AppIndexRoute: typeof AppIndexRoute
 }
-
 const AppRouteChildren: AppRouteChildren = {
-  AppAppointmentsRoute: AppAppointmentsRoute,
-  AppBindingRoute: AppBindingRoute,
-  AppGroceryRoute: AppGroceryRoute,
-  AppJourneyRoute: AppJourneyRoute,
-  AppMealsRoute: AppMealsRoute,
-  AppMoveRoute: AppMoveRoute,
-  AppNouriRoute: AppNouriRoute,
-  AppOnboardingRoute: AppOnboardingRoute,
-  AppPantryRoute: AppPantryRoute,
-  AppPartnerRoute: AppPartnerRoute,
-  AppProfileRoute: AppProfileRoute,
-  AppResourcesRoute: AppResourcesRoute,
-  AppStoreRoute: AppStoreRoute,
-  AppIndexRoute: AppIndexRoute,
+  AppAppointmentsRoute, AppBindingRoute, AppGroceryRoute, AppJourneyRoute, AppMealsRoute,
+  AppMoveRoute, AppNouriRoute, AppOnboardingRoute, AppPantryRoute, AppPartnerRoute,
+  AppProfileRoute, AppResourcesRoute, AppStoreRoute, AppIndexRoute,
 }
-
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  IndexRoute,
+  AboutRoute,
+  AccessibilityRoute,
   AdminRoute: AdminRouteWithChildren,
   AppRoute: AppRouteWithChildren,
-  BellyBindingRoute: BellyBindingRoute,
-  CheckoutRoute: CheckoutRoute,
-  ContactRoute: ContactRoute,
-  HearthRoute: HearthRoute,
-  JoinRoute: JoinRoute,
-  LoginRoute: LoginRoute,
-  NouriRoute: NouriRoute,
-  PricingRoute: PricingRoute,
-  PrivacyRoute: PrivacyRoute,
-  TermsRoute: TermsRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  BellyBindingRoute,
+  CheckoutRoute,
+  ContactRoute,
+  CookiesRoute,
+  HearthRoute,
+  JoinRoute,
+  LoginRoute,
+  NouriRoute,
+  PricingRoute,
+  PrivacyRoute,
+  TermsRoute,
+  ApiAuthSplatRoute,
 }
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
 import type { createStart } from '@tanstack/react-start'
