@@ -13,7 +13,7 @@ function Privacy() {
       <PublicNav />
       <PageCanvas>
         <article className="mx-auto max-w-2xl px-4 pb-24 pt-12 md:pt-16">
-          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 11, 2026</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 15, 2026</p>
           <h1 className="mt-3 font-display text-5xl">Privacy</h1>
           <div className="glass-panel mt-8 space-y-8 p-6 text-sm leading-relaxed text-muted-foreground md:p-8">
             <section>
@@ -24,24 +24,37 @@ function Privacy() {
                 photographs you choose to upload, and records of membership and purchases.
               </p>
               <p className="mt-2">
-                Location is optional. A ZIP code, city, or a store list you type is enough. We do not sell location
-                data. We do not sell your health notes.
+                City, state, ZIP code, and preferred stores are optional profile information. You can share them to make
+                grocery planning and nearby-store suggestions more useful for your area. We do not need your street
+                address for grocery planning.
+              </p>
+            </section>
+            <section>
+              <h2 className="font-display text-2xl text-ink">Location and nearby stores</h2>
+              <p className="mt-2">
+                The Grocery room includes a “Find stores near me” button. If you choose it, your browser asks for
+                location permission. Her First Meal uses the coordinates returned by your browser in that moment to
+                open a nearby grocery search in Maps. We do not save those precise GPS coordinates to your profile.
+              </p>
+              <p className="mt-2">
+                If you decline device location, the nearby-store search falls back to the city, state, ZIP code, or
+                store preferences you chose to save. We do not sell location data.
               </p>
             </section>
             <section>
               <h2 className="font-display text-2xl text-ink">How we use it</h2>
               <p className="mt-2">
-                To keep you signed in, run membership, suggest meals and groceries, operate the binding studio and
-                movement rooms, carry letters to Maat, book optional sessions, take payment, and — if you allow
-                cookies — count visits or measure ads.
+                To keep you signed in, run membership, personalize meals and grocery planning, help you find nearby
+                stores when you ask, operate the binding studio and movement rooms, carry letters to Maat, book optional
+                sessions, take payment, and — if you allow cookies — count visits or measure ads.
               </p>
             </section>
             <section>
-              <h2 className="font-display text-2xl text-ink">No artificial intelligence</h2>
+              <h2 className="font-display text-2xl text-ink">How recommendations are made</h2>
               <p className="mt-2">
-                This house does not send your notes to an AI model. Meals, grocery lists, and season guidance are
-                written in the catalog and chosen from the stage, diet, and state you share. Questions go to Maat by
-                letter — from the contact page or from Write us inside the house.
+                Meals, grocery lists, and season guidance come from Her First Meal’s built-in catalog and are selected
+                using the stage, dietary preferences, household information, pantry, budget, and location details you
+                choose to share. Questions sent through the support experience go to Maat.
               </p>
             </section>
             <section>
@@ -52,8 +65,9 @@ function Privacy() {
               </p>
               <p className="mt-2">
                 Processors that help run the house may receive what they need to do their job: hosting and database,
-                email delivery, Stripe for cards, and — only if you consent — analytics or advertising measurement.
-                Stripe processes payment details. We do not keep your full card number.
+                email delivery, Stripe for cards, mapping when you choose a nearby-store search, and — only if you
+                consent — analytics or advertising measurement. Stripe processes payment details. We do not keep your
+                full card number.
               </p>
               <p className="mt-2">
                 Those companies may store data on servers outside your country. If you use the house, you understand
