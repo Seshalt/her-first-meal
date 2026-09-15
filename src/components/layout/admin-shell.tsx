@@ -11,15 +11,15 @@ const NAV = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/clients", label: "Clients" },
   { to: "/admin/landing", label: "Website" },
-  { to: "/admin/letters", label: "Letters" },
+  { to: "/admin/ai", label: "Letters" },
   { to: "/admin/content", label: "Content" },
   { to: "/admin/calendar", label: "Calendar" },
-  { to: "/admin/season-notes", label: "Season notes" },
+  { to: "/admin/nouri", label: "Season notes" },
   { to: "/admin/business", label: "Business" },
   { to: "/admin/analytics", label: "Analytics" },
   { to: "/admin/preview", label: "Member trail" },
   { to: "/admin/launch", label: "Launch list" },
-];
+] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
