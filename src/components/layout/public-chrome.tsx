@@ -8,6 +8,7 @@ import { publicHttpUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { LocaleSwitch } from "@/components/i18n/locale-switch";
 import { useT } from "@/lib/i18n/provider";
+import { LOCALES } from "@/lib/i18n/locales";
 
 export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -126,10 +127,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
           </Link>
           <button
             type="button"
-            className={cn(
-              "relative z-[90] grid size-12 place-items-center rounded-full lg:hidden",
-              ink,
-            )}
+            className={cn("relative z-[90] grid size-12 place-items-center rounded-full lg:hidden", ink)}
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((v) => !v)}
@@ -143,31 +141,17 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
         <div className={cn("fixed inset-0 z-[100] flex flex-col", stayDark ? "bg-ink text-paper" : "bg-background text-foreground")}>
           <div className="flex h-16 items-center justify-between px-4">
             <Wordmark className={stayDark ? "text-paper" : undefined} />
-            <button
-              type="button"
-              className="grid size-12 place-items-center rounded-full"
-              aria-label="Close menu"
-              onClick={() => setOpen(false)}
-            >
+            <button type="button" className="grid size-12 place-items-center rounded-full" aria-label="Close menu" onClick={() => setOpen(false)}>
               <X className="size-6" />
             </button>
           </div>
           <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-10 pt-6" aria-label="Mobile">
             {links.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="rounded-2xl px-3 py-4 font-display text-3xl"
-              >
+              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-2xl px-3 py-4 font-display text-3xl">
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/pricing"
-              onClick={() => setOpen(false)}
-              className="mt-6 rounded-full bg-primary px-5 py-4 text-center text-base font-medium text-primary-foreground"
-            >
+            <Link to="/pricing" onClick={() => setOpen(false)} className="mt-6 rounded-full bg-primary px-5 py-4 text-center text-base font-medium text-primary-foreground">
               {t("cta")}
             </Link>
             <SignedOut>
@@ -195,6 +179,23 @@ export function PublicFooter() {
   return (
     <footer className="relative overflow-hidden bg-ink text-paper">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_280px_at_10%_0%,rgba(212,162,74,0.12),transparent_60%),radial-gradient(640px_240px_at_90%_100%,rgba(42,117,108,0.16),transparent_55%)]" />
+
+      <section className="relative border-b border-white/10 px-4 py-12 md:px-6" aria-label="Languages">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs uppercase tracking-[0.24em] text-gold">18 languages · one home</p>
+          <p className="mt-4 max-w-3xl font-display text-3xl leading-tight text-paper md:text-4xl">
+            {t("footer.languages")}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-xs text-paper/55" aria-label="Available languages">
+            {LOCALES.map((language) => (
+              <span key={language.id} lang={language.id === "yue" ? "zh-HK" : language.id}>
+                {language.native}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
           <Wordmark stacked className="text-paper" />
