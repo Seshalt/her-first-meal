@@ -1,0 +1,154 @@
+.member-shell,
+.onboarding-shell {
+  --member-bg: #f3eadc;
+  --member-ink: #1d2621;
+  --member-panel: rgba(255, 250, 243, 0.82);
+  --member-line: rgba(30, 34, 31, 0.09);
+  --member-glow-a: rgba(42, 117, 108, 0.14);
+  --member-glow-b: rgba(196, 92, 62, 0.13);
+  --member-glow-c: rgba(212, 162, 74, 0.16);
+  min-height: 100dvh;
+  color: var(--member-ink);
+}
+
+.member-shell > .min-h-dvh.bg-background,
+.onboarding-shell > .grid {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(54rem 38rem at 92% 3%, var(--member-glow-a), transparent 66%),
+    radial-gradient(44rem 32rem at 5% 42%, var(--member-glow-b), transparent 70%),
+    radial-gradient(52rem 34rem at 70% 95%, var(--member-glow-c), transparent 68%),
+    linear-gradient(145deg, #f7f0e6 0%, var(--member-bg) 50%, #eee3d3 100%) !important;
+}
+
+.member-shell > .min-h-dvh.bg-background::before,
+.onboarding-shell > .grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.38;
+  background-image:
+    linear-gradient(rgba(30, 34, 31, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 34, 31, 0.025) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(circle at 50% 32%, black 0%, transparent 76%);
+}
+
+.member-shell > .min-h-dvh.bg-background > *,
+.onboarding-shell > .grid > * {
+  position: relative;
+  z-index: 1;
+}
+
+.onboarding-shell > .grid > div:last-child {
+  background:
+    radial-gradient(26rem 22rem at 95% 4%, rgba(42, 117, 108, 0.12), transparent 70%),
+    radial-gradient(26rem 20rem at 12% 94%, rgba(212, 162, 74, 0.12), transparent 72%),
+    rgba(249, 244, 235, 0.76) !important;
+  backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(30, 34, 31, 0.08);
+}
+
+.onboarding-shell input,
+.onboarding-shell select,
+.member-shell input,
+.member-shell select,
+.member-shell textarea {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 14px 40px -32px rgba(32, 43, 38, 0.45);
+}
+
+.member-shell .surface-card,
+.member-shell [class*="bg-card"] {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 24px 70px -48px rgba(39, 54, 47, 0.55);
+}
+
+.dark .member-shell,
+.dark .onboarding-shell {
+  --background: #0b1210;
+  --foreground: #f5eee4;
+  --card: #121f1a;
+  --card-foreground: #f5eee4;
+  --popover: #16231e;
+  --popover-foreground: #f5eee4;
+  --primary: #89c8b8;
+  --primary-foreground: #08110e;
+  --secondary: #1a2923;
+  --secondary-foreground: #f5eee4;
+  --muted: #17241f;
+  --muted-foreground: #aebdb7;
+  --accent: #e4b65c;
+  --accent-foreground: #111713;
+  --border: rgba(228, 214, 191, 0.12);
+  --input: rgba(228, 214, 191, 0.16);
+  --ring: #89c8b8;
+  --wash-linen: #1d1a16;
+  --wash-clay: #2b1916;
+  --wash-blush: #2c1b21;
+  --wash-plum: #211c2a;
+  --wash-sea: #11241f;
+  --member-bg: #0b1210;
+  --member-ink: #f5eee4;
+  --member-panel: rgba(15, 27, 22, 0.82);
+  --member-line: rgba(245, 238, 228, 0.08);
+  --member-glow-a: rgba(72, 156, 134, 0.16);
+  --member-glow-b: rgba(169, 72, 54, 0.14);
+  --member-glow-c: rgba(212, 162, 74, 0.12);
+}
+
+.dark .member-shell > .min-h-dvh.bg-background,
+.dark .onboarding-shell > .grid {
+  background:
+    radial-gradient(54rem 40rem at 88% 0%, rgba(85, 151, 126, 0.17), transparent 68%),
+    radial-gradient(46rem 34rem at 3% 48%, rgba(125, 54, 65, 0.2), transparent 72%),
+    radial-gradient(48rem 30rem at 72% 100%, rgba(205, 151, 64, 0.11), transparent 70%),
+    linear-gradient(145deg, #08100d 0%, #0b1511 46%, #10120f 100%) !important;
+}
+
+.dark .member-shell > .min-h-dvh.bg-background::after,
+.dark .onboarding-shell > .grid::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  background-image: radial-gradient(circle at 30% 30%, rgba(255,255,255,.22) 0 .6px, transparent .8px);
+  background-size: 10px 10px;
+  mix-blend-mode: soft-light;
+}
+
+.dark .onboarding-shell > .grid > div:last-child {
+  background:
+    radial-gradient(28rem 22rem at 100% 0%, rgba(86, 157, 137, 0.14), transparent 68%),
+    radial-gradient(24rem 18rem at 10% 100%, rgba(212, 162, 74, 0.08), transparent 72%),
+    rgba(11, 20, 17, 0.88) !important;
+  border-left-color: rgba(245, 238, 228, 0.08);
+}
+
+.dark .member-shell .surface-card,
+.dark .member-shell [class*="bg-card"] {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 28px 80px -52px rgba(0, 0, 0, 0.9);
+}
+
+.location-disclosure {
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, transparent);
+  background:
+    radial-gradient(24rem 12rem at 100% 0%, color-mix(in oklab, var(--primary) 11%, transparent), transparent 72%),
+    color-mix(in oklab, var(--card) 88%, transparent);
+  box-shadow: 0 20px 55px -44px rgba(24, 45, 37, 0.45);
+  backdrop-filter: blur(14px);
+}
+
+.dark .location-disclosure {
+  background:
+    radial-gradient(24rem 12rem at 100% 0%, rgba(137, 200, 184, 0.12), transparent 72%),
+    rgba(18, 31, 26, 0.78);
+  box-shadow: 0 24px 64px -46px rgba(0, 0, 0, 0.9);
+}
