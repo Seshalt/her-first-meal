@@ -32,6 +32,7 @@ export const EN = {
   "footer.privacy": "Privacy",
   "footer.contact": "Contact us",
   "footer.connect": "Connect",
+  "footer.languages": "Mothers live everywhere. We bring home to you — choose from 18 languages so the experience can feel familiar from the first screen.",
   "footer.legal":
     "Educational wellness support. Not medical care. Speak with your healthcare provider for clinical decisions.",
 
