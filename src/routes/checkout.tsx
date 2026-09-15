@@ -227,7 +227,7 @@ function Checkout() {
                   <Link to="/terms" className="underline">terms</Link>{" "}
                   and{" "}
                   <Link to="/privacy" className="underline">privacy</Link>{" "}
-                  pages. Her First Meal uses a built-in content library and saved preferences for personalization; it does not use generative AI. It is not medical care.
+                  pages. Her First Meal personalizes your experience using the preferences you save. It is not medical care.
                 </p>
               </form>
             )}
