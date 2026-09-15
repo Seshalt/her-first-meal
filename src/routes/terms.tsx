@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
 
@@ -10,173 +10,119 @@ function Terms() {
       <PublicNav />
       <PageCanvas>
         <article className="mx-auto max-w-2xl px-4 pb-24 pt-12 md:pt-16">
-          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 11, 2026</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-clay">Last updated September 15, 2026</p>
           <h1 className="mt-3 font-display text-5xl">Terms of use</h1>
-          <p className="mt-4 text-sm text-muted-foreground">
-            By creating an account, joining a membership, or using this website, you agree to these terms. If you do
-            not agree, do not use the house. This page is a contract between you and Her First Meal. It is not a
-            substitute for advice from your own lawyer.
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            By creating an account, purchasing a membership, or using Her First Meal, you agree to these terms. If you do not agree, do not use the service.
           </p>
+
           <div className="glass-panel mt-8 space-y-8 p-6 text-sm leading-relaxed text-muted-foreground md:p-8">
             <section>
-              <h2 className="font-display text-2xl text-ink">1. Who may enter</h2>
+              <h2 className="font-display text-2xl text-ink">1. Who may use Her First Meal</h2>
               <p className="mt-2">
-                You must be at least 18 years old. The house is written for pregnant and postpartum adults and the
-                people who care for them. It is not for children. You are responsible for the accuracy of the email
-                and information you give us.
+                You must be at least 18 years old. You are responsible for providing accurate account and billing information and for keeping your sign-in credentials secure.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">2. What this house is — and is not</h2>
+              <h2 className="font-display text-2xl text-ink">2. Wellness and educational service</h2>
               <p className="mt-2">
-                Her First Meal is a membership for education, recipes, grocery planning, movement ideas, belly binding
-                education, companion support, and optional paid sessions with Maat. It is wellness and education.
+                Her First Meal provides wellness education, recipes, grocery and pantry planning, movement ideas, belly-binding education, daily body readings, support, and optional paid meetings. It is not a medical practice, emergency service, pharmacy, or substitute for care from a licensed clinician.
               </p>
               <p className="mt-2">
-                It is <strong className="text-ink">not</strong> a medical practice, clinic, pharmacy, hospital, or
-                emergency service. Nothing on this site, in Nouri, in the binding studio, in a meal plan, or in a
-                session with Maat is a diagnosis, prescription, treatment plan, or substitute for care from a licensed
-                clinician. We do not treat, cure, or prevent disease.
-              </p>
-              <p className="mt-2">
-                If you have pain, bleeding, fever, thoughts of harming yourself or your baby, or any emergency, call
-                your local emergency number or your clinician. Do not use this website for urgent care.
+                If you have urgent symptoms or an emergency, contact your clinician or local emergency services. Do not use this website for urgent medical care.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">3. Artificial intelligence</h2>
+              <h2 className="font-display text-2xl text-ink">3. Personalization</h2>
               <p className="mt-2">
-                Parts of the house use artificial intelligence. That includes Nouri, suggested questions, grocery and
-                meal suggestions, and any notes offered on belly-binding photographs. AI can be wrong, incomplete, or
-                out of date. It does not know your full medical history. It does not examine you.
+                The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.
               </p>
               <p className="mt-2">
-                You agree that AI output is informational only. You will not rely on it as medical, nutritional,
-                mental-health, or legal advice. You will check anything important with a qualified professional who
-                knows you. We do not guarantee that AI is accurate, safe for your body, or appropriate for your
-                pregnancy, birth, or recovery.
-              </p>
-              <p className="mt-2">
-                Messages and photos you send to AI features may be processed by our systems and by third-party model
-                providers in order to generate a reply. Do not upload anyone else’s private information. See Privacy
-                for how that data is handled.
+                Personalized suggestions are informational and may not fit every health condition, allergy, pregnancy complication, recovery plan, or dietary need. You are responsible for checking ingredients and deciding what is appropriate for you with qualified professionals when needed.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">4. Food, movement, and binding</h2>
+              <h2 className="font-display text-2xl text-ink">4. Food, movement, and belly binding</h2>
               <p className="mt-2">
-                Recipes and grocery lists are general. They cannot promise to be free of every allergen or safe for
-                every condition (including gestational diabetes, preeclampsia, cesarean recovery, or food
-                restriction). You are responsible for reading ingredients and for what you eat.
-              </p>
-              <p className="mt-2">
-                Movement and belly binding can involve physical risk. Stop if something hurts. Binding is never a
-                treatment for organ prolapse, hernia, infection, or unhealed incision. After surgery or a complicated
-                birth, ask your clinician before you wrap or train. You use these rooms at your own risk.
+                Recipes and grocery lists are general wellness content and cannot guarantee that a food is safe for every allergy, medical condition, or pregnancy. Movement and belly binding can involve physical risk. Stop if something hurts or feels wrong, and ask your clinician before beginning if you have a complicated pregnancy, recent surgery, an unhealed incision, or another condition that may affect safety.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">5. Membership, Stripe, and money</h2>
+              <h2 className="font-display text-2xl text-ink">5. Membership, Stripe, and access</h2>
               <p className="mt-2">
-                Paid membership is billed through Stripe. We do not store your full card number. Stripe’s terms also
-                apply to the payment itself. Prices shown are in US dollars unless we say otherwise. Membership renews
-                for the same cadence (month or year) until you cancel.
+                Membership is paid through Stripe. The member app unlocks only after Stripe confirms a successful payment and an active membership is linked to your account. Creating or signing into an account by itself does not create paid access.
               </p>
               <p className="mt-2">
-                Cancel from Settings before the next renewal if you do not want to be charged again. Fees already
-                collected for the current period are not automatically refunded, except where the law of your place
-                requires it or we agree in writing. Chargebacks made in bad faith may lead to account closure.
+                Monthly and yearly memberships renew on their selected cadence until canceled. Prices and billing frequency are shown before purchase. Stripe processes payment information; Her First Meal does not store your full card number.
               </p>
               <p className="mt-2">
-                A meeting with Maat is optional and billed separately when you book it. It is not included in
-                membership unless we expressly say so at booking.
+                If a payment fails, a subscription ends, or a membership expires, access to paid member rooms may be restricted. Optional private meetings are billed separately unless the booking page expressly says otherwise.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">6. Your account and your content</h2>
+              <h2 className="font-display text-2xl text-ink">6. Your account and saved information</h2>
               <p className="mt-2">
-                Keep your password to yourself. You are responsible for activity under your account. Photographs,
-                notes, and messages you upload stay yours. You give Her First Meal a limited license to store them and
-                to use them only to run the rooms you asked for (for example, to show a wrap back to you, or to let
-                Nouri read a question you typed). We do not sell your photos. We do not show them to other members.
+                Member progress and preferences are stored with your account so they can remain available across supported devices. This can include onboarding progress, profile details, diet and grocery preferences, hydration and mood check-ins, appointments, pantry information, support messages, and other records created while using the member service.
               </p>
               <p className="mt-2">
-                Do not upload illegal content, anyone else’s image without permission, or material that harasses. We
-                may remove content or close an account that breaks these terms or the law.
+                Content you upload or submit remains yours. You give Her First Meal permission to store and process it only as reasonably needed to operate the features you choose to use, comply with law, prevent abuse, and maintain the service.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">7. Our materials</h2>
+              <h2 className="font-display text-2xl text-ink">7. Cookies and privacy</h2>
               <p className="mt-2">
-                The name Her First Meal, the mark, the writing, recipes, layouts, and software belong to the operator
-                of this house or its licensors. Membership is a license to use the rooms during the paid period. It is
-                not a sale of the underlying work. Do not copy the house to sell it as your own.
+                Necessary cookies and similar storage support authentication, security, checkout continuity, and consent preferences. Optional analytics is used only when allowed. Important member records are stored with your account rather than depending only on browser cookies.
+              </p>
+              <p className="mt-2">
+                Review the <Link to="/privacy" className="text-primary underline underline-offset-2">Privacy Policy</Link> and <Link to="/cookies" className="text-primary underline underline-offset-2">Cookie Settings</Link> for more detail.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">8. Cookies and other companies we use</h2>
+              <h2 className="font-display text-2xl text-ink">8. Acceptable use</h2>
               <p className="mt-2">
-                Hosting, databases, email, and Stripe sit with third parties. Their outages or errors are outside our
-                full control. We are not liable for their independent acts beyond what the law will not let us
-                disclaim.
-              </p>
-              <p className="mt-2">
-                Cookies: a small sign-in cookie keeps a member in the rooms. A separate notice cookie remembers that
-                you already tapped OK on the cookie bar, so it does not open on every visit. We do not use advertising
-                cookies. What we collect is on the Privacy page. This page is the record — there is no cookie-toggles
-                panel.
+                Do not misuse the service, attempt to bypass payment or security controls, interfere with the service, upload unlawful content, impersonate another person, or submit private information about someone else without permission. We may suspend or close accounts that violate these terms or create security or safety risks.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">9. No warranty</h2>
+              <h2 className="font-display text-2xl text-ink">9. Intellectual property</h2>
               <p className="mt-2">
-                The house is provided “as is” and “as available.” To the fullest extent the law allows, we disclaim
-                all warranties, express or implied, including merchantability, fitness for a particular purpose, and
-                non-infringement. We do not warrant that the site or AI will be uninterrupted, secure, or free of
-                error.
+                Her First Meal’s name, branding, original writing, recipes, layouts, educational materials, and software are owned by Her First Meal or its licensors. A membership gives you a personal right to use the service during your active membership; it does not transfer ownership of the underlying materials.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">10. Limit of liability</h2>
+              <h2 className="font-display text-2xl text-ink">10. Availability and warranties</h2>
               <p className="mt-2">
-                To the fullest extent the law allows, Her First Meal and its owner, workers, and contractors are not
-                liable for indirect, incidental, special, consequential, or punitive damages, or for lost profits,
-                data, or goodwill, arising from your use of the house, meals, movement, binding, Nouri, or a session
-                with Maat.
-              </p>
-              <p className="mt-2">
-                Our total liability for any claim is limited to the membership fees you paid us in the three months
-                before the claim, or fifty US dollars, whichever is greater — unless a law in your place says we
-                cannot limit it that way.
+                The service is provided on an “as is” and “as available” basis to the extent permitted by law. We cannot promise uninterrupted access, that every suggestion will suit every person, or that third-party services such as hosting, email, maps, or payment processing will always be available.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">11. Your promise to us</h2>
+              <h2 className="font-display text-2xl text-ink">11. Limitation of liability</h2>
               <p className="mt-2">
-                You will not use the house in a way that breaks the law. If your use of the house causes a claim
-                against us (for example, you share someone else’s private photo, or you treat AI output as medical
-                care and then blame the house), you will cover the reasonable cost of defending that claim, to the
-                extent the law allows.
+                To the fullest extent permitted by law, Her First Meal is not liable for indirect, incidental, special, consequential, or punitive damages arising from use of the service. Nothing here limits rights or remedies that applicable consumer law does not allow us to limit.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">12. Ending the relationship</h2>
+              <h2 className="font-display text-2xl text-ink">12. Ending or changing the service</h2>
               <p className="mt-2">
-                You may stop using the house and cancel renewal at any time. We may suspend or close an account that
-                violates these terms, fails payment, or puts others at risk. Sections on money already owed, AI,
-                content license for stored files, liability, and indemnity survive closing.
+                You may stop using the service or cancel future renewal. We may update features, pricing, or these terms, and we may suspend access for failed payment, abuse, or legal or security reasons. Material changes will be reflected by updating the date on this page and, when appropriate, providing additional notice.
               </p>
             </section>
+
             <section>
-              <h2 className="font-display text-2xl text-ink">13. Changes and law</h2>
+              <h2 className="font-display text-2xl text-ink">13. Questions</h2>
               <p className="mt-2">
-                We may update these terms. The date at the top will change. Continued use after an update means you
-                accept the new terms. If a court strikes one sentence, the rest stays. These terms are governed by the
-                laws that apply to the operator of Her First Meal, without regard to conflict-of-law rules, except
-                where consumer law in your country or state cannot be waived.
-              </p>
-              <p className="mt-2">
-                Questions: use the Contact page. Privacy is separate and also applies.
+                Use the Contact page for questions about these terms, billing, privacy, or accessibility. The <Link to="/accessibility" className="text-primary underline underline-offset-2">Accessibility Statement</Link> also explains how to report a barrier.
               </p>
             </section>
           </div>
