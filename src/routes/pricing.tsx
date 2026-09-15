@@ -35,9 +35,9 @@ function Pricing() {
   const meetingPoints = lines(site.meetingPoints);
 
   return (
-    <div className="bg-ink">
+    <div className="overflow-x-hidden bg-ink">
       <PublicNav overlay />
-      <section className="pricing-stage min-h-dvh px-4 pb-16 pt-24 md:px-6 md:pb-24 md:pt-28">
+      <section className="pricing-stage min-h-dvh px-4 pb-16 pt-24 sm:px-5 md:px-6 md:pb-24 md:pt-28">
         <div className="pricing-orbs" aria-hidden>
           <span />
           <span />
@@ -49,19 +49,19 @@ function Pricing() {
         </div>
         <div className="pricing-veil" />
 
-        <div className="relative z-10 mx-auto max-w-6xl text-center">
+        <div className="relative z-10 mx-auto w-full max-w-[74rem] text-center">
           <p className="text-xs uppercase tracking-[0.32em] text-gold">{site.pricingKicker}</p>
-          <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,4.2rem)] leading-[0.95] text-paper">
+          <h1 className="mx-auto mt-4 max-w-4xl font-display text-[clamp(2.35rem,4.8vw,4.6rem)] leading-[0.96] text-paper">
             {site.pricingTitle}
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-paper/75 md:text-base">
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-paper/75 md:text-base">
             {site.pricingBody}
           </p>
 
           <div className="mt-7 flex flex-col items-center gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-3 text-sm text-paper/80">
+            <label className="inline-flex cursor-pointer flex-wrap items-center justify-center gap-3 text-sm text-paper/80">
               <span className={cn(!yearlyOn && "text-paper")}>Monthly</span>
-              <span className="relative inline-flex h-8 w-14 items-center rounded-full bg-white/15 p-1">
+              <span className="relative inline-flex h-8 w-14 shrink-0 items-center rounded-full bg-white/15 p-1">
                 <input
                   type="checkbox"
                   className="peer sr-only"
@@ -78,15 +78,15 @@ function Pricing() {
               <span className={cn(yearlyOn && "text-paper")}>{site.pricingToggleOn}</span>
             </label>
             {yearlyOn ? (
-              <p className="text-sm text-gold">
+              <p className="max-w-xl px-2 text-sm text-gold">
                 Yearly keeps {formatCurrency(save.savedCents)} in her pocket — {save.percent}% less than twelve months.
               </p>
             ) : (
-              <p className="text-sm text-paper/55">Same rooms either way. Yearly is only how you pay.</p>
+              <p className="max-w-xl px-2 text-sm text-paper/55">Same rooms either way. Yearly is only how you pay.</p>
             )}
           </div>
 
-          <div className="mt-10 grid gap-5 text-left lg:grid-cols-3">
+          <div className="mt-10 grid min-w-0 gap-5 text-left md:grid-cols-2 xl:grid-cols-3">
             <PlanCard
               name={site.pricingMonthlyName}
               headline={formatCurrency(monthly)}
@@ -122,7 +122,7 @@ function Pricing() {
             />
           </div>
 
-          <p className="mx-auto mt-12 max-w-xl text-sm text-paper/55">{site.pricingFoot}</p>
+          <p className="mx-auto mt-12 max-w-xl px-2 text-sm text-paper/55">{site.pricingFoot}</p>
         </div>
       </section>
       <PublicFooter />
@@ -160,26 +160,28 @@ function PlanCard({
   return (
     <article
       className={cn(
-        "pricing-card h-full",
+        "pricing-card min-w-0 h-full",
         featured && "is-featured",
         muted && "opacity-70",
-        extra && "border-blush/40",
+        extra && "border-blush/40 md:col-span-2 xl:col-span-1",
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <h2 className="font-display text-2xl text-paper">{name}</h2>
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        <h2 className="min-w-0 font-display text-2xl text-paper">{name}</h2>
         {badge ? <span className="pricing-save shrink-0">{badge}</span> : null}
       </div>
-      <p className="mt-6 font-display text-5xl tabular-nums leading-none text-paper">
-        {headline}
-        <span className="ml-2 text-lg text-paper/55">{cadence}</span>
-      </p>
-      <p className="mt-3 text-sm text-paper/60">{sub}</p>
+      <div className="mt-6 flex min-w-0 flex-wrap items-end gap-x-2 gap-y-1">
+        <span className="min-w-0 font-display text-[clamp(2.7rem,4.4vw,4.75rem)] tabular-nums leading-none text-paper">
+          {headline}
+        </span>
+        <span className="pb-1 text-base text-paper/55 sm:text-lg">{cadence}</span>
+      </div>
+      <p className="mt-3 break-words text-sm text-paper/60">{sub}</p>
       <ul className="mt-8 flex-1 space-y-3 text-sm text-paper/80">
         {points.map((p) => (
           <li key={p} className="flex gap-2.5">
             <Check className="mt-0.5 size-4 shrink-0 text-gold" />
-            <span>{p}</span>
+            <span className="min-w-0 break-words">{p}</span>
           </li>
         ))}
       </ul>
