@@ -1,22 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CalendarDays,
+  Droplets,
+  HeartHandshake,
+  MapPin,
+  Sparkles,
+  StretchHorizontal,
+  UtensilsCrossed,
+} from "lucide-react";
 import { getMyHome, saveCheckIn } from "@/lib/server/profile";
 import { AFFIRMATIONS, STAGE_LABEL, type Stage } from "@/lib/content/catalog";
+import { dailyCareFor } from "@/lib/content/daily-care";
 import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { altFor } from "@/lib/landing";
 
 export const Route = createFileRoute("/app/")({ component: Today });
-
-function heroFor(stage: Stage | null) {
-  if (stage === "postpartum") return { src: "/images/postpartum-rest.jpg", alt: altFor("/images/postpartum-rest.jpg") };
-  if (stage === "first" || stage === "second" || stage === "third") {
-    return { src: "/images/hero-kitchen.jpg", alt: altFor("/images/hero-kitchen.jpg") };
-  }
-  if (stage === "trying") return { src: "/images/hydration.jpg", alt: altFor("/images/hydration.jpg") };
-  return { src: "/images/meal-bowl.jpg", alt: altFor("/images/meal-bowl.jpg") };
-}
 
 function Today() {
   const [home, setHome] = useState<Awaited<ReturnType<typeof getMyHome>> | null>(null);
@@ -27,218 +28,302 @@ function Today() {
       .catch(() => setHome(null));
   }, []);
 
+  useEffect(() => {
+    if (!home) return;
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>(".member-reveal"));
+    const frame = window.requestAnimationFrame(() => {
+      nodes.forEach((node, index) => {
+        window.setTimeout(() => node.classList.add("is-in"), Math.min(index * 55, 330));
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [home?.profile.onboardingCompleted]);
+
   const week = useMemo(() => {
     if (!home) return null;
     if (home.profile.stage === "postpartum") return postpartumWeekFromBirthday(home.profile.babyBirthday);
     return pregnancyWeekFromDueDate(home.profile.dueDate);
   }, [home]);
 
-  const affirmation = AFFIRMATIONS[(new Date().getDate() + (week ?? 1)) % AFFIRMATIONS.length];
-
   if (!home) {
-    return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">Setting today's table…</p>;
+    return (
+      <div className="member-dashboard">
+        <div className="member-card min-h-56 animate-pulse" aria-label="Loading your dashboard" />
+      </div>
+    );
   }
 
   if (!home.profile.onboardingCompleted) {
     return (
-      <section className="relative min-h-dvh overflow-hidden text-paper">
-        <img src="/images/hero-kitchen.jpg" alt={altFor("/images/hero-kitchen.jpg")} className="media absolute inset-0 h-full w-full object-cover" />
-        <div className="hero-veil pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col justify-end px-5 pb-24 pt-32 md:px-10">
-          <p className="text-xs uppercase tracking-[0.32em] text-aqua">Before the table is set</p>
-          <h1 className="mt-5 font-display text-[clamp(2.8rem,8vw,5.6rem)] leading-[0.95]">Let us know you first.</h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed text-paper/88">
-            A short welcome so meals, wrapping, and the grocery list can meet you where you are — not a generic plan.
-          </p>
-          <Button asChild className="mt-10 h-14 w-fit rounded-full px-8" variant="gold">
-            <Link to="/app/onboarding">Begin onboarding</Link>
-          </Button>
-        </div>
-      </section>
+      <div className="member-dashboard">
+        <section className="member-hero-card member-reveal is-in grid min-h-[32rem] items-end overflow-hidden lg:grid-cols-[1fr_.72fr]">
+          <div className="relative z-10 max-w-2xl">
+            <p className="member-eyebrow">Before the table is set</p>
+            <h1 className="member-display">Let us know you first.</h1>
+            <p className="member-lede">
+              Four short steps shape meals, grocery planning, stage guidance, and the rooms you see first. Nothing here should feel generic.
+            </p>
+            <Link
+              to="/app/onboarding"
+              className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-full bg-[var(--member-teal)] px-5 font-semibold text-[#06110d] transition hover:-translate-y-0.5 active:scale-95"
+            >
+              Finish setup <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <div className="relative mt-8 h-56 overflow-hidden rounded-[22px] lg:mt-0 lg:h-full lg:min-h-[25rem]">
+            <img
+              src="/images/hero-kitchen.jpg"
+              alt={altFor("/images/hero-kitchen.jpg")}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+        </section>
+      </div>
     );
   }
 
-  const name = home.profile.displayName?.split(" ")[0] ?? "love";
+  const name = home.profile.displayName?.split(" ")[0] ?? "there";
   const stage = home.profile.stage as Stage | null;
-  const hero = heroFor(stage);
   const season = week ? `Week ${week}` : stage ? STAGE_LABEL[stage] : "Your season";
+  const affirmation = AFFIRMATIONS[(new Date().getDate() + (week ?? 1)) % AFFIRMATIONS.length];
+  const reading = dailyCareFor(stage);
+  const dateLabel = new Intl.DateTimeFormat(undefined, { weekday: "long", month: "long", day: "numeric" }).format(new Date());
+  const localPlace = home.profile.city || home.profile.location || (home.profile.stateCode ? "your area" : "your market");
 
-  async function toggle(key: string) {
-    const completed = { ...home!.checkin.completed, [key]: !home!.checkin.completed[key] };
-    setHome({ ...home!, checkin: { ...home!.checkin, completed } });
-    await saveCheckIn({ data: { hydration: home!.checkin.hydration, completed } });
-  }
-
-  async function sip() {
-    const hydration = Math.min(12, home!.checkin.hydration + 1);
+  async function setHydration(value: number) {
+    const hydration = Math.max(0, Math.min(12, value));
     setHome({ ...home!, checkin: { ...home!.checkin, hydration } });
     await saveCheckIn({ data: { hydration, completed: home!.checkin.completed } });
   }
 
+  async function setMood(mood: string) {
+    setHome({ ...home!, checkin: { ...home!.checkin, mood } });
+    await saveCheckIn({ data: { hydration: home!.checkin.hydration, mood, completed: home!.checkin.completed } });
+  }
+
   return (
-    <div>
-      <section className="relative min-h-[88dvh] overflow-hidden text-paper md:min-h-dvh">
-        <img src={hero.src} alt={hero.alt} className="media absolute inset-0 h-full w-full object-cover" />
-        <div className="hero-veil pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto flex min-h-[88dvh] max-w-5xl flex-col justify-end px-5 pb-16 pt-32 md:min-h-dvh md:px-10 md:pb-24">
-          <p className="text-xs uppercase tracking-[0.32em] text-aqua">Today's journey</p>
-          <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6.4rem)] leading-[0.92]">Welcome back, {name}.</h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-paper/88 md:text-xl">
-            {season}
-            <span className="mx-3 text-gold">·</span>
-            {affirmation}
+    <div className="member-dashboard">
+      <div className="member-dashboard-hero">
+        <section className="member-hero-card member-reveal">
+          <p className="member-eyebrow">{dateLabel}</p>
+          <h1 className="member-display">Good to see you, {name}.</h1>
+          <p className="member-lede">
+            {affirmation} Today is organized around your body, your kitchen, and the season you are actually in.
           </p>
-        </div>
-      </section>
-
-      <div className="mx-auto max-w-5xl px-5 py-20 md:px-10 md:py-28">
-        <p className="text-xs uppercase tracking-[0.32em] text-earth">This day's care</p>
-        <h2 className="mt-5 font-display text-[clamp(2.2rem,5vw,4.4rem)] leading-[1.05]">What does her body need?</h2>
-        <div className="editorial-rule mt-10" />
-
-        <ul className="mt-6">
-          <Ritual
-            photo="/images/hydration.jpg"
-            photoAlt={altFor("/images/hydration.jpg")}
-            kicker="Hydration"
-            kickerTone="text-sea"
-            title={`${home.checkin.hydration} glasses so far`}
-            body="A quiet tally. No streak. No shame."
-            action="Add a glass"
-            onAction={() => void sip()}
-          />
-          <Ritual
-            photo="/images/meal-bowl.jpg"
-            photoAlt={altFor("/images/meal-bowl.jpg")}
-            kicker="The table"
-            kickerTone="text-clay"
-            title="Today's meals"
-            body="A plan that already knows your plate, kitchen, and week. Tap a recipe to see how to make it."
-            href="/app/meals"
-            linkLabel="Open the week"
-          />
-          <Ritual
-            photo="/images/binding-hands.jpg"
-            photoAlt={altFor("/images/binding-hands.jpg")}
-            kicker="Flagship practice"
-            kickerTone="text-blush"
-            title="Belly binding"
-            body={
-              home.checkin.completed.binding
-                ? "Marked for today. The studio is still here if you want to look again."
-                : "Studio video, wrap review, and a private journal — when you are ready."
-            }
-            href="/app/binding"
-            linkLabel="Open the studio"
-            action={home.checkin.completed.binding ? "Undo" : "Mark done"}
-            onAction={() => void toggle("binding")}
-          />
-          <Ritual
-            photo="/images/grocery-partner.jpg"
-            photoAlt={altFor("/images/grocery-partner.jpg")}
-            kicker="The market"
-            kickerTone="text-gold"
-            title="This week's grocery list"
-            body="Built from her plates, pantry, and what is in season where she lives."
-            href="/app/grocery"
-            linkLabel="Open the list"
-          />
-          <Ritual
-            photo="/images/nouri-drop.jpg"
-            photoAlt={altFor("/images/nouri-drop.jpg")}
-            kicker="Write the house"
-            kickerTone="text-plum"
-            title="A question for Maat"
-            body="There is no chatbot. Guidance for this season is written. A letter still goes to a person."
-            href="/app/nouri"
-            linkLabel="Write us"
-          />
-        </ul>
-
-        <section className="mt-20">
-          <p className="text-xs uppercase tracking-[0.32em] text-earth">How the body feels</p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {["steady", "tender", "tired", "bright"].map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => {
-                  setHome({ ...home, checkin: { ...home.checkin, mood: m } });
-                  void saveCheckIn({ data: { hydration: home.checkin.hydration, mood: m, completed: home.checkin.completed } });
-                }}
-                className={`h-11 rounded-full px-5 text-sm ${home.checkin.mood === m ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}
-              >
-                {m}
-              </button>
-            ))}
+          <div className="member-season-chip">
+            <Sparkles className="size-4 text-[var(--member-gold)]" />
+            <span>{season}</span>
+            {stage ? <span className="text-[var(--member-muted)]">· {STAGE_LABEL[stage]}</span> : null}
           </div>
         </section>
 
-        <section className="mt-20 border-t border-border pt-12">
+        <article className="member-body-note member-card member-reveal">
+          <div>
+            <p className="member-eyebrow">{reading.eyebrow} · {reading.minutes} min</p>
+            <h2>{reading.title}</h2>
+            <p className="mt-4 text-sm leading-6">{reading.body}</p>
+            <p className="member-reading-tip">Today: {reading.tip}</p>
+          </div>
+          <Link to="/app/resources" className="member-reading-link mt-5">
+            Read today’s body guide <ArrowRight className="size-4" />
+          </Link>
+        </article>
+      </div>
+
+      <section className="member-grid" aria-label="Today at a glance">
+        <article className="member-card member-hydration member-reveal">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="member-eyebrow">Hydration</p>
+              <h2 className="member-card-title">{home.checkin.hydration} glasses logged</h2>
+            </div>
+            <Droplets className="size-6 text-[var(--member-teal)]" />
+          </div>
+          <p className="member-card-copy">Tap a glass to update the day. No streaks, no shame, no fake score.</p>
+          <div className="member-glasses" aria-label="Hydration glasses">
+            {Array.from({ length: 12 }, (_, index) => {
+              const value = index + 1;
+              const full = value <= home.checkin.hydration;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  className={`member-glass ${full ? "is-full" : ""}`}
+                  aria-label={`${value} glass${value === 1 ? "" : "es"}`}
+                  aria-pressed={full}
+                  onClick={() => void setHydration(full && value === home.checkin.hydration ? value - 1 : value)}
+                >
+                  <span className="member-glass-water" />
+                </button>
+              );
+            })}
+          </div>
+        </article>
+
+        <article className="member-card member-photo-card member-reveal">
+          <img src="/images/meal-bowl.jpg" alt={altFor("/images/meal-bowl.jpg")} />
+          <div className="member-photo-copy">
+            <p className="member-eyebrow">Your table</p>
+            <h2 className="member-card-title">Meals for this week</h2>
+            <p className="member-card-copy">Recipes shaped around your stage, diet, dislikes, and household.</p>
+            <Link to="/app/meals" className="member-card-link mt-3">
+              Open meals <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </article>
+
+        <article className="member-card member-photo-card member-reveal">
+          <img src="/images/grocery-partner.jpg" alt={altFor("/images/grocery-partner.jpg")} />
+          <div className="member-photo-copy">
+            <p className="member-eyebrow">Local grocery</p>
+            <h2 className="member-card-title">Shop around {localPlace}</h2>
+            <p className="member-card-copy">
+              Your list follows the meals and pantry. Use your saved city or tap Find stores near me when you want a one-time local search.
+            </p>
+            <Link to="/app/grocery" className="member-card-link mt-3">
+              <MapPin className="size-4" /> Open grocery
+            </Link>
+          </div>
+        </article>
+
+        <article className="member-card member-reveal">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="member-eyebrow">Calendar</p>
+              <h2 className="member-card-title">{home.nextAppointment ? "Your next session" : "Your calendar is open"}</h2>
+            </div>
+            <CalendarDays className="size-6 text-[var(--member-gold)]" />
+          </div>
           {home.nextAppointment ? (
-            <p className="font-display text-3xl leading-snug">
-              Upcoming: {home.nextAppointment.type} · {new Date(home.nextAppointment.startsAt).toLocaleString()}
-              <Link to="/app/appointments" className="ml-4 text-xl text-primary">
-                View
-              </Link>
+            <p className="member-card-copy">
+              {home.nextAppointment.type} · {new Date(home.nextAppointment.startsAt).toLocaleString()}
             </p>
           ) : (
-            <p className="font-display text-3xl leading-snug text-ink-soft">
-              No appointment on the calendar.{" "}
-              <Link to="/app/appointments" className="text-primary">
-                Book a time
-              </Link>
-            </p>
+            <p className="member-card-copy">Book a private session only when you want one. It stays separate from your membership.</p>
           )}
-        </section>
+          <Link to="/app/appointments" className="member-card-link mt-5">
+            {home.nextAppointment ? "View appointment" : "See appointments"} <ArrowRight className="size-4" />
+          </Link>
+        </article>
+      </section>
+
+      <section className="member-card member-reveal mt-4 p-5 md:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="member-eyebrow">How the body feels</p>
+            <h2 className="member-card-title">A ten-second check-in.</h2>
+            <p className="member-card-copy">This is context for you, not a score to improve.</p>
+          </div>
+          <div className="member-mood-row lg:mt-0">
+            {["steady", "tender", "tired", "bright"].map((mood) => (
+              <button
+                key={mood}
+                type="button"
+                className={`member-mood ${home.checkin.mood === mood ? "is-active" : ""}`}
+                aria-pressed={home.checkin.mood === mood}
+                onClick={() => void setMood(mood)}
+              >
+                {mood}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="member-section-head member-reveal">
+        <div>
+          <p className="member-eyebrow">Your rooms</p>
+          <h2>Go where you need to go.</h2>
+        </div>
+        <p className="hidden md:block">No giant list of chores. Open a room when it is useful, then leave it alone when it is not.</p>
       </div>
+
+      <section className="member-room-grid" aria-label="Member rooms">
+        <RoomCard
+          to="/app/binding"
+          image="/images/binding-hands.jpg"
+          alt={altFor("/images/binding-hands.jpg")}
+          eyebrow="Belly binding"
+          title="The Binding Studio"
+          body="Wrap education, reference steps, your journal, and optional review."
+          icon={<HeartHandshake className="size-4" />}
+        />
+        <RoomCard
+          to="/app/journey"
+          image="/images/movement.jpg"
+          alt={altFor("/images/movement.jpg")}
+          eyebrow="Your stage"
+          title="Week-by-week journey"
+          body="A quieter timeline for what may be changing in this season."
+          icon={<Sparkles className="size-4" />}
+        />
+        <RoomCard
+          to="/app/move"
+          image="/images/postpartum-rest.jpg"
+          alt={altFor("/images/postpartum-rest.jpg")}
+          eyebrow="Movement"
+          title="Move with the day you have"
+          body="Stage-aware movement without punishment, streaks, or pressure."
+          icon={<StretchHorizontal className="size-4" />}
+        />
+        <RoomCard
+          to="/app/resources"
+          image="/images/hydration.jpg"
+          alt={altFor("/images/hydration.jpg")}
+          eyebrow="Readings"
+          title="Learn your body in small pieces"
+          body="Daily body notes, food and recovery tips, and short practical readings."
+          icon={<BookOpen className="size-4" />}
+        />
+      </section>
+
+      <section className="member-card member-reveal mt-4 flex flex-col gap-5 p-5 md:flex-row md:items-center md:justify-between md:p-6">
+        <div>
+          <p className="member-eyebrow">Need a person?</p>
+          <h2 className="member-card-title">Write the house.</h2>
+          <p className="member-card-copy">Send a private support note when something needs a human answer.</p>
+        </div>
+        <Link
+          to="/app/nouri"
+          className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--member-text)] px-5 text-sm font-semibold text-[var(--member-surface)] transition hover:-translate-y-0.5 active:scale-95"
+        >
+          <HeartHandshake className="size-4" /> Contact support
+        </Link>
+      </section>
     </div>
   );
 }
 
-function Ritual({
-  photo,
-  photoAlt,
-  kicker,
-  kickerTone = "text-earth",
+function RoomCard({
+  to,
+  image,
+  alt,
+  eyebrow,
   title,
   body,
-  href,
-  linkLabel,
-  action,
-  onAction,
+  icon,
 }: {
-  photo: string;
-  photoAlt: string;
-  kicker: string;
-  kickerTone?: string;
+  to: "/app/binding" | "/app/journey" | "/app/move" | "/app/resources";
+  image: string;
+  alt: string;
+  eyebrow: string;
   title: string;
   body: string;
-  href?: "/app/meals" | "/app/binding" | "/app/nouri" | "/app/grocery";
-  linkLabel?: string;
-  action?: string;
-  onAction?: () => void;
+  icon: React.ReactNode;
 }) {
   return (
-    <li className="grid gap-8 border-b border-border py-14 md:grid-cols-[minmax(0,16rem)_1fr] md:items-center md:py-16">
-      <img src={photo} alt={photoAlt} className="media h-56 w-full object-cover md:h-44" />
-      <div>
-        <p className={`text-xs uppercase tracking-[0.28em] ${kickerTone}`}>{kicker}</p>
-        <h3 className="mt-3 font-display text-3xl md:text-5xl">{title}</h3>
-        <p className="mt-4 max-w-lg text-base leading-relaxed text-ink-soft md:text-lg">{body}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-5">
-          {href && linkLabel ? (
-            <Link to={href} className="inline-flex items-center gap-2 text-primary">
-              {linkLabel} <ArrowRight className="size-4" />
-            </Link>
-          ) : null}
-          {action && onAction ? (
-            <button type="button" onClick={onAction} className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-              {action}
-            </button>
-          ) : null}
-        </div>
+    <Link to={to} className="member-room-card member-reveal">
+      <div className="overflow-hidden">
+        <img src={image} alt={alt} />
       </div>
-    </li>
+      <div className="member-room-card-copy">
+        <p className="member-eyebrow">{eyebrow}</p>
+        <h3>{title}</h3>
+        <p>{body}</p>
+        <span className="member-room-arrow">
+          {icon} Open room <ArrowRight className="size-4" />
+        </span>
+      </div>
+    </Link>
   );
 }
