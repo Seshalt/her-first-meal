@@ -41,8 +41,8 @@ export const LANDING_IMAGE_SLOTS = [
   {
     id: "nouri",
     label: "Home · personal support",
-    fallback: "/images/nouri-drop.jpg",
-    alt: "Hot tea pouring into a ceramic cup",
+    fallback: "/images/postpartum-rest.jpg",
+    alt: "Latina mother standing outside, holding her baby close",
   },
   {
     id: "family",
@@ -125,8 +125,8 @@ export const LANDING_IMAGE_SLOTS = [
   {
     id: "nouriHero",
     label: "Support page · photograph",
-    fallback: "/images/nouri-drop.jpg",
-    alt: "Hot tea pouring into a ceramic cup",
+    fallback: "/images/postpartum-rest.jpg",
+    alt: "Latina mother standing outside, holding her baby close",
   },
 ] as const;
 
