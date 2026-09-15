@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, Navigation, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { getGroceryList, toggleGroceryItem } from "@/lib/server/meals";
@@ -76,13 +76,16 @@ function Grocery() {
         tone="gold"
       />
       <RoomBody>
-        <section className="mb-14 overflow-hidden rounded-[30px] border border-border/70 bg-card/80 p-5 shadow-[0_24px_70px_-32px_rgba(30,42,38,.45)] md:p-7">
+        <section className="location-disclosure mb-14 overflow-hidden rounded-[30px] p-5 md:p-7">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="flex items-center gap-2 text-xs uppercase tracking-[0.26em] text-gold"><MapPin className="size-4" /> Nearby markets</p>
-              <h2 className="mt-2 font-display text-3xl">Shop the list near you.</h2>
+              <p className="flex items-center gap-2 text-xs uppercase tracking-[0.26em] text-gold"><MapPin className="size-4" /> Local grocery planning</p>
+              <h2 className="mt-2 font-display text-3xl">Take your list to stores near you.</h2>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-soft">
-                Her First Meal never sells or stores your live GPS position. When you tap below, your browser can share a one-time location directly with your maps app. If you decline, we search around {place} instead.
+                Your saved city, state, ZIP, and preferred stores help make grocery planning local. If you tap “Find stores near me,” your browser asks permission for your current location and Her First Meal uses those coordinates only in that moment to open a nearby grocery search in Maps.
+              </p>
+              <p className="mt-3 flex max-w-xl items-start gap-2 text-xs leading-5 text-muted-foreground">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" /> We do not save your precise GPS coordinates to your profile or sell location data. If you decline location access, we use your saved area instead.
               </p>
             </div>
             <Button type="button" variant="gold" onClick={findNearby} disabled={locating}>
