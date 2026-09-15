@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { MapPin, ShieldCheck, Store } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand/logo";
@@ -11,6 +12,7 @@ import { STAGE_LABEL, STORES, readJoinDiets, type Stage } from "@/lib/content/ca
 import { US_STATES, stateByCode } from "@/lib/content/places";
 import { altFor } from "@/lib/landing";
 import { getMyHome, saveJoinDiets, saveOnboarding } from "@/lib/server/profile";
+import { authClient } from "@/lib/auth/client";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { useI18n } from "@/lib/i18n/provider";
 import type { MsgKey } from "@/lib/i18n/en";
@@ -52,6 +54,8 @@ const STEPS = [
   },
 ] as const;
 
+const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
 function Onboarding() {
   const user = useCurrentUser();
   const navigate = useNavigate();
@@ -78,67 +82,98 @@ function Onboarding() {
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [sessionError, setSessionError] = useState(false);
 
   useEffect(() => {
     const stored = readJoinDiets();
     if (stored.length) setDiets(stored);
-    void getMyHome()
-      .then((home) => {
-        if (home.profile.displayName) setDisplayName(home.profile.displayName);
-        if (home.profile.language) setLocale(home.profile.language as typeof locale);
-        if (home.profile.stage) setStage(home.profile.stage);
-        if (home.profile.stateCode) setStateCode(home.profile.stateCode);
-        if (home.profile.city) setLocation(home.profile.city);
-        if (home.diet.diets.length) setDiets(home.diet.diets);
-        else if (stored.length) void saveJoinDiets({ data: { diets: stored, language: locale } });
-      })
-      .catch(() => {
-        if (stored.length) void saveJoinDiets({ data: { diets: stored, language: locale } });
-      });
+    let live = true;
+
+    async function loadHome() {
+      for (let attempt = 0; attempt < 7; attempt += 1) {
+        try {
+          await authClient.getSession().catch(() => undefined);
+          const home = await getMyHome();
+          if (!live) return;
+          if (home.profile.displayName) setDisplayName(home.profile.displayName);
+          if (home.profile.language) setLocale(home.profile.language as typeof locale);
+          if (home.profile.stage) setStage(home.profile.stage);
+          if (home.profile.stateCode) setStateCode(home.profile.stateCode);
+          if (home.profile.city) setLocation(home.profile.city);
+          if (home.profile.zipCode) setZipCode(home.profile.zipCode);
+          if (home.grocery.stores.length) setStores(home.grocery.stores);
+          if (home.diet.diets.length) setDiets(home.diet.diets);
+          else if (stored.length) await saveJoinDiets({ data: { diets: stored, language: locale } }).catch(() => undefined);
+          setSessionReady(true);
+          setSessionError(false);
+          return;
+        } catch {
+          if (attempt < 6) await wait(250 + attempt * 180);
+        }
+      }
+      if (live) setSessionError(true);
+    }
+
+    void loadHome();
+    return () => {
+      live = false;
+    };
   }, []);
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
     set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
   }
 
+  function onboardingPayload(complete = false, nextStep = step) {
+    return {
+      displayName,
+      location: stateByCode(stateCode)?.name ?? location,
+      timezone,
+      language: locale,
+      stage,
+      dueDate: dueDate || null,
+      babyBirthday: babyBirthday || null,
+      previousPregnancies,
+      isFirstPregnancy,
+      isMultiple,
+      diets,
+      allergies: allergies
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      avoids,
+      dislikes,
+      loves,
+      cuisines: cuisines
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      stores,
+      householdSize,
+      weeklyBudget,
+      zipCode,
+      city: location,
+      stateCode: stateCode || undefined,
+      region: stateByCode(stateCode)?.region,
+      complete,
+      step: nextStep,
+    };
+  }
+
   async function persist(complete = false, nextStep = step) {
     setBusy(true);
     try {
-      await saveOnboarding({
-        data: {
-          displayName,
-          location: stateByCode(stateCode)?.name ?? location,
-          timezone,
-          language: locale,
-          stage,
-          dueDate: dueDate || null,
-          babyBirthday: babyBirthday || null,
-          previousPregnancies,
-          isFirstPregnancy,
-          isMultiple,
-          diets,
-          allergies: allergies
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-          avoids,
-          dislikes,
-          loves,
-          cuisines: cuisines
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-          stores,
-          householdSize,
-          weeklyBudget,
-          zipCode,
-          city: location,
-          stateCode: stateCode || undefined,
-          region: stateByCode(stateCode)?.region,
-          complete,
-          step: nextStep,
-        },
-      });
+      const data = onboardingPayload(complete, nextStep);
+      try {
+        await saveOnboarding({ data });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "";
+        if (!/unauthorized/i.test(message)) throw err;
+        await authClient.getSession().catch(() => undefined);
+        await wait(450);
+        await saveOnboarding({ data });
+      }
       if (complete) {
         toast.success("Your house is ready.");
         void navigate({ to: "/app" });
@@ -177,10 +212,35 @@ function Onboarding() {
           <div className="h-full bg-primary transition-[width] duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
         </div>
 
+        {!sessionReady ? (
+          <div className="mt-5 rounded-2xl border border-border/70 bg-card/70 px-4 py-3 text-sm text-muted-foreground backdrop-blur">
+            {sessionError ? "Your account was created, but sign-in did not finish. Refresh this page or sign in again." : "Securing your new account…"}
+          </div>
+        ) : null}
+
         {step === 0 ? (
           <div className="mt-8 space-y-4">
             <Field label={t("join.name")} value={displayName} onChange={setDisplayName} />
-            <Field label={t("onboarding.city")} value={location} onChange={setLocation} optional />
+            <Field
+              label="City or area"
+              value={location}
+              onChange={setLocation}
+              optional
+              helper="Add this if you want grocery planning tailored to stores and markets around you. We do not need your exact address."
+            />
+            <div className="location-disclosure rounded-[24px] p-5">
+              <div className="flex gap-4">
+                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/12 text-primary">
+                  <MapPin className="size-5" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Make grocery planning local</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Your city or ZIP helps us shape store and market guidance around where you actually shop. Later, “Find stores near me” can ask for one-time device location only when you tap it; precise GPS is not saved to your profile.
+                  </p>
+                </div>
+              </div>
+            </div>
             <div>
               <Label>{t("join.language")}</Label>
               <div className="mt-2">
@@ -244,6 +304,22 @@ function Onboarding() {
 
         {step === 3 ? (
           <div className="mt-8 space-y-4">
+            <div className="location-disclosure rounded-[24px] p-5">
+              <div className="flex gap-4">
+                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 text-earth dark:text-gold">
+                  <Store className="size-5" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Tell us where the grocery list has to work.</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Choose your state, favorite stores, and optionally a ZIP. We use them to make grocery planning more practical for your area and the stores you actually use.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
+                <ShieldCheck className="size-4 text-primary" /> Exact GPS is only used if you later choose “Find stores near me,” and is not stored.
+              </div>
+            </div>
             <div>
               <Label>{t("onboarding.state")}</Label>
               <select
@@ -266,7 +342,13 @@ function Onboarding() {
                 </Pill>
               ))}
             </div>
-            <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
+            <Field
+              label="ZIP code"
+              value={zipCode}
+              onChange={setZipCode}
+              optional
+              helper="Helps narrow local grocery planning without asking for a street address."
+            />
             <Field
               label="Household size"
               value={String(householdSize)}
@@ -284,12 +366,12 @@ function Onboarding() {
             </Button>
           ) : null}
           {step < STEPS.length - 1 ? (
-            <Button type="button" disabled={busy || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
-              {t("continue")}
+            <Button type="button" disabled={busy || !sessionReady || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
+              {busy ? "Saving…" : !sessionReady ? "Securing account…" : t("continue")}
             </Button>
           ) : (
-            <Button type="button" disabled={busy} onClick={() => void persist(true, step)}>
-              {busy ? t("onboarding.opening") : t("onboarding.enter")}
+            <Button type="button" disabled={busy || !sessionReady} onClick={() => void persist(true, step)}>
+              {busy ? t("onboarding.opening") : !sessionReady ? "Securing account…" : t("onboarding.enter")}
             </Button>
           )}
         </div>
@@ -304,12 +386,14 @@ function Field({
   onChange,
   type = "text",
   optional,
+  helper,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   optional?: boolean;
+  helper?: string;
 }) {
   const id = label.toLowerCase().replace(/\s+/g, "-");
   return (
@@ -319,6 +403,7 @@ function Field({
         {optional ? <span className="ml-1 text-muted-foreground">(optional)</span> : null}
       </Label>
       <Input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+      {helper ? <p className="mt-2 text-xs leading-5 text-muted-foreground">{helper}</p> : null}
     </div>
   );
 }
