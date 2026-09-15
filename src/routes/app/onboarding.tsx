@@ -3,8 +3,6 @@ import { MapPin, ShieldCheck, Store } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand/logo";
-import { Pill } from "@/components/layout/room-hero";
-import { Button } from "@/components/ui/button";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { DietPicks } from "@/components/house/diet-picks";
 import { LocaleSwitch } from "@/components/i18n/locale-switch";
@@ -64,7 +62,7 @@ function Onboarding() {
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [location, setLocation] = useState("");
   const [stateCode, setStateCode] = useState("");
-  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [timezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [stage, setStage] = useState<Stage | null>(null);
   const [dueDate, setDueDate] = useState("");
   const [babyBirthday, setBabyBirthday] = useState("");
@@ -102,6 +100,8 @@ function Onboarding() {
           if (home.profile.stateCode) setStateCode(home.profile.stateCode);
           if (home.profile.city) setLocation(home.profile.city);
           if (home.profile.zipCode) setZipCode(home.profile.zipCode);
+          if (home.profile.householdSize) setHouseholdSize(home.profile.householdSize);
+          if (home.profile.weeklyBudget) setWeeklyBudget(home.profile.weeklyBudget);
           if (home.grocery.stores.length) setStores(home.grocery.stores);
           if (home.diet.diets.length) setDiets(home.diet.diets);
           else if (stored.length) await saveJoinDiets({ data: { diets: stored, language: locale } }).catch(() => undefined);
@@ -120,6 +120,10 @@ function Onboarding() {
       live = false;
     };
   }, []);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
     set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
@@ -191,192 +195,214 @@ function Onboarding() {
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
-      <div className="relative min-h-[42vh] overflow-hidden text-paper lg:min-h-dvh">
-        <img src={current.src} alt={current.alt} className="media absolute inset-0 h-full w-full object-cover" />
-        <div className="hero-veil pointer-events-none absolute inset-0" />
-        <div className="relative flex h-full min-h-[42vh] flex-col justify-between px-5 py-8 md:px-10 lg:min-h-dvh lg:py-10">
+      <aside className="onboarding-photo" data-step={step}>
+        <img src={current.src} alt={current.alt} className="media" />
+        <div className="onboarding-photo-veil" />
+        <div className="onboarding-photo-copy">
           <Wordmark to="/" className="text-paper" />
-          <div className="pb-8 lg:pb-12">
-            <p className="text-xs uppercase tracking-[0.32em] text-aqua">
+          <div className="onboarding-photo-message">
+            <p className="onboarding-kicker">
               {t(current.kicker as MsgKey)} · {step + 1} of {STEPS.length}
             </p>
-            <h1 className="mt-5 font-display text-[clamp(2.4rem,5vw,4.6rem)] leading-[0.95]">{t(current.title as MsgKey)}</h1>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-paper/88">{t(current.body as MsgKey)}</p>
+            <h1>{t(current.title as MsgKey)}</h1>
+            <p>{t(current.body as MsgKey)}</p>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div className="flex flex-col justify-center bg-background px-5 py-12 md:px-14">
-        <p className="text-xs uppercase tracking-[0.32em] text-earth">{current.label}</p>
-        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-secondary">
-          <div className="h-full bg-primary transition-[width] duration-300" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
-        </div>
-
-        {!sessionReady ? (
-          <div className="mt-5 rounded-2xl border border-border/70 bg-card/70 px-4 py-3 text-sm text-muted-foreground backdrop-blur">
-            {sessionError ? "Your account was created, but sign-in did not finish. Refresh this page or sign in again." : "Securing your new account…"}
+      <main className="onboarding-panel">
+        <div className="onboarding-form">
+          <p className="onboarding-step-label">{current.label}</p>
+          <div className="onboarding-progress" aria-label={`Step ${step + 1} of ${STEPS.length}`}>
+            <span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
           </div>
-        ) : null}
 
-        {step === 0 ? (
-          <div className="mt-8 space-y-4">
-            <Field label={t("join.name")} value={displayName} onChange={setDisplayName} />
-            <Field
-              label="City or area"
-              value={location}
-              onChange={setLocation}
-              optional
-              helper="Add this if you want grocery planning tailored to stores and markets around you. We do not need your exact address."
-            />
-            <div className="location-disclosure rounded-[24px] p-5">
-              <div className="flex gap-4">
-                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/12 text-primary">
-                  <MapPin className="size-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Make grocery planning local</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Your city or ZIP helps us shape store and market guidance around where you actually shop. Later, “Find stores near me” can ask for one-time device location only when you tap it; precise GPS is not saved to your profile.
-                  </p>
-                </div>
-              </div>
+          {!sessionReady ? (
+            <div className="onboarding-session">
+              {sessionError
+                ? "Your account exists, but the secure session did not finish. Refresh once or sign in again."
+                : "Securing your new account…"}
             </div>
-            <div>
-              <Label>{t("join.language")}</Label>
-              <div className="mt-2">
-                <LocaleSwitch tone="gold" />
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {step === 1 ? (
-          <div className="mt-8 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(STAGE_LABEL) as Stage[]).map((s) => (
-                <Pill key={s} active={stage === s} onClick={() => setStage(s)}>
-                  {t(`stage.${s}` as MsgKey)}
-                </Pill>
-              ))}
-            </div>
-            {stage && stage !== "postpartum" && stage !== "trying" ? (
-              <Field label="Due date" value={dueDate} onChange={setDueDate} type="date" />
-            ) : null}
-            {stage === "postpartum" ? (
-              <Field label="Baby's birthday" value={babyBirthday} onChange={setBabyBirthday} type="date" />
-            ) : null}
-            <label className="flex min-h-11 items-center gap-2 text-sm">
-              <input type="checkbox" checked={isFirstPregnancy} onChange={(e) => setIsFirstPregnancy(e.target.checked)} />
-              First pregnancy
-            </label>
-            <label className="flex min-h-11 items-center gap-2 text-sm">
-              <input type="checkbox" checked={isMultiple} onChange={(e) => setIsMultiple(e.target.checked)} />
-              Multiple pregnancy
-            </label>
-            <Field
-              label="Previous pregnancies"
-              value={String(previousPregnancies)}
-              onChange={(v) => setPreviousPregnancies(Number(v) || 0)}
-              type="number"
-            />
-          </div>
-        ) : null}
-
-        {step === 2 ? (
-          <div className="mt-8 space-y-4">
-            <DietPicks value={diets} onChange={setDiets} />
-            <Field label="Allergies (comma separated)" value={allergies} onChange={setAllergies} optional />
-            <div>
-              <Label>What foods do you avoid?</Label>
-              <Textarea value={avoids} onChange={(e) => setAvoids(e.target.value)} />
-            </div>
-            <div>
-              <Label>What foods do you dislike?</Label>
-              <Textarea value={dislikes} onChange={(e) => setDislikes(e.target.value)} />
-            </div>
-            <div>
-              <Label>What foods do you love?</Label>
-              <Textarea value={loves} onChange={(e) => setLoves(e.target.value)} />
-            </div>
-            <Field label="Cuisines you enjoy" value={cuisines} onChange={setCuisines} optional />
-          </div>
-        ) : null}
-
-        {step === 3 ? (
-          <div className="mt-8 space-y-4">
-            <div className="location-disclosure rounded-[24px] p-5">
-              <div className="flex gap-4">
-                <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gold/15 text-earth dark:text-gold">
-                  <Store className="size-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-foreground">Tell us where the grocery list has to work.</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Choose your state, favorite stores, and optionally a ZIP. We use them to make grocery planning more practical for your area and the stores you actually use.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
-                <ShieldCheck className="size-4 text-primary" /> Exact GPS is only used if you later choose “Find stores near me,” and is not stored.
-              </div>
-            </div>
-            <div>
-              <Label>{t("onboarding.state")}</Label>
-              <select
-                className="mt-2 h-12 w-full rounded-xl border border-border bg-transparent px-3"
-                value={stateCode}
-                onChange={(e) => setStateCode(e.target.value)}
-              >
-                <option value="">—</option>
-                {US_STATES.map((s) => (
-                  <option key={s.code} value={s.code}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {STORES.map((s) => (
-                <Pill key={s} active={stores.includes(s)} onClick={() => toggle(stores, s, setStores)}>
-                  {s}
-                </Pill>
-              ))}
-            </div>
-            <Field
-              label="ZIP code"
-              value={zipCode}
-              onChange={setZipCode}
-              optional
-              helper="Helps narrow local grocery planning without asking for a street address."
-            />
-            <Field
-              label="Household size"
-              value={String(householdSize)}
-              onChange={(v) => setHouseholdSize(Number(v) || 1)}
-              type="number"
-            />
-            <Field label="Weekly grocery budget" value={weeklyBudget} onChange={setWeeklyBudget} optional />
-          </div>
-        ) : null}
-
-        <div className="mt-10 flex flex-wrap gap-3">
-          {step > 0 ? (
-            <Button type="button" variant="outline" onClick={() => setStep((s) => s - 1)}>
-              {t("back")}
-            </Button>
           ) : null}
-          {step < STEPS.length - 1 ? (
-            <Button type="button" disabled={busy || !sessionReady || (step === 0 && !displayName)} onClick={() => void persist(false, step + 1)}>
-              {busy ? "Saving…" : !sessionReady ? "Securing account…" : t("continue")}
-            </Button>
-          ) : (
-            <Button type="button" disabled={busy || !sessionReady} onClick={() => void persist(true, step)}>
-              {busy ? t("onboarding.opening") : !sessionReady ? "Securing account…" : t("onboarding.enter")}
-            </Button>
-          )}
+
+          {step === 0 ? (
+            <div className="onboarding-body space-y-5">
+              <Field label={t("join.name")} value={displayName} onChange={setDisplayName} />
+              <Field
+                label="City or area"
+                value={location}
+                onChange={setLocation}
+                optional
+                helper="Add this if you want grocery planning tailored to stores and markets around you. We do not need your exact address."
+              />
+              <div className="onboarding-disclosure">
+                <div className="flex gap-3">
+                  <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--member-teal)_14%,transparent)] text-[var(--member-teal)]">
+                    <MapPin className="size-5" />
+                  </div>
+                  <div>
+                    <strong className="block text-sm">Why we ask</strong>
+                    <p className="mt-1 text-sm leading-6">
+                      A city or ZIP helps your grocery list work around the stores and markets near you. Exact device location is only requested later if you tap “Find stores near me.”
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label>{t("join.language")}</Label>
+                <div className="mt-2">
+                  <LocaleSwitch tone="gold" />
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {step === 1 ? (
+            <div className="onboarding-body space-y-5">
+              <div>
+                <Label>Where are you right now?</Label>
+                <div className="onboarding-choice-grid mt-2">
+                  {(Object.keys(STAGE_LABEL) as Stage[]).map((value) => (
+                    <Choice key={value} active={stage === value} onClick={() => setStage(value)}>
+                      {t(`stage.${value}` as MsgKey)}
+                    </Choice>
+                  ))}
+                </div>
+              </div>
+              {stage && stage !== "postpartum" && stage !== "trying" ? (
+                <Field label="Due date" value={dueDate} onChange={setDueDate} type="date" />
+              ) : null}
+              {stage === "postpartum" ? (
+                <Field label="Baby's birthday" value={babyBirthday} onChange={setBabyBirthday} type="date" />
+              ) : null}
+              <label className="onboarding-check">
+                <input type="checkbox" checked={isFirstPregnancy} onChange={(e) => setIsFirstPregnancy(e.target.checked)} />
+                <span>First pregnancy</span>
+              </label>
+              <label className="onboarding-check">
+                <input type="checkbox" checked={isMultiple} onChange={(e) => setIsMultiple(e.target.checked)} />
+                <span>Multiple pregnancy</span>
+              </label>
+              <Field
+                label="Previous pregnancies"
+                value={String(previousPregnancies)}
+                onChange={(v) => setPreviousPregnancies(Number(v) || 0)}
+                type="number"
+              />
+            </div>
+          ) : null}
+
+          {step === 2 ? (
+            <div className="onboarding-body space-y-5">
+              <div>
+                <Label>How do you eat?</Label>
+                <p className="onboarding-helper mb-3">Choose every option that should shape recipes. Tap again to remove it.</p>
+                <DietPicks value={diets} onChange={setDiets} />
+              </div>
+              <Field label="Allergies (comma separated)" value={allergies} onChange={setAllergies} optional />
+              <div>
+                <Label>What foods do you avoid?</Label>
+                <Textarea value={avoids} onChange={(e) => setAvoids(e.target.value)} />
+              </div>
+              <div>
+                <Label>What foods do you dislike?</Label>
+                <Textarea value={dislikes} onChange={(e) => setDislikes(e.target.value)} />
+              </div>
+              <div>
+                <Label>What foods do you love?</Label>
+                <Textarea value={loves} onChange={(e) => setLoves(e.target.value)} />
+              </div>
+              <Field label="Cuisines you enjoy" value={cuisines} onChange={setCuisines} optional />
+            </div>
+          ) : null}
+
+          {step === 3 ? (
+            <div className="onboarding-body space-y-5">
+              <div className="onboarding-disclosure">
+                <div className="flex gap-3">
+                  <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--member-gold)_14%,transparent)] text-[var(--member-gold)]">
+                    <Store className="size-5" />
+                  </div>
+                  <div>
+                    <strong className="block text-sm">Make the grocery list useful where you live.</strong>
+                    <p className="mt-1 text-sm leading-6">
+                      Pick your state, the stores you actually use, and an optional ZIP. This improves local grocery planning without needing your exact address.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-start gap-2 border-t border-[var(--member-line)] pt-4 text-xs leading-5 text-[var(--member-muted)]">
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--member-teal)]" />
+                  Precise GPS is requested only if you later choose “Find stores near me,” and those coordinates are not saved to your profile.
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="state">{t("onboarding.state")}</Label>
+                <select id="state" value={stateCode} onChange={(e) => setStateCode(e.target.value)}>
+                  <option value="">Select your state</option>
+                  {US_STATES.map((state) => (
+                    <option key={state.code} value={state.code}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <Label>Stores you use</Label>
+                <p className="onboarding-helper mb-3">Selected stores are clearly filled. You can change these later.</p>
+                <div className="onboarding-choice-grid">
+                  {STORES.map((store) => (
+                    <Choice key={store} active={stores.includes(store)} onClick={() => toggle(stores, store, setStores)}>
+                      {store}
+                    </Choice>
+                  ))}
+                </div>
+              </div>
+
+              <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
+              <Field
+                label="Household size"
+                value={String(householdSize)}
+                onChange={(v) => setHouseholdSize(Math.max(1, Number(v) || 1))}
+                type="number"
+              />
+              <Field label="Weekly grocery budget" value={weeklyBudget} onChange={setWeeklyBudget} optional />
+            </div>
+          ) : null}
+
+          <div className="onboarding-actions">
+            {step > 0 ? (
+              <button type="button" className="onboarding-secondary" disabled={busy} onClick={() => setStep((value) => value - 1)}>
+                {t("back")}
+              </button>
+            ) : null}
+            {step < STEPS.length - 1 ? (
+              <button
+                type="button"
+                className="onboarding-primary"
+                disabled={busy || !sessionReady || (step === 0 && !displayName.trim())}
+                onClick={() => void persist(false, step + 1)}
+              >
+                {busy ? "Saving…" : t("continue")}
+              </button>
+            ) : (
+              <button type="button" className="onboarding-primary" disabled={busy || !sessionReady} onClick={() => void persist(true, step)}>
+                {busy ? t("onboarding.opening") : t("onboarding.enter")}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
+  );
+}
+
+function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button type="button" className="onboarding-choice" aria-pressed={active} onClick={onClick}>
+      {children}
+    </button>
   );
 }
 
@@ -390,20 +416,20 @@ function Field({
 }: {
   label: string;
   value: string;
-  onChange: (v: string) => void;
+  onChange: (value: string) => void;
   type?: string;
   optional?: boolean;
   helper?: string;
 }) {
-  const id = label.toLowerCase().replace(/\s+/g, "-");
+  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div>
       <Label htmlFor={id}>
         {label}
-        {optional ? <span className="ml-1 text-muted-foreground">(optional)</span> : null}
+        {optional ? <span className="ml-1 font-normal text-[var(--member-faint)]">(optional)</span> : null}
       </Label>
       <Input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} />
-      {helper ? <p className="mt-2 text-xs leading-5 text-muted-foreground">{helper}</p> : null}
+      {helper ? <p className="onboarding-helper">{helper}</p> : null}
     </div>
   );
 }
