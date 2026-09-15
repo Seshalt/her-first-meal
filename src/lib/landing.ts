@@ -170,22 +170,29 @@ export type LandingCopy = {
   closeBody: string;
 };
 
+const OLD_SUBHEAD =
+  "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery and pantry planning, belly binding education, movement, week-by-week guidance, and real human support. Care that grows with you.";
+const OLD_OFFER =
+  "One membership opens the house: personalized meals, grocery and pantry planning, belly binding education, movement for her stage, week-by-week guidance, and a partner lane. A private session with Maat is the only extra.";
+const OLD_MEALS =
+  "Members receive personalized meal guidance for pregnancy and postpartum — chosen from a deep built-in recipe library around her culture, appetite, household size, budget, pantry, and the way she eats. Vegan, pescatarian, vegetarian, gluten-free, dairy-free, halal, kosher, and more can be selected during onboarding.";
+
 export const DEFAULT_LANDING_COPY: LandingCopy = {
   eyebrow: "Her First Meal",
   headline: "The world celebrates the baby.",
   headlineAccent: "We remember the mother.",
   subhead:
-    "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery and pantry planning, belly binding education, movement, week-by-week guidance, and real human support. Care that grows with you.",
+    "A personalized pregnancy and postpartum wellness home — nourishing meals, grocery lists shaped around your city and preferred stores, pantry planning, belly binding education, movement, week-by-week guidance, and real human support.",
   cta: "Start your journey today",
   secondaryCta: "See membership",
   offerLine:
-    "One membership opens the house: personalized meals, grocery and pantry planning, belly binding education, movement for her stage, week-by-week guidance, and a partner lane. A private session with Maat is the only extra.",
+    "One membership opens the house: personalized meals, local grocery and nearby-store planning, a virtual pantry, belly binding education, movement for her stage, week-by-week guidance, and a partner lane. A private session with Maat is the only extra.",
   manifesto:
     "Before we ask what the baby needs, we set the table for the woman who grew them — with meals, wrapping education, recovery movement, and a partner who finally has somewhere useful to stand.",
-  mealsKicker: "Nourishment",
+  mealsKicker: "Nourishment · local grocery planning",
   mealsTitle: "Meals that bow to her real kitchen.",
   mealsBody:
-    "Members receive personalized meal guidance for pregnancy and postpartum — chosen from a deep built-in recipe library around her culture, appetite, household size, budget, pantry, and the way she eats. Vegan, pescatarian, vegetarian, gluten-free, dairy-free, halal, kosher, and more can be selected during onboarding.",
+    "Choose from a deep built-in recipe library around culture, appetite, household size, budget, pantry, and the way you eat. Her First Meal turns those choices into grocery planning for the stores you use and can open nearby-market searches from your city or ZIP — or from a one-time location share only when you ask for it.",
   bindingKicker: "Flagship practice",
   bindingTitle: "Belly binding, held with care.",
   bindingBody:
@@ -196,7 +203,7 @@ export const DEFAULT_LANDING_COPY: LandingCopy = {
     "Your meals, market list, stage guide, pantry suggestions, and movement library are organized from Her First Meal’s built-in content and the preferences you choose. When you want a person, send Maat a private note or book a live Zoom session.",
   closeTitle: "What does her body need?",
   closeBody:
-    "Membership is the house itself: personalized meals and grocery lists, pantry planning, the Belly Binding Studio, stage-right movement, week-by-week guidance, and the partner lane. The only extra is a private meeting with Maat.",
+    "Membership is the house itself: personalized meals and grocery lists, nearby-store planning, pantry tools, the Belly Binding Studio, stage-right movement, week-by-week guidance, and the partner lane. The only extra is a private meeting with Maat.",
 };
 
 export type LandingContent = LandingCopy & {
@@ -248,7 +255,11 @@ function pickCopy(copy: Partial<LandingCopy> | null | undefined): Partial<Landin
     const value = copy[key];
     if (typeof value === "string" && value.trim()) {
       const trimmed = value.trim();
-      // Migrate any legacy Nouri/AI marketing copy stored in the database.
+      // Migrate legacy marketing copy stored in the database so the public site
+      // picks up newer product positioning without destroying genuine owner edits.
+      if (key === "subhead" && trimmed === OLD_SUBHEAD) continue;
+      if (key === "offerLine" && trimmed === OLD_OFFER) continue;
+      if (key === "mealsBody" && trimmed === OLD_MEALS) continue;
       if ((key === "nouriBody" || key === "subhead") && /\b(ai|nouri|chatbot)\b/i.test(trimmed)) continue;
       if (key === "nouriTitle" && /nouri|companion|questions between appointments/i.test(trimmed)) continue;
       if (key === "nouriKicker" && /nouri/i.test(trimmed)) continue;
@@ -260,11 +271,11 @@ function pickCopy(copy: Partial<LandingCopy> | null | undefined): Partial<Landin
 
 export const OFFER_TICKER = [
   "Personalized meals",
+  "Nearby grocery planning",
   "Belly Binding Studio",
   "Human support",
   "Movement",
-  "Grocery lists",
+  "Virtual pantry",
   "Partner lane",
   "Week-by-week journey",
-  "Fourth trimester care",
 ];
