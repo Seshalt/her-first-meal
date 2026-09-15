@@ -9,6 +9,7 @@ import { CookieConsent } from "@/components/security/cookie-consent";
 import { ConsentTags } from "@/components/security/consent-tags";
 import { ScrollReset } from "@/components/layout/scroll-reset";
 import { PwaRegister } from "@/components/pwa-register";
+import { VisualOverrides } from "@/components/visual-overrides";
 import { restoreOwnerToken } from "@/lib/session-ready";
 import { LocaleProvider } from "@/lib/i18n/provider";
 import appCss from "../styles.css?url";
@@ -77,6 +78,7 @@ function RootDocument() {
             <ThemeProvider>
               <ThemePaint />
               <ScrollReset />
+              <VisualOverrides />
               <Outlet />
               <CookieConsent />
               <ConsentTags />
