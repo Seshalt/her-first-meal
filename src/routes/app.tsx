@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/app-shell";
 import { RequireMember } from "@/components/gates/require-member";
+import "../app-atmosphere.css";
 
 export const Route = createFileRoute("/app")({ component: AppLayout });
 
@@ -9,13 +10,15 @@ function AppLayout() {
   const bare = pathname.startsWith("/app/onboarding");
   return (
     <RequireMember>
-      {bare ? (
-        <Outlet />
-      ) : (
-        <AppShell hideNouri={pathname.startsWith("/app/nouri")}>
+      <div className={bare ? "onboarding-shell" : "member-shell"}>
+        {bare ? (
           <Outlet />
-        </AppShell>
-      )}
+        ) : (
+          <AppShell hideNouri={pathname.startsWith("/app/nouri")}>
+            <Outlet />
+          </AppShell>
+        )}
+      </div>
     </RequireMember>
   );
 }
