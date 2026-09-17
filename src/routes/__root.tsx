@@ -47,10 +47,9 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "canonical", href: "https://www.herfirstmeal.app/" },
-      { rel: "icon", type: "image/svg+xml", sizes: "any", href: "/favicon.svg?v=hfm-pwa-1" },
-      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png?v=hfm8" },
-      { rel: "apple-touch-icon", sizes: "180x180", href: "/icon-180.png?v=hfm-pwa-1" },
-      { rel: "manifest", href: "/manifest.webmanifest?v=hfm-pwa-1" },
+      { rel: "icon", type: "image/png", href: "/images/logos/hfm-official.png?v=hfm-official-2" },
+      { rel: "apple-touch-icon", href: "/images/logos/hfm-official.png?v=hfm-official-2" },
+      { rel: "manifest", href: "/manifest.webmanifest?v=hfm-official-1" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

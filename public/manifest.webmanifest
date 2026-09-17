@@ -5,38 +5,26 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "background_color": "#F6EFE4",
-  "theme_color": "#1B4D47",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#EEE5D6",
+  "theme_color": "#0E4D52",
   "description": "Pregnancy and postpartum meals, grocery planning, daily body guidance, belly binding education, movement, and human support.",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["health", "lifestyle", "food"],
+  "categories": [
+    "health",
+    "lifestyle",
+    "food"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/favicon.svg?v=hfm-pwa-1",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-180.png?v=hfm-pwa-1",
-      "sizes": "180x180",
+      "src": "/images/logos/hfm-official.png?v=hfm-official-2",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png?v=hfm-pwa-1",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-maskable.svg?v=hfm-pwa-1",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ],
   "shortcuts": [

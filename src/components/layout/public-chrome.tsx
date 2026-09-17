@@ -75,7 +75,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
       )}
     >
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-4 md:h-[5.25rem] md:px-6">
-        <Wordmark className={cn("min-w-0", ink)} />
+        <Wordmark mark className={cn("min-w-0", ink)} />
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
           {links.map((l) => (
             <Link
@@ -140,7 +140,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
       {open ? (
         <div className={cn("fixed inset-0 z-[100] flex flex-col", stayDark ? "bg-ink text-paper" : "bg-background text-foreground")}>
           <div className="flex h-16 items-center justify-between px-4">
-            <Wordmark className={stayDark ? "text-paper" : undefined} />
+            <Wordmark mark className={stayDark ? "text-paper" : undefined} />
             <button type="button" className="grid size-12 place-items-center rounded-full" aria-label="Close menu" onClick={() => setOpen(false)}>
               <X className="size-6" />
             </button>
@@ -198,7 +198,7 @@ export function PublicFooter() {
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
-          <Wordmark stacked className="text-paper" />
+          <Wordmark stacked mark className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
             {content.headlineAccent} {t("footer.blurb")}
           </p>
