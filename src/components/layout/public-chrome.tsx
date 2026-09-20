@@ -61,17 +61,22 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
 
   const onHero = overlay && !scrolled && !open;
   const stayDark = cinematic;
-  const ink = onHero || stayDark ? "text-paper" : "text-foreground";
+  const solidOverlay = overlay && scrolled;
+  const darkNav = onHero || stayDark;
+  const ink = darkNav ? "text-paper" : "text-foreground";
 
   return (
     <header
       data-site-nav
+      data-scrolled={scrolled ? "true" : "false"}
       className={cn(
         overlay ? "fixed inset-x-0 top-0 z-[80]" : "sticky top-0 z-[80]",
-        "transition-[background,box-shadow,border-color,color] duration-700 ease-out",
-        onHero || stayDark
-          ? "nav-liquid-glass nav-liquid-glass-thin border-b border-white/15 text-paper"
-          : "nav-liquid-glass border-b border-white/35 text-foreground",
+        "transition-[background,box-shadow,border-color,color] duration-300 ease-out",
+        onHero
+          ? "border-b border-white/15 bg-[linear-gradient(180deg,rgba(6,38,40,.72),rgba(6,38,40,.12))] text-paper backdrop-blur-[10px]"
+          : solidOverlay || stayDark
+            ? "border-b border-[#b88d48]/35 bg-[#e7c988] text-foreground shadow-[0_10px_36px_-22px_rgba(4,28,29,.45)]"
+            : "border-b border-ink/10 bg-background/95 text-foreground shadow-sm backdrop-blur-xl",
       )}
     >
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-4 md:h-[5.25rem] md:px-6">
@@ -83,8 +88,8 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
               to={l.to}
               className={cn(
                 "text-sm tracking-wide transition-colors",
-                onHero || stayDark ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
-                pathname === l.to && (onHero || stayDark ? "text-paper" : "text-foreground"),
+                darkNav ? "text-paper/80 hover:text-paper" : "text-muted-foreground hover:text-foreground",
+                pathname === l.to && (darkNav ? "text-paper" : "text-foreground"),
               )}
             >
               {l.label}
@@ -92,7 +97,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-          <LocaleSwitch tone={onHero ? "paper" : "ink"} className="hidden md:inline-flex" />
+          <LocaleSwitch tone={darkNav ? "paper" : "ink"} className="hidden md:inline-flex" />
           <SignedOut>
             <Link
               to="/login"
@@ -120,7 +125,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
             to="/pricing"
             className={cn(
               "hidden h-11 items-center rounded-full px-5 text-sm font-medium sm:inline-flex",
-              onHero || stayDark ? "bg-gold text-ink hover:bg-paper" : "bg-primary text-primary-foreground hover:bg-sea-deep",
+              darkNav ? "bg-gold text-ink hover:bg-paper" : "bg-primary text-primary-foreground hover:bg-sea-deep",
             )}
           >
             {t("cta")}
@@ -198,7 +203,7 @@ export function PublicFooter() {
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-4 md:px-6">
         <div className="md:col-span-2">
-          <Wordmark stacked mark className="text-paper" />
+          <Wordmark stacked className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
             {content.headlineAccent} {t("footer.blurb")}
           </p>

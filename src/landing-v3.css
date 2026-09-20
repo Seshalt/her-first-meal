@@ -383,3 +383,256 @@
 @media (prefers-reduced-motion: reduce) {
   .hfm4 *, .hfm4 *::before, .hfm4 *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: 0.01ms !important; }
 }
+
+/* 2026-09-20 readability + brand polish based on live-page feedback */
+.hfm4 {
+  background:
+    radial-gradient(70rem 44rem at -10% 34%, rgba(14,77,82,.13), transparent 66%),
+    radial-gradient(60rem 40rem at 108% 60%, rgba(182,83,62,.13), transparent 66%),
+    linear-gradient(180deg, #eadfce 0%, #f6ecdf 24%, #eadfce 58%, #f3e7d7 100%);
+}
+
+.hfm4 [data-site-nav][data-scrolled="false"] {
+  background: linear-gradient(180deg, rgba(5,39,41,.82), rgba(5,39,41,.28)) !important;
+  border-color: rgba(248,242,232,.16) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(10px) saturate(105%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(105%) !important;
+}
+
+.hfm4 [data-site-nav][data-scrolled="true"] {
+  background: #e7c988 !important;
+  border-color: rgba(24,35,33,.2) !important;
+  box-shadow: 0 12px 34px -24px rgba(20,38,34,.6) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.hfm4 [data-site-nav][data-scrolled="true"] select {
+  color: #182321 !important;
+  border-color: rgba(24,35,33,.28) !important;
+}
+
+.hfm4 [data-site-nav] img {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.hfm4-hero-brand {
+  gap: 0;
+  padding-bottom: .75rem;
+  border-bottom-color: rgba(227,189,105,.4);
+}
+
+.hfm4-hero-brand::before {
+  content: "";
+  width: 2.75rem;
+  height: 1px;
+  margin-right: .85rem;
+  background: var(--hfm-gold);
+}
+
+.hfm4-hero-lede {
+  max-width: 34rem;
+  line-height: 1.62;
+}
+
+.hfm4-manifesto {
+  overflow: hidden;
+  padding-block: clamp(5rem, 8vw, 8rem);
+  background:
+    radial-gradient(44rem 26rem at 12% 12%, rgba(227,189,105,.22), transparent 68%),
+    radial-gradient(38rem 24rem at 88% 85%, rgba(182,83,62,.14), transparent 68%),
+    linear-gradient(120deg, rgba(245,231,211,.94), rgba(231,218,196,.9));
+}
+
+.hfm4-manifesto h2 {
+  max-width: 18ch;
+  font-size: clamp(2.65rem, 4.8vw, 5rem);
+  line-height: .98;
+}
+
+.hfm4-quick-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 48rem;
+  margin-top: 2.4rem;
+  border-top: 1px solid rgba(14,77,82,.2);
+}
+
+.hfm4-quick-points span {
+  padding: .8rem .25rem .8rem 0;
+  border-bottom: 1px solid rgba(14,77,82,.16);
+  color: var(--hfm-teal-deep);
+  font-size: .84rem;
+  font-weight: 700;
+  letter-spacing: .015em;
+}
+
+.hfm4-quick-points span:nth-child(odd) {
+  margin-right: 1.5rem;
+}
+
+.hfm4-stories {
+  width: min(100% - 2rem, 92rem);
+  padding-inline: clamp(.25rem, 2vw, 1.5rem);
+  background:
+    radial-gradient(30rem 24rem at 3% 26%, rgba(14,77,82,.08), transparent 72%),
+    radial-gradient(34rem 26rem at 98% 74%, rgba(227,189,105,.13), transparent 72%);
+}
+
+.hfm4-story {
+  padding-block: clamp(4rem, 6vw, 6rem);
+}
+
+.hfm4-story-copy h2 {
+  max-width: 13ch;
+  font-size: clamp(2.65rem, 4.7vw, 4.9rem);
+  line-height: .96;
+}
+
+.hfm4-story-copy > p:not(.hfm4-kicker):not(.hfm4-detail) {
+  max-width: 35rem;
+  margin-top: 1.35rem;
+  font-size: .98rem;
+  line-height: 1.68;
+}
+
+.hfm4-diet-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem .7rem;
+  margin-top: 1.6rem;
+  max-width: 36rem;
+}
+
+.hfm4-diet-row span {
+  padding: .38rem .68rem;
+  border: 1px solid rgba(14,77,82,.18);
+  border-radius: 999px;
+  background: rgba(248,242,232,.58);
+  color: var(--hfm-teal-deep);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.hfm4-market-note {
+  background: rgba(231,201,136,.92);
+  color: var(--hfm-ink);
+}
+
+.hfm4-rhythm {
+  position: relative;
+  isolation: isolate;
+  width: min(100% - 2rem, 88rem);
+  margin-block: clamp(2rem, 5vw, 5rem);
+  padding: clamp(4.5rem, 8vw, 7rem) clamp(1rem, 4vw, 4rem);
+}
+
+.hfm4-rhythm::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid rgba(14,77,82,.12);
+  border-radius: 2.25rem 2.25rem 7rem 2.25rem;
+  background:
+    radial-gradient(38rem 23rem at 12% 0%, rgba(14,77,82,.13), transparent 72%),
+    radial-gradient(30rem 21rem at 95% 100%, rgba(182,83,62,.12), transparent 72%),
+    linear-gradient(135deg, rgba(248,242,232,.96), rgba(230,217,195,.9));
+  box-shadow: 0 34px 80px -70px rgba(14,52,55,.8);
+}
+
+.hfm4-rhythm-head {
+  gap: 1rem;
+}
+
+.hfm4-rhythm-head h2 {
+  max-width: 12ch;
+  font-size: clamp(2.6rem, 4.5vw, 4.5rem);
+  line-height: .98;
+}
+
+.hfm4-rhythm-lines {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.hfm4-rhythm-lines article {
+  padding: 1.5rem 0 1.5rem 1rem;
+  border-left: 3px solid transparent;
+}
+
+.hfm4-rhythm-lines article:nth-child(1) { border-left-color: var(--hfm-teal); }
+.hfm4-rhythm-lines article:nth-child(2) { border-left-color: var(--hfm-clay); }
+.hfm4-rhythm-lines article:nth-child(3) { border-left-color: var(--hfm-gold-deep); }
+
+.hfm4-rhythm-lines h3 {
+  font-size: clamp(1.65rem, 2.5vw, 2.35rem);
+  line-height: 1.05;
+}
+
+.hfm4-rhythm-lines p {
+  max-width: 35rem;
+  font-size: .9rem;
+  line-height: 1.58;
+}
+
+.hfm4-seasons-intro h2 {
+  max-width: 17ch;
+  font-size: clamp(2.75rem, 4.8vw, 4.9rem);
+  line-height: .98;
+}
+
+.hfm4-season p {
+  line-height: 1.55;
+}
+
+.hfm4-support {
+  position: relative;
+  isolation: isolate;
+  width: min(100% - 2rem, 88rem);
+  padding: clamp(5rem, 8vw, 7rem) clamp(.5rem, 2vw, 2rem);
+}
+
+.hfm4-support::before {
+  content: "";
+  position: absolute;
+  inset: 7% -3% 5% 11%;
+  z-index: -1;
+  border-radius: 4rem 1rem 4rem 1rem;
+  background:
+    radial-gradient(28rem 20rem at 78% 18%, rgba(227,189,105,.18), transparent 72%),
+    linear-gradient(135deg, rgba(222,205,180,.72), rgba(244,235,220,.45));
+}
+
+.hfm4-support-copy h2 {
+  max-width: 10ch;
+  font-size: clamp(3rem, 5.3vw, 5.3rem);
+  line-height: .94;
+}
+
+.hfm4-support-copy > p:not(.hfm4-kicker) {
+  max-width: 32rem;
+  margin-top: 1.35rem;
+  line-height: 1.65;
+}
+
+.hfm4-membership-top h2 {
+  font-size: clamp(3rem, 5.6vw, 5.8rem);
+  line-height: .92;
+}
+
+.hfm4-membership-top > p {
+  max-width: 33rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 760px) {
+  .hfm4-quick-points { grid-template-columns: 1fr; }
+  .hfm4-quick-points span:nth-child(odd) { margin-right: 0; }
+  .hfm4-rhythm { padding-inline: 1rem; }
+  .hfm4-rhythm::before { border-radius: 1.5rem 1.5rem 4rem 1.5rem; }
+  .hfm4-rhythm-lines article { padding-left: .8rem; }
+  .hfm4-support::before { inset: 4% 0 2% 6%; }
+}
