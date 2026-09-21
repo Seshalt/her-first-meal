@@ -97,7 +97,7 @@ export const getMyHome = createServerFn({ method: "GET" })
       loves: string | null;
       cuisines: unknown;
     }>`select * from dietary_profiles where user_id = ${context.userId}`;
-    const storeRows = await sql<{ stores: unknown; custom_stores: string | null }>`
+    const storeRows = await sql<{ stores: unknown; custom_stores: string | null; appliances: unknown }>`
       select * from grocery_preferences where user_id = ${context.userId}
     `;
     const membershipRows = await sql<{
@@ -142,8 +142,12 @@ export const getMyHome = createServerFn({ method: "GET" })
         }
       : { diets: [], allergies: [], avoids: null, dislikes: null, loves: null, cuisines: [] };
     const grocery: GroceryPrefs = storeRows[0]
-      ? { stores: asJson(storeRows[0].stores, []), customStores: storeRows[0].custom_stores }
-      : { stores: [], customStores: null };
+      ? {
+          stores: asJson(storeRows[0].stores, []),
+          customStores: storeRows[0].custom_stores,
+          appliances: asJson(storeRows[0].appliances, []),
+        }
+      : { stores: [], customStores: null, appliances: [] };
     const checkin = await sql<{
       hydration: number;
       mood: string | null;
@@ -212,6 +216,7 @@ export const saveOnboarding = createServerFn({ method: "POST" })
       cuisines?: string[];
       stores?: string[];
       customStores?: string;
+      appliances?: string[];
       householdSize?: number;
       weeklyBudget?: string;
       zipCode?: string;
@@ -268,11 +273,17 @@ export const saveOnboarding = createServerFn({ method: "POST" })
         cuisines = excluded.cuisines
     `;
     await sql`
-      insert into grocery_preferences (user_id, stores, custom_stores)
-      values (${context.userId}, ${JSON.stringify(data.stores ?? [])}::jsonb, ${data.customStores ?? null})
+      insert into grocery_preferences (user_id, stores, custom_stores, appliances)
+      values (
+        ${context.userId},
+        ${JSON.stringify(data.stores ?? [])}::jsonb,
+        ${data.customStores ?? null},
+        ${JSON.stringify(data.appliances ?? [])}::jsonb
+      )
       on conflict (user_id) do update set
         stores = excluded.stores,
-        custom_stores = excluded.custom_stores
+        custom_stores = excluded.custom_stores,
+        appliances = excluded.appliances
     `;
     if (data.stage || data.diets || data.stateCode || data.complete) {
       await sql`delete from meal_plans where user_id = ${context.userId}`;
@@ -307,6 +318,7 @@ export const saveProfile = createServerFn({ method: "POST" })
       loves?: string;
       cuisines?: string[];
       stores?: string[];
+      appliances?: string[];
     }) => input,
   )
   .handler(async ({ context, data }) => {
@@ -353,11 +365,17 @@ export const saveProfile = createServerFn({ method: "POST" })
           cuisines = excluded.cuisines
       `;
     }
-    if (data.stores) {
+    if (data.stores || data.appliances) {
       await sql`
-        insert into grocery_preferences (user_id, stores)
-        values (${context.userId}, ${JSON.stringify(data.stores)}::jsonb)
-        on conflict (user_id) do update set stores = excluded.stores
+        insert into grocery_preferences (user_id, stores, appliances)
+        values (
+          ${context.userId},
+          ${JSON.stringify(data.stores ?? [])}::jsonb,
+          ${JSON.stringify(data.appliances ?? [])}::jsonb
+        )
+        on conflict (user_id) do update set
+          stores = case when ${data.stores ? true : false} then excluded.stores else grocery_preferences.stores end,
+          appliances = case when ${data.appliances ? true : false} then excluded.appliances else grocery_preferences.appliances end
       `;
     }
     if (data.stage || data.diets || data.stateCode) {
