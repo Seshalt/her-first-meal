@@ -6,7 +6,7 @@ import { Wordmark } from "@/components/brand/logo";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { DietPicks } from "@/components/house/diet-picks";
 import { LocaleSwitch } from "@/components/i18n/locale-switch";
-import { STAGE_LABEL, STORES, readJoinDiets, type Stage } from "@/lib/content/catalog";
+import { KITCHEN_APPLIANCES, STAGE_LABEL, STORES, readJoinDiets, type Stage } from "@/lib/content/catalog";
 import { US_STATES, stateByCode } from "@/lib/content/places";
 import { altFor } from "@/lib/landing";
 import { getMyHome, saveJoinDiets, saveOnboarding } from "@/lib/server/profile";
@@ -53,17 +53,6 @@ const STEPS = [
 ] as const;
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
-
-const KITCHEN_APPLIANCES = [
-  { id: "oven", label: "Oven", icon: "◫" },
-  { id: "stovetop", label: "Stovetop", icon: "♨" },
-  { id: "air-fryer", label: "Air fryer", icon: "◎" },
-  { id: "pressure-cooker", label: "Pressure cooker", icon: "◉" },
-  { id: "slow-cooker", label: "Slow cooker", icon: "◌" },
-  { id: "microwave", label: "Microwave", icon: "▣" },
-  { id: "toaster", label: "Toaster", icon: "▤" },
-  { id: "blender", label: "Blender", icon: "◇" },
-] as const;
 
 function Onboarding() {
   const user = useCurrentUser();
