@@ -33,6 +33,17 @@ export const STORES = [
   "Farmers market",
 ] as const;
 
+export const KITCHEN_APPLIANCES = [
+  { id: "oven", label: "Oven", icon: "◫" },
+  { id: "stovetop", label: "Stovetop", icon: "♨" },
+  { id: "air-fryer", label: "Air fryer", icon: "◎" },
+  { id: "pressure-cooker", label: "Pressure cooker", icon: "◉" },
+  { id: "slow-cooker", label: "Slow cooker", icon: "◌" },
+  { id: "microwave", label: "Microwave", icon: "▣" },
+  { id: "toaster", label: "Toaster", icon: "▤" },
+  { id: "blender", label: "Blender", icon: "◇" },
+] as const;
+
 export const DIETS: { id: DietFlag; label: string }[] = [
   { id: "vegan", label: "Vegan" },
   { id: "vegetarian", label: "Vegetarian" },
