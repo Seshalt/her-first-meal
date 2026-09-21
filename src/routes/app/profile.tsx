@@ -5,7 +5,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Pill, RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
+import { KITCHEN_APPLIANCES, STAGE_LABEL, STORES, type Stage } from "@/lib/content/catalog";
 import { US_STATES } from "@/lib/content/places";
 import { LocaleSwitch } from "@/components/i18n/locale-switch";
 import { DietPicks } from "@/components/house/diet-picks";
@@ -52,6 +52,7 @@ function Profile() {
         loves: home.diet.loves ?? "",
         cuisines: home.diet.cuisines,
         stores: home.grocery.stores,
+        appliances: home.grocery.appliances,
       },
     });
     toast.success("Saved.");
@@ -128,6 +129,38 @@ function Profile() {
                 {s}
               </Pill>
             ))}
+          </div>
+        </section>
+        <section>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">Kitchen tools</p>
+          <p className="mt-3 text-sm leading-6 text-ink-soft">
+            Choose the appliances you actually have so the kitchen setup stays realistic.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {KITCHEN_APPLIANCES.map((item) => {
+              const active = home.grocery.appliances.includes(item.id);
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    const appliances = active
+                      ? home.grocery.appliances.filter((x) => x !== item.id)
+                      : [...home.grocery.appliances, item.id];
+                    setHome({ ...home, grocery: { ...home.grocery, appliances } });
+                  }}
+                  className={
+                    active
+                      ? "rounded-[20px] border border-primary bg-primary/10 p-4 text-left shadow-sm"
+                      : "rounded-[20px] border border-border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:border-gold"
+                  }
+                >
+                  <span className="grid size-9 place-items-center rounded-xl bg-background text-lg">{item.icon}</span>
+                  <span className="mt-3 block text-sm font-semibold">{item.label}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
         <section>
