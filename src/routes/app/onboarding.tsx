@@ -43,7 +43,7 @@ const STEPS = [
     alt: altFor("/images/meal-bowl.jpg"),
   },
   {
-    label: "Market",
+    label: "Kitchen",
     kicker: "onboarding.marketKicker",
     title: "onboarding.marketTitle",
     body: "onboarding.marketBody",
@@ -53,6 +53,17 @@ const STEPS = [
 ] as const;
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+const KITCHEN_APPLIANCES = [
+  { id: "oven", label: "Oven", icon: "◫" },
+  { id: "stovetop", label: "Stovetop", icon: "♨" },
+  { id: "air-fryer", label: "Air fryer", icon: "◎" },
+  { id: "pressure-cooker", label: "Pressure cooker", icon: "◉" },
+  { id: "slow-cooker", label: "Slow cooker", icon: "◌" },
+  { id: "microwave", label: "Microwave", icon: "▣" },
+  { id: "toaster", label: "Toaster", icon: "▤" },
+  { id: "blender", label: "Blender", icon: "◇" },
+] as const;
 
 function Onboarding() {
   const user = useCurrentUser();
@@ -76,6 +87,7 @@ function Onboarding() {
   const [loves, setLoves] = useState("");
   const [cuisines, setCuisines] = useState("");
   const [stores, setStores] = useState<string[]>([]);
+  const [appliances, setAppliances] = useState<string[]>([]);
   const [householdSize, setHouseholdSize] = useState(2);
   const [weeklyBudget, setWeeklyBudget] = useState("");
   const [zipCode, setZipCode] = useState("");
@@ -103,6 +115,7 @@ function Onboarding() {
           if (home.profile.householdSize) setHouseholdSize(home.profile.householdSize);
           if (home.profile.weeklyBudget) setWeeklyBudget(home.profile.weeklyBudget);
           if (home.grocery.stores.length) setStores(home.grocery.stores);
+          if (home.grocery.appliances.length) setAppliances(home.grocery.appliances);
           if (home.diet.diets.length) setDiets(home.diet.diets);
           else if (stored.length) await saveJoinDiets({ data: { diets: stored, language: locale } }).catch(() => undefined);
           setSessionReady(true);
@@ -154,6 +167,7 @@ function Onboarding() {
         .map((s) => s.trim())
         .filter(Boolean),
       stores,
+      appliances,
       householdSize,
       weeklyBudget,
       zipCode,
@@ -317,57 +331,131 @@ function Onboarding() {
           ) : null}
 
           {step === 3 ? (
-            <div className="onboarding-body space-y-5">
-              <div className="onboarding-disclosure">
+            <div className="onboarding-body space-y-8">
+              <section className="overflow-hidden rounded-[30px] border border-[var(--member-line)] bg-[var(--member-card)] p-5 shadow-[0_20px_60px_-42px_rgba(23,37,31,.45)] md:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">01 · Your kitchen</p>
+                    <h2 className="mt-2 font-display text-3xl leading-tight">What can you cook with?</h2>
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--member-muted)]">
+                      Pick everything you have. We save this with your kitchen preferences so your planning can stay realistic.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[color-mix(in_oklab,var(--member-gold)_14%,transparent)] px-3 py-1 text-xs text-[var(--member-gold)]">
+                    {appliances.length} selected
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {KITCHEN_APPLIANCES.map((item) => {
+                    const active = appliances.includes(item.id);
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => toggle(appliances, item.id, setAppliances)}
+                        className={
+                          active
+                            ? "group rounded-[22px] border border-[var(--member-teal)] bg-[color-mix(in_oklab,var(--member-teal)_13%,var(--member-card))] p-4 text-left shadow-sm transition"
+                            : "group rounded-[22px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--member-gold)]"
+                        }
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="grid size-10 place-items-center rounded-2xl bg-[var(--member-card)] text-xl shadow-sm">{item.icon}</span>
+                          <span
+                            className={
+                              active
+                                ? "grid size-6 place-items-center rounded-full bg-[var(--member-teal)] text-xs font-bold text-white"
+                                : "grid size-6 place-items-center rounded-full border border-[var(--member-line)] text-transparent"
+                            }
+                          >
+                            ✓
+                          </span>
+                        </div>
+                        <span className="mt-4 block text-sm font-semibold">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="overflow-hidden rounded-[30px] border border-[var(--member-line)] bg-[var(--member-card)] p-5 shadow-[0_20px_60px_-42px_rgba(23,37,31,.45)] md:p-6">
                 <div className="flex gap-3">
-                  <div className="grid size-10 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--member-gold)_14%,transparent)] text-[var(--member-gold)]">
+                  <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[color-mix(in_oklab,var(--member-gold)_14%,transparent)] text-[var(--member-gold)]">
                     <Store className="size-5" />
                   </div>
                   <div>
-                    <strong className="block text-sm">Make the grocery list useful where you live.</strong>
-                    <p className="mt-1 text-sm leading-6">
-                      Pick your state, the stores you actually use, and an optional ZIP. This improves local grocery planning without needing your exact address.
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">02 · Your market</p>
+                    <h2 className="mt-1 font-display text-3xl leading-tight">Where do you actually shop?</h2>
+                    <p className="mt-2 text-sm leading-6 text-[var(--member-muted)]">
+                      Choose the stores you use most. Your grocery room will keep those stores one tap away and organize the week around one practical list.
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 flex items-start gap-2 border-t border-[var(--member-line)] pt-4 text-xs leading-5 text-[var(--member-muted)]">
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="state">{t("onboarding.state")}</Label>
+                    <select id="state" value={stateCode} onChange={(e) => setStateCode(e.target.value)}>
+                      <option value="">Select your state</option>
+                      {US_STATES.map((state) => (
+                        <option key={state.code} value={state.code}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
+                </div>
+
+                <div className="mt-5">
+                  <Label>Favorite stores</Label>
+                  <p className="onboarding-helper mb-3">Tap every store you use. You can change these later.</p>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {STORES.map((store) => {
+                      const active = stores.includes(store);
+                      return (
+                        <button
+                          key={store}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => toggle(stores, store, setStores)}
+                          className={
+                            active
+                              ? "rounded-2xl border border-[var(--member-gold)] bg-[color-mix(in_oklab,var(--member-gold)_13%,var(--member-card))] px-4 py-3 text-left text-sm font-semibold shadow-sm"
+                              : "rounded-2xl border border-[var(--member-line)] bg-[var(--member-surface)] px-4 py-3 text-left text-sm transition hover:border-[var(--member-gold)]"
+                          }
+                        >
+                          <span className="flex items-center justify-between gap-2">
+                            {store}
+                            <span className={active ? "text-[var(--member-gold)]" : "text-[var(--member-faint)]"}>{active ? "✓" : "+"}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-start gap-2 border-t border-[var(--member-line)] pt-4 text-xs leading-5 text-[var(--member-muted)]">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--member-teal)]" />
-                  Precise GPS is requested only if you later choose “Find stores near me,” and those coordinates are not saved to your profile.
+                  Your city, state, ZIP, and preferred stores are enough for normal planning. Precise location is only requested when you choose “Find stores near me.”
                 </div>
-              </div>
+              </section>
 
-              <div>
-                <Label htmlFor="state">{t("onboarding.state")}</Label>
-                <select id="state" value={stateCode} onChange={(e) => setStateCode(e.target.value)}>
-                  <option value="">Select your state</option>
-                  {US_STATES.map((state) => (
-                    <option key={state.code} value={state.code}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <Label>Stores you use</Label>
-                <p className="onboarding-helper mb-3">Selected stores are clearly filled. You can change these later.</p>
-                <div className="onboarding-choice-grid">
-                  {STORES.map((store) => (
-                    <Choice key={store} active={stores.includes(store)} onClick={() => toggle(stores, store, setStores)}>
-                      {store}
-                    </Choice>
-                  ))}
+              <section className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
+                  <Field
+                    label="Household size"
+                    value={String(householdSize)}
+                    onChange={(v) => setHouseholdSize(Math.max(1, Number(v) || 1))}
+                    type="number"
+                  />
                 </div>
-              </div>
-
-              <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
-              <Field
-                label="Household size"
-                value={String(householdSize)}
-                onChange={(v) => setHouseholdSize(Math.max(1, Number(v) || 1))}
-                type="number"
-              />
-              <Field label="Weekly grocery budget" value={weeklyBudget} onChange={setWeeklyBudget} optional />
+                <div className="rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
+                  <Field label="Weekly grocery budget" value={weeklyBudget} onChange={setWeeklyBudget} optional />
+                </div>
+              </section>
             </div>
           ) : null}
 
