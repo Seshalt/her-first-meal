@@ -153,11 +153,14 @@ export const getGroceryList = createServerFn({ method: "GET" })
       values (${context.userId}, ${weekStart}, ${JSON.stringify(merged)}::jsonb)
       on conflict (user_id, week_start) do update set items = excluded.items
     `;
-    const stores = await sql<{ stores: unknown }>`select stores from grocery_preferences where user_id = ${context.userId}`;
+    const stores = await sql<{ stores: unknown; appliances: unknown }>`
+      select stores, appliances from grocery_preferences where user_id = ${context.userId}
+    `;
     return {
       weekStart,
       items: merged,
       stores: asJson<string[]>(stores[0]?.stores, []),
+      appliances: asJson<string[]>(stores[0]?.appliances, []),
       stateCode: profile.stateCode,
       location: profile.location,
       stage: profile.stage,
