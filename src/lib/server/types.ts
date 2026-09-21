@@ -40,6 +40,7 @@ export type Dietary = {
 export type GroceryPrefs = {
   stores: string[];
   customStores: string | null;
+  appliances: string[];
 };
 
 export type Membership = {
