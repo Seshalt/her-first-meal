@@ -13,6 +13,7 @@ import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { lines } from "@/lib/site";
 import { usePublicSite } from "@/lib/use-public-site";
 import { ReceiptPrinter } from "@/components/commerce/receipt-printer";
+import { CheckoutCardAnimation } from "@/components/commerce/checkout-card-animation";
 import { isMemberWalk } from "@/lib/preview-mode";
 
 type EmbeddedCheckout = { mount: (selector: string) => void; destroy: () => void };
@@ -172,7 +173,8 @@ function Checkout() {
       ) : (
         <div className="mx-auto grid max-w-5xl gap-10 px-4 py-16 md:grid-cols-[1fr_0.9fr]">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
+            <CheckoutCardAnimation amount={formatCurrency(price)} processing={busy} />
+            <p className="mt-10 text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
             <h1 className="mt-3 font-display text-4xl">{site.checkoutTitle}</h1>
             <p className="mt-3 text-muted-foreground">
               {plan === "yearly" ? "Yearly membership" : "Monthly membership"} — {formatCurrency(price)}
