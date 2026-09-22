@@ -474,8 +474,8 @@ export const savePlace = createServerFn({ method: "POST" })
         city = coalesce(${city || null}, city),
         location = coalesce(${location || null}, location),
         zip_code = coalesce(${zipCode || null}, zip_code),
-        latitude = coalesce(${latitude}, latitude),
-        longitude = coalesce(${longitude}, longitude),
+        latitude = null,
+        longitude = null,
         location_permission = ${permission},
         updated_at = now()
       where user_id = ${context.userId}
@@ -506,7 +506,7 @@ async function reverseGeocode(lat: number, lng: number) {
         signal: ctrl.signal,
         headers: {
           Accept: "application/json",
-          "User-Agent": "HerFirstMeal/1.0 (hello@herfirstmeal.com)",
+          "User-Agent": "HerFirstMeal/1.0 (hello@herfirstmeal.app)",
         },
       },
     );
