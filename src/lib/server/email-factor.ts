@@ -26,9 +26,6 @@ export const getEmailFactorStatus = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const email = await accountEmail(context.userId);
-    if (!mailConfigured()) {
-      return { needed: false, emailMasked: email ? maskEmail(email) : "your email" };
-    }
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
     const rows = await sql<{ email_factor_ok: boolean }>`
@@ -37,6 +34,7 @@ export const getEmailFactorStatus = createServerFn({ method: "GET" })
     return {
       needed: rows[0] ? !rows[0].email_factor_ok : true,
       emailMasked: email ? maskEmail(email) : "your email",
+      configured: mailConfigured(),
     };
   });
 
@@ -46,7 +44,7 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
     rateLimit(`email-factor:${context.userId}`, 6, 15 * 60 * 1000);
     const email = await accountEmail(context.userId);
     if (!mailConfigured()) {
-      return { needed: false, sent: false, emailMasked: maskEmail(email), configured: false };
+      throw new Error("Email verification is temporarily unavailable. Please try again later.");
     }
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
@@ -74,20 +72,10 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
       html: `<p>Your first-time sign-in code is <strong style="font-size:24px;letter-spacing:4px">${code}</strong>.</p><p>It expires in 10 minutes. If you did not try to enter the house, ignore this note.</p>`,
     });
     if (!mail.sent) {
-      await sql`update profiles set email_factor_ok = true, updated_at = now() where user_id = ${context.userId}`;
-      return {
-        needed: false,
-        sent: false,
-        emailMasked: maskEmail(email),
-        configured: false,
-      };
+      await sql`delete from email_factors where user_id = ${context.userId}`;
+      throw new Error("We could not send your verification code. Please try again later.");
     }
-    return {
-      needed: true,
-      sent: true,
-      emailMasked: maskEmail(email),
-      configured: true,
-    };
+    return { needed: true, sent: true, emailMasked: maskEmail(email), configured: true };
   });
 
 export const verifyEmailFactor = createServerFn({ method: "POST" })
@@ -108,6 +96,7 @@ export const verifyEmailFactor = createServerFn({ method: "POST" })
     const row = rows[0];
     if (!row) throw new Error("Ask for a new code.");
     if (new Date(row.expires_at).getTime() < Date.now()) {
+      await sql`delete from email_factors where id = ${row.id}`;
       throw new Error("That code expired. Ask for a new one.");
     }
     if (row.attempts >= 5) throw new Error("Too many tries. Ask for a new code.");
