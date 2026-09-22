@@ -38,8 +38,8 @@ export async function sendHouseMail(input: {
       }),
     });
     if (!response.ok) {
-      const detail = await response.text().catch(() => "");
-      console.error("Resend rejected house mail", response.status, detail.slice(0, 300));
+      // Do not log provider response bodies: they can contain recipient or request details.
+      console.error("Resend rejected house mail", response.status);
       return { sent: false, reason: "provider" };
     }
     return { sent: true };
