@@ -539,6 +539,16 @@ export const deleteAccount = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const sql = await getSql();
     const uid = context.userId;
+
+    // Capture the email before removing the profile/auth identity. Financial
+    // records are retained only in de-identified form for billing/disputes.
+    const profileRows = await sql<{ email: string | null }>`
+      select email from profiles where user_id = ${uid} limit 1
+    `;
+    const email = profileRows[0]?.email ?? null;
+
+    // Remove member-created wellness/profile data.
+    await sql`delete from email_factors where user_id = ${uid}`;
     await sql`delete from pantry_items where user_id = ${uid}`;
     await sql`delete from meal_plans where user_id = ${uid}`;
     await sql`delete from grocery_lists where user_id = ${uid}`;
@@ -551,8 +561,27 @@ export const deleteAccount = createServerFn({ method: "POST" })
     await sql`delete from dietary_profiles where user_id = ${uid}`;
     await sql`delete from grocery_preferences where user_id = ${uid}`;
     await sql`delete from saved_recipes where user_id = ${uid}`;
+    await sql`delete from workout_logs where user_id = ${uid}`;
+    await sql`delete from ai_usage where user_id = ${uid}`;
     await sql`delete from house_letters where user_id = ${uid}`;
+    await sql`delete from owner_notes where client_user_id = ${uid}`;
+    await sql`delete from partner_links where mother_user_id = ${uid} or partner_user_id = ${uid}`;
+
+    // Keep only the minimum transaction history needed for accounting/disputes.
+    // Do not leave a deleted user's app identity attached to those records.
+    await sql`update purchases set user_id = null where user_id = ${uid}`;
+    await sql`update memberships set user_id = null, status = 'deleted' where user_id = ${uid}`;
+
     await sql`delete from profiles where user_id = ${uid}`;
+
+    // Better Auth owns these tables. Deleting the user cascades account/session
+    // rows through the auth schema. Verification rows are keyed by identifier,
+    // so clear the user's email separately when it is known.
+    if (email) {
+      await sql`delete from "verification" where "identifier" = ${email}`;
+    }
+    await sql`delete from "user" where "id" = ${uid}`;
+
     return { ok: true };
   });
 
