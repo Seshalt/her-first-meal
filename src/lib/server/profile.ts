@@ -569,8 +569,8 @@ export const deleteAccount = createServerFn({ method: "POST" })
 
     // Keep only the minimum transaction history needed for accounting/disputes.
     // Do not leave a deleted user's app identity attached to those records.
-    await sql`update purchases set user_id = null where user_id = ${uid}`;
-    await sql`update memberships set user_id = null, status = 'deleted' where user_id = ${uid}`;
+    await sql`update purchases set user_id = null, email = 'deleted@herfirstmeal.invalid' where user_id = ${uid}`;
+    await sql`update memberships set user_id = null, email = 'deleted@herfirstmeal.invalid', status = 'deleted' where user_id = ${uid}`;
 
     await sql`delete from profiles where user_id = ${uid}`;
 
