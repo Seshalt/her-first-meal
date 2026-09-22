@@ -28,6 +28,7 @@ export const getEmailFactorStatus = createServerFn({ method: "GET" })
     const email = await accountEmail(context.userId);
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
+    await sql`delete from email_factors where expires_at < now()`;
     const rows = await sql<{ email_factor_ok: boolean }>`
       select email_factor_ok from profiles where user_id = ${context.userId}
     `;
