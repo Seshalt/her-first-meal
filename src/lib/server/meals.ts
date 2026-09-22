@@ -19,6 +19,51 @@ function startOfWeekISO() {
 
 type MealSlot = { day: string; recipeId: string };
 
+const APPLIANCE_HINTS: Record<string, string[]> = {
+  oven: ["bake", "baked", "roast", "roasted", "oven", "sheet-pan", "frittata"],
+  stovetop: ["simmer", "skillet", "stew", "soup", "porridge", "curry", "broth", "pan"],
+  microwave: ["microwave"],
+  "air-fryer": ["air fryer"],
+  "pressure-cooker": ["pressure cooker", "instant pot"],
+  "slow-cooker": ["slow cooker"],
+  toaster: ["toast"],
+  blender: ["blend", "smoothie"],
+  "food-processor": ["food processor", "process"],
+  "rice-cooker": ["rice", "porridge"],
+  grill: ["grill", "grilled"],
+  kettle: ["tea", "steep", "kettle"],
+};
+
+function recipeFitsKitchen(recipe: Recipe, appliances: string[]) {
+  if (!appliances.length || appliances.includes("basic-kitchen")) return true;
+  const text = [recipe.title, recipe.summary, ...recipe.steps].join(" ").toLowerCase();
+  const explicitlyNeeds = Object.entries(APPLIANCE_HINTS)
+    .filter(([, hints]) => hints.some((hint) => text.includes(hint)))
+    .map(([id]) => id);
+  if (!explicitlyNeeds.length) return true;
+  return explicitlyNeeds.some((id) => appliances.includes(id));
+}
+
+async function applianceRow(sql: Awaited<ReturnType<typeof getSql>>, userId: string) {
+  const rows = await sql<{ appliances: unknown }>`
+    select appliances from grocery_preferences where user_id = ${userId}
+  `;
+  return asJson<string[]>(rows[0]?.appliances, []);
+}
+
+async function kitchenRecipePool(
+  sql: Awaited<ReturnType<typeof getSql>>,
+  userId: string,
+  stage: Stage | null,
+  diets: string[],
+  dislikes: string,
+) {
+  const base = recipePool(stage, diets, dislikes);
+  const appliances = await applianceRow(sql, userId);
+  const matched = base.filter((recipe) => recipeFitsKitchen(recipe, appliances));
+  return { pool: matched.length >= 3 ? matched : base, appliances };
+}
+
 async function dietRow(sql: Awaited<ReturnType<typeof getSql>>, userId: string) {
   const diet = await sql<{ diets: unknown; dislikes: string | null; allergies: unknown }>`
     select diets, dislikes, allergies from dietary_profiles where user_id = ${userId}
@@ -34,7 +79,7 @@ export async function rebuildMealWeek(userId: string) {
   const sql = await getSql();
   const profile = await ensureProfile(userId);
   const diet = await dietRow(sql, userId);
-  const pool = recipePool(profile.stage as Stage | null, diet.diets, diet.dislikes);
+  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes);
   const weekStart = startOfWeekISO();
   const meals: MealSlot[] = DAYS.map((day, i) => ({ day, recipeId: pool[i % pool.length].id }));
   await sql`
@@ -50,7 +95,7 @@ async function ensureMealWeek(userId: string) {
   const sql = await getSql();
   const profile = await ensureProfile(userId);
   const diet = await dietRow(sql, userId);
-  const pool = recipePool(profile.stage as Stage | null, diet.diets, diet.dislikes);
+  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes);
   const allowed = new Set(pool.map((r) => r.id));
   const weekStart = startOfWeekISO();
   const existing = await sql<{ meals: unknown }>`
