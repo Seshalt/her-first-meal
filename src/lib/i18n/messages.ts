@@ -4,6 +4,11 @@ import type { LocaleId } from "./locales";
 type Pack = Record<MsgKey, string>;
 
 const es: Pack = {
+  "home.heroOverline": "El mundo celebra al bebé.",
+  "home.heroTitle": "Nosotras recordamos a la madre.",
+  "home.heroBody": "Comidas, planificación de compras, orientación diaria para el cuerpo, movimiento, educación sobre el vendaje abdominal y apoyo humano real, adaptados a tu etapa y preferencias.",
+  "home.meet": "Conoce Her First Meal",
+  "home.careChanges": "Tu cuidado debe cambiar cuando cambia tu cuerpo.",
   ...EN,
   tagline: "El mundo celebra al bebé. Nosotras recordamos a la madre.",
   cta: "Empieza tu camino hoy",
@@ -158,6 +163,11 @@ function overlay(base: Pack, extra: Partial<Pack>): Pack {
 }
 
 const fr = overlay(EN, {
+  "home.heroOverline": "Le monde célèbre le bébé.",
+  "home.heroTitle": "Nous nous souvenons de la mère.",
+  "home.heroBody": "Repas, courses, conseils quotidiens pour le corps, mouvement, éducation au bandage abdominal et soutien humain réel, adaptés à votre étape et à vos préférences.",
+  "home.meet": "Découvrir Her First Meal",
+  "home.careChanges": "Vos soins doivent évoluer avec votre corps.",
   tagline: "Le monde célèbre le bébé. Nous nous souvenons de la mère.",
   cta: "Commencez votre chemin aujourd’hui",
   memberLogin: "Connexion membre",
@@ -260,6 +270,11 @@ const fr = overlay(EN, {
 });
 
 const de = overlay(EN, {
+  "home.heroOverline": "Die Welt feiert das Baby.",
+  "home.heroTitle": "Wir denken an die Mutter.",
+  "home.heroBody": "Mahlzeiten, Einkaufsplanung, tägliche Körperbegleitung, Bewegung, Wissen zum Bauchbinden und echte menschliche Unterstützung – passend zu deiner Phase und deinen Vorlieben.",
+  "home.meet": "Her First Meal kennenlernen",
+  "home.careChanges": "Deine Begleitung sollte sich mit deinem Körper verändern.",
   tagline: "Die Welt feiert das Baby. Wir erinnern uns an die Mutter.",
   cta: "Beginne heute deinen Weg",
   memberLogin: "Mitglieder-Anmeldung",
@@ -326,6 +341,11 @@ const de = overlay(EN, {
 });
 
 const it = overlay(EN, {
+  "home.heroOverline": "Il mondo festeggia il bambino.",
+  "home.heroTitle": "Noi ricordiamo la madre.",
+  "home.heroBody": "Pasti, spesa, guida quotidiana per il corpo, movimento, educazione sulla fasciatura addominale e vero supporto umano, adattati alla tua fase e alle tue preferenze.",
+  "home.meet": "Scopri Her First Meal",
+  "home.careChanges": "La tua cura dovrebbe cambiare insieme al tuo corpo.",
   tagline: "Il mondo festeggia il bambino. Noi ricordiamo la madre.",
   cta: "Inizia oggi il tuo cammino",
   memberLogin: "Accesso socie",
@@ -379,6 +399,11 @@ const it = overlay(EN, {
 });
 
 const pt = overlay(EN, {
+  "home.heroOverline": "O mundo celebra o bebê.",
+  "home.heroTitle": "Nós lembramos da mãe.",
+  "home.heroBody": "Refeições, planejamento de compras, orientação diária para o corpo, movimento, educação sobre faixa abdominal e apoio humano real, adaptados à sua fase e preferências.",
+  "home.meet": "Conheça Her First Meal",
+  "home.careChanges": "Seu cuidado deve mudar quando seu corpo muda.",
   tagline: "O mundo celebra o bebê. Nós lembramos a mãe.",
   cta: "Comece sua jornada hoje",
   memberLogin: "Entrada de membras",
@@ -432,6 +457,11 @@ const pt = overlay(EN, {
 });
 
 const ro = overlay(EN, {
+  "home.heroOverline": "Lumea sărbătorește copilul.",
+  "home.heroTitle": "Noi ne amintim de mamă.",
+  "home.heroBody": "Mese, planificarea cumpărăturilor, îndrumare zilnică pentru corp, mișcare, educație despre legarea abdomenului și sprijin uman real, adaptate etapei și preferințelor tale.",
+  "home.meet": "Descoperă Her First Meal",
+  "home.careChanges": "Îngrijirea ta ar trebui să se schimbe odată cu corpul tău.",
   tagline: "Lumea sărbătorește copilul. Noi o ținem minte pe mamă.",
   cta: "Începe drumul astăzi",
   language: "Limbă",
@@ -465,6 +495,11 @@ const ro = overlay(EN, {
 });
 
 const pl = overlay(EN, {
+  "home.heroOverline": "Świat świętuje dziecko.",
+  "home.heroTitle": "My pamiętamy o matce.",
+  "home.heroBody": "Posiłki, planowanie zakupów, codzienne wskazówki dla ciała, ruch, edukacja o wiązaniu brzucha i prawdziwe ludzkie wsparcie — dopasowane do Twojego etapu i preferencji.",
+  "home.meet": "Poznaj Her First Meal",
+  "home.careChanges": "Twoja opieka powinna zmieniać się wraz z Twoim ciałem.",
   tagline: "Świat świętuje dziecko. My pamiętamy o matce.",
   cta: "Zacznij drogę już dziś",
   language: "Język",
@@ -498,6 +533,11 @@ const pl = overlay(EN, {
 });
 
 const ru = overlay(EN, {
+  "home.heroOverline": "Мир празднует рождение ребёнка.",
+  "home.heroTitle": "Мы помним о матери.",
+  "home.heroBody": "Питание, планирование покупок, ежедневные рекомендации для тела, движение, обучение послеродовому подвязыванию живота и настоящая человеческая поддержка — с учётом вашего этапа и предпочтений.",
+  "home.meet": "Познакомьтесь с Her First Meal",
+  "home.careChanges": "Забота должна меняться вместе с вашим телом.",
   tagline: "Мир празднует ребёнка. Мы помним мать.",
   cta: "Начните путь сегодня",
   language: "Язык",
@@ -532,6 +572,11 @@ const ru = overlay(EN, {
 });
 
 const uk = overlay(EN, {
+  "home.heroOverline": "Світ святкує народження дитини.",
+  "home.heroTitle": "Ми пам’ятаємо про матір.",
+  "home.heroBody": "Харчування, планування покупок, щоденні поради для тіла, рух, навчання післяпологовому підв’язуванню живота та справжня людська підтримка — відповідно до вашого етапу й уподобань.",
+  "home.meet": "Познайомтеся з Her First Meal",
+  "home.careChanges": "Турбота має змінюватися разом із вашим тілом.",
   tagline: "Світ святкує дитину. Ми пам’ятаємо матір.",
   cta: "Почніть шлях сьогодні",
   language: "Мова",
@@ -563,6 +608,11 @@ const uk = overlay(EN, {
 });
 
 const ar = overlay(EN, {
+  "home.heroOverline": "العالم يحتفل بالطفل.",
+  "home.heroTitle": "ونحن نتذكر الأم.",
+  "home.heroBody": "وجبات، وتخطيط للمشتريات، وإرشاد يومي للجسم، وحركة، وتثقيف حول ربط البطن، ودعم إنساني حقيقي — بما يناسب مرحلتك وتفضيلاتك.",
+  "home.meet": "تعرّفي على Her First Meal",
+  "home.careChanges": "يجب أن تتغير رعايتك عندما يتغير جسمك.",
   tagline: "العالم يحتفل بالطفل. نحن نتذكر الأم.",
   cta: "ابدئي رحلتك اليوم",
   memberLogin: "دخول العضوات",
@@ -634,6 +684,11 @@ const ar = overlay(EN, {
 });
 
 const hi = overlay(EN, {
+  "home.heroOverline": "दुनिया बच्चे का जश्न मनाती है।",
+  "home.heroTitle": "हम माँ को याद रखते हैं।",
+  "home.heroBody": "भोजन, किराने की योजना, शरीर के लिए रोज़ की जानकारी, हलचल, पेट बाँधने की शिक्षा और वास्तविक मानवीय सहायता — आपकी अवस्था और पसंद के अनुसार।",
+  "home.meet": "Her First Meal को जानें",
+  "home.careChanges": "आपके शरीर के बदलने के साथ आपकी देखभाल भी बदलनी चाहिए।",
   tagline: "दुनिया बच्चे का जश्न मनाती है। हम माँ को याद रखते हैं।",
   cta: "आज अपनी यात्रा शुरू करें",
   language: "भाषा",
@@ -665,6 +720,11 @@ const hi = overlay(EN, {
 });
 
 const ko = overlay(EN, {
+  "home.heroOverline": "세상은 아기를 축하합니다.",
+  "home.heroTitle": "우리는 엄마를 기억합니다.",
+  "home.heroBody": "식사, 장보기 계획, 매일의 신체 가이드, 움직임, 복부 바인딩 교육, 실제 사람의 지원을 현재 단계와 선호에 맞춰 제공합니다.",
+  "home.meet": "Her First Meal 알아보기",
+  "home.careChanges": "몸이 변하면 돌봄도 함께 달라져야 합니다.",
   tagline: "세상은 아기를 축하합니다. 우리는 엄마를 기억합니다.",
   cta: "오늘 여정을 시작하세요",
   language: "언어",
@@ -696,6 +756,11 @@ const ko = overlay(EN, {
 });
 
 const zh = overlay(EN, {
+  "home.heroOverline": "世界庆祝宝宝。",
+  "home.heroTitle": "我们也记得妈妈。",
+  "home.heroBody": "膳食、购物计划、每日身体指导、运动、腹部绑带知识和真人支持——根据你的阶段和偏好进行调整。",
+  "home.meet": "了解 Her First Meal",
+  "home.careChanges": "身体在变化，照护也应该随之改变。",
   tagline: "世界庆祝孩子。我们记得母亲。",
   cta: "今天开始你的旅程",
   language: "语言",
@@ -729,6 +794,11 @@ const zh = overlay(EN, {
 });
 
 const yue = overlay(EN, {
+  "home.heroOverline": "世界慶祝BB。",
+  "home.heroTitle": "我哋亦都記得媽媽。",
+  "home.heroBody": "膳食、買餸計劃、每日身體指引、活動、腹部包紮教育同真人支援——按你嘅階段同喜好調整。",
+  "home.meet": "認識 Her First Meal",
+  "home.careChanges": "身體改變，照顧方式都應該跟住改變。",
   tagline: "世界慶祝BB。我哋記得媽媽。",
   cta: "今日開始你嘅旅程",
   language: "語言",
@@ -761,6 +831,11 @@ const yue = overlay(EN, {
 });
 
 const fil = overlay(EN, {
+  "home.heroOverline": "Ipinagdiriwang ng mundo ang sanggol.",
+  "home.heroTitle": "Naaalala rin namin ang ina.",
+  "home.heroBody": "Mga pagkain, pagpaplano ng grocery, araw-araw na gabay sa katawan, paggalaw, edukasyon sa belly binding, at tunay na suportang pantao — ayon sa iyong yugto at mga kagustuhan.",
+  "home.meet": "Kilalanin ang Her First Meal",
+  "home.careChanges": "Dapat magbago ang iyong pangangalaga habang nagbabago ang iyong katawan.",
   tagline: "Ipinagdiriwang ng mundo ang sanggol. Naaalala namin ang ina.",
   cta: "Simulan ang iyong lakbay ngayon",
   language: "Wika",
@@ -792,6 +867,11 @@ const fil = overlay(EN, {
 });
 
 const ht = overlay(EN, {
+  "home.heroOverline": "Mond lan selebre tibebe a.",
+  "home.heroTitle": "Nou sonje manman an tou.",
+  "home.heroBody": "Manje, planifikasyon makèt, gid chak jou pou kò a, mouvman, edikasyon sou mare vant ak vrè sipò moun — adapte ak etap ou ak preferans ou.",
+  "home.meet": "Dekouvri Her First Meal",
+  "home.careChanges": "Swen ou dwe chanje lè kò ou chanje.",
   tagline: "Mond lan selebre ti bebe a. Nou sonje manman an.",
   cta: "Kòmanse vwayaj ou jodi a",
   language: "Lang",
@@ -823,6 +903,11 @@ const ht = overlay(EN, {
 });
 
 const vi = overlay(EN, {
+  "home.heroOverline": "Thế giới chúc mừng em bé.",
+  "home.heroTitle": "Chúng tôi cũng nhớ đến người mẹ.",
+  "home.heroBody": "Bữa ăn, kế hoạch mua sắm, hướng dẫn cơ thể hằng ngày, vận động, kiến thức về quấn bụng và hỗ trợ thực sự từ con người — phù hợp với giai đoạn và sở thích của bạn.",
+  "home.meet": "Tìm hiểu Her First Meal",
+  "home.careChanges": "Sự chăm sóc nên thay đổi khi cơ thể bạn thay đổi.",
   tagline: "Thế giới chúc mừng em bé. Chúng tôi nhớ đến người mẹ.",
   cta: "Bắt đầu hành trình hôm nay",
   language: "Ngôn ngữ",
