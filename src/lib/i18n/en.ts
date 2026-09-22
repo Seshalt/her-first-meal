@@ -15,6 +15,12 @@ export const EN = {
   send: "Send",
   sending: "Sending…",
 
+  "home.heroOverline": "The world celebrates the baby.",
+  "home.heroTitle": "We remember the mother.",
+  "home.heroBody": "Meals, grocery planning, daily body guidance, movement, belly binding education, and real human support — shaped around your stage and preferences.",
+  "home.meet": "Meet Her First Meal",
+  "home.careChanges": "Your care should change when your body does.",
+
   "nav.about": "About",
   "nav.binding": "Belly binding",
   "nav.write": "Support",
