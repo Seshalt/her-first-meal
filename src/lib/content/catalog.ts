@@ -36,12 +36,17 @@ export const STORES = [
 export const KITCHEN_APPLIANCES = [
   { id: "oven", label: "Oven", icon: "◫" },
   { id: "stovetop", label: "Stovetop", icon: "♨" },
-  { id: "air-fryer", label: "Air fryer", icon: "◎" },
-  { id: "pressure-cooker", label: "Pressure cooker", icon: "◉" },
-  { id: "slow-cooker", label: "Slow cooker", icon: "◌" },
   { id: "microwave", label: "Microwave", icon: "▣" },
-  { id: "toaster", label: "Toaster", icon: "▤" },
+  { id: "air-fryer", label: "Air fryer", icon: "◎" },
+  { id: "pressure-cooker", label: "Pressure cooker / Instant Pot", icon: "◉" },
+  { id: "slow-cooker", label: "Slow cooker", icon: "◌" },
+  { id: "toaster", label: "Toaster / toaster oven", icon: "▤" },
   { id: "blender", label: "Blender", icon: "◇" },
+  { id: "food-processor", label: "Food processor", icon: "✣" },
+  { id: "rice-cooker", label: "Rice cooker", icon: "◍" },
+  { id: "grill", label: "Grill", icon: "≋" },
+  { id: "kettle", label: "Kettle", icon: "◒" },
+  { id: "basic-kitchen", label: "None / basic kitchen", icon: "○" },
 ] as const;
 
 export const DIETS: { id: DietFlag; label: string }[] = [
