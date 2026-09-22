@@ -128,7 +128,27 @@ function Onboarding() {
   }, [step]);
 
   function toggle(list: string[], value: string, set: (v: string[]) => void) {
-    set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
+    if (value === "basic-kitchen") {
+      set(list.includes(value) ? [] : [value]);
+      return;
+    }
+    const withoutBasic = list.filter((x) => x !== "basic-kitchen");
+    set(withoutBasic.includes(value) ? withoutBasic.filter((x) => x !== value) : [...withoutBasic, value]);
+  }
+
+  function findStoresNearMe() {
+    if (!("geolocation" in navigator)) {
+      toast.error("Location is not available on this device. Add your ZIP or city instead.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const query = encodeURIComponent(`grocery stores near ${coords.latitude},${coords.longitude}`);
+        window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank", "noopener,noreferrer");
+      },
+      () => toast.message("No problem. Add your ZIP or city and choose your usual stores below."),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60 * 1000 },
+    );
   }
 
   function onboardingPayload(complete = false, nextStep = step) {
@@ -380,6 +400,18 @@ function Onboarding() {
                     <p className="mt-2 text-sm leading-6 text-[var(--member-muted)]">
                       Choose the stores you use most. Your grocery room will keep those stores one tap away and organize the week around one practical list.
                     </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold">Find what is close to you</p>
+                      <p className="mt-1 text-xs leading-5 text-[var(--member-muted)]">Use your location once, or skip it and use ZIP/city below.</p>
+                    </div>
+                    <button type="button" onClick={findStoresNearMe} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--member-teal)] px-5 text-sm font-semibold text-white transition hover:opacity-90">
+                      <MapPin className="size-4" /> Find stores near me
+                    </button>
                   </div>
                 </div>
 
