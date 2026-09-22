@@ -4,6 +4,7 @@ import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { mergeLanding } from "@/lib/landing";
 import { getLanding } from "@/lib/server/public";
 import { formatCurrency } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
 import "../landing-v3.css";
 
 export const Route = createFileRoute("/")({
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const t = useT();
   const page = Route.useLoaderData();
   const content = page?.content ?? mergeLanding(null);
   const monthly = page?.monthlyPriceCents ?? 4900;
@@ -35,23 +37,23 @@ function Home() {
               <div className="hfm4-hero-brand">
                 <span>Pregnancy · postpartum · care centered on you</span>
               </div>
-              <p className="hfm4-hero-overline">The world celebrates the baby.</p>
-              <h1>We remember<br />the mother.</h1>
+              <p className="hfm4-hero-overline">{t("home.heroOverline")}</p>
+              <h1>{t("home.heroTitle")}</h1>
               <p className="hfm4-hero-lede">
-                Meals, grocery planning, daily body guidance, movement, belly binding education, and real human support — shaped around your stage and preferences.
+                {t("home.heroBody")}
               </p>
               <div className="hfm4-actions">
                 <Link to="/pricing" className="hfm4-button hfm4-button-light">
-                  {content.cta} <ArrowRight className="size-4" />
+                  {t("cta")} <ArrowRight className="size-4" />
                 </Link>
-                <Link to="/about" className="hfm4-text-link">Meet Her First Meal <ArrowRight className="size-4" /></Link>
+                <Link to="/about" className="hfm4-text-link">{t("home.meet")} <ArrowRight className="size-4" /></Link>
               </div>
               <div className="hfm4-hero-proof" aria-label="Membership highlights">
-                <span>Meals</span><i />
-                <span>Groceries</span><i />
-                <span>Movement</span><i />
-                <span>Binding</span><i />
-                <span>Support</span>
+                <span>{t("room.meals")}</span><i />
+                <span>{t("room.grocery")}</span><i />
+                <span>{t("room.move")}</span><i />
+                <span>{t("room.binding")}</span><i />
+                <span>{t("room.write")}</span>
               </div>
             </div>
 
@@ -60,7 +62,7 @@ function Home() {
                 <img src={content.images.hero} alt={content.alts.hero} className="hfm4-hero-photo" />
               </div>
               <figcaption>
-                <span>Your care should change when your body does.</span>
+                <span>{t("home.careChanges")}</span>
                 <span>Her First Meal · 2026</span>
               </figcaption>
             </figure>
