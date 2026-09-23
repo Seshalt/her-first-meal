@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saaba Neru — Birthday Matchday</title>
+<style>
+:root{
+  --bg:#061009;--panel:#0d1b12;--text:#f7fff9;--muted:#b6c5ba;
+  --line:rgba(255,255,255,.16);--lime:#b8ff63;--gold:#ffd85a;
+  --pitch1:#19783a;--pitch2:#146631;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);
+  background:
+    linear-gradient(rgba(2,8,4,.48),rgba(2,8,4,.64)),
+    repeating-linear-gradient(90deg,#0e5d2c 0 120px,#0b4f26 120px 240px);
+  overflow-x:hidden;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.34;
+  background:
+    linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.16) 49.8% 50.2%,transparent 50.4%),
+    radial-gradient(circle at 50% 48%,transparent 0 105px,rgba(255,255,255,.13) 106px 109px,transparent 110px);
+}
+.wrap{width:min(1100px,92vw);margin:auto}
+nav{position:fixed;top:0;left:0;width:100%;z-index:40;background:rgba(3,8,5,.68);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:.78rem;font-weight:950;letter-spacing:.08em}.live{font-size:.76rem;border:1px solid rgba(184,255,99,.3);border-radius:999px;padding:8px 12px;color:#e8ffd9}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime);margin-right:7px}
+section{min-height:100svh;display:grid;place-items:center;padding:92px 0 56px;position:relative}
+.eyebrow{text-transform:uppercase;letter-spacing:.18em;color:var(--lime);font-size:.77rem;font-weight:900;margin-bottom:18px}
+.hero{text-align:center}.hero h1,.final h2{font-size:clamp(3rem,10vw,8rem);line-height:.88;letter-spacing:-.065em;margin:0}
+.hero p,.final p,.copy{color:var(--muted);line-height:1.7}
+.hero p{max-width:650px;margin:24px auto 0;font-size:1.1rem}
+.ball{width:90px;height:90px;border-radius:50%;display:grid;place-items:center;font-size:54px;margin:34px auto 22px;background:rgba(255,255,255,.07);border:1px solid var(--line);animation:float 2.8s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-11px) rotate(8deg)}}
+button{font:inherit}.cta,.secondary{cursor:pointer;font-weight:900;border-radius:999px;padding:14px 21px}
+.cta{border:0;background:var(--lime);color:#061009}.secondary{background:transparent;border:1px solid rgba(255,255,255,.26);color:#fff}
+.panel{border:1px solid var(--line);border-radius:28px;background:rgba(5,15,9,.76);box-shadow:0 30px 90px rgba(0,0,0,.3)}
+.score-shell{width:min(970px,100%);overflow:hidden;border-radius:26px;border:1px solid rgba(255,255,255,.2);background:#09110b}
+.score-header{display:grid;grid-template-columns:1fr auto 1fr;padding:14px 18px;font-size:.76rem;color:#abb8ae;border-bottom:1px solid var(--line)}
+.score-header span:nth-child(2){font-weight:950;color:#fff}.score-header span:last-child{text-align:right}
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:44px 24px;background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.3)),repeating-linear-gradient(90deg,#216f38 0 72px,#195f31 72px 144px)}
+.team{text-align:center}.team-name{font-weight:950}.team-sub{font-size:.78rem;color:#d5dfd7;margin-top:8px}
+.score-num{font-family:"Courier New",monospace;font-size:clamp(4rem,12vw,8rem);font-weight:950;line-height:.8}.clock{text-align:center}.minute{font-family:"Courier New",monospace;color:var(--gold);font-weight:950}.finaltag{font-size:.75rem;color:#aab6ad;margin-top:8px}
+.score-footer{display:flex;justify-content:space-between;gap:12px;padding:15px 18px;color:#bec9c0;font-size:.8rem}.score-footer b{color:#fff}
+.card{width:min(850px,100%);padding:clamp(28px,6vw,66px)}.quote{font-size:clamp(1.45rem,3.7vw,2.75rem);line-height:1.25;letter-spacing:-.035em;margin:0}.quote span{color:var(--lime)}
+.sub{color:var(--muted);font-size:1.03rem;line-height:1.8;margin-top:26px}
+.advice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}.advice{padding:18px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.035)}.advice b{display:block;margin-bottom:7px}.advice small{color:var(--muted);line-height:1.5}
+.quote-card,.hotline,.game-wrap{width:min(900px,100%);padding:clamp(28px,5vw,54px);text-align:center}
+.quote-card h2,.hotline h2,.game-wrap h2{font-size:clamp(2.1rem,6vw,4rem);letter-spacing:-.045em;margin:0 0 18px}
+.sigma{font-size:clamp(1.4rem,4vw,2.55rem);line-height:1.36;color:#fff;font-weight:850}
+.hotline{width:min(760px,100%)}.repeat-note{font-size:.93rem;color:#e8ffd8;font-weight:800}
+#adviceResult{min-height:58px;margin-top:23px;color:var(--gold);font-size:1.08rem;font-weight:850;line-height:1.5}
+.game-top{display:flex;justify-content:space-between;margin:15px 0 18px;font-weight:950}.game-score{font-family:"Courier New",monospace;color:var(--gold)}
+#game{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;border:3px solid rgba(255,255,255,.42);outline:none;background:
+linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.88) 49.6% 50.4%,transparent 50.4%),
+radial-gradient(circle at 50% 50%,transparent 0 11%,rgba(255,255,255,.84) 11.2% 11.8%,transparent 12%),
+repeating-linear-gradient(90deg,var(--pitch1) 0 12.5%,var(--pitch2) 12.5% 25%)}
+#game:before,#game:after{content:"";position:absolute;top:26%;width:10%;height:48%;border:3px solid rgba(255,255,255,.92)}
+#game:before{left:-3px;border-left:0}#game:after{right:-3px;border-right:0}
+.goal-net{position:absolute;right:0;top:35%;height:30%;width:4%;border-left:2px solid white;background:repeating-linear-gradient(0deg,rgba(255,255,255,.45) 0 1px,transparent 1px 8px),repeating-linear-gradient(90deg,rgba(255,255,255,.45) 0 1px,transparent 1px 8px)}
+.player{position:absolute;width:34px;height:49px;transform:translate(-50%,-50%);z-index:3}
+.head{position:absolute;left:8px;top:0;width:18px;height:16px;background:#5b341f;border-radius:2px;box-shadow:0 -4px 0 #111}
+.body{position:absolute;left:6px;top:16px;width:22px;height:18px;border:3px solid #111}.shorts{position:absolute;left:7px;top:34px;width:20px;height:8px;background:#111}
+.leg1,.leg2{position:absolute;top:42px;width:7px;height:12px;background:#5b341f}.leg1{left:7px}.leg2{right:7px}
+#saaba .body{background:#f4f4f4}#seshmuab .body{background:var(--lime)}
+.tag{position:absolute;left:50%;top:-23px;transform:translateX(-50%);font-size:9px;font-weight:950;background:rgba(0,0,0,.72);padding:2px 5px;border-radius:5px;white-space:nowrap}
+#gameball{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #111;transform:translate(-50%,-50%);z-index:4;box-shadow:inset -4px -4px 0 rgba(0,0,0,.16)}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px;text-align:left}.control{padding:13px;border:1px solid var(--line);border-radius:13px;background:rgba(0,0,0,.16)}.control b{display:block;margin-bottom:6px}.control span{font-size:.88rem;color:var(--muted)}
+.key{display:inline-block;padding:2px 7px;border:1px solid rgba(255,255,255,.3);border-bottom-width:3px;border-radius:6px;background:#111;color:#fff;font-family:monospace}
+#gameMsg{min-height:28px;margin-top:15px;color:var(--lime);font-weight:900}
+.final{text-align:center}.final p{max-width:680px;margin:24px auto;font-size:1.08rem}.signature{color:var(--lime);font-weight:950;margin-top:38px}
+.confetti{position:fixed;top:-20px;z-index:60;width:9px;height:16px;border-radius:2px;pointer-events:none;animation:fall linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+.reveal{opacity:0;transform:translateY(24px);transition:.7s ease}.reveal.on{opacity:1;transform:none}
+@media(max-width:760px){.advice-grid,.controls{grid-template-columns:1fr}.scoreboard{padding:30px 10px}.game-wrap{padding:20px 14px}.brand{font-size:.66rem}section{padding-top:82px}}
+
+/* ULTIMATE MATCH ENGINE */
+.game-wrap{width:min(1180px,96vw)!important;padding:clamp(18px,3vw,34px)!important}
+.game-lobby{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);gap:14px;margin:16px 0}
+.lobby-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.035);text-align:left}
+.lobby-card h3{margin:0 0 7px;font-size:1rem}.lobby-card p{margin:0 0 13px;color:var(--muted);font-size:.9rem;line-height:1.5}
+.field-row,.mode-row{display:flex;gap:8px;flex-wrap:wrap}
+.opponent-picker{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.03)}
+.opponent-picker strong{font-size:.92rem}
+.opponent-options{display:flex;gap:8px;flex-wrap:wrap}
+.opponent-btn{min-height:42px;border-radius:999px;padding:9px 16px;font-weight:900;color:#fff;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);cursor:pointer}
+.opponent-btn.active{background:var(--glow);color:#071009;border-color:var(--glow)}
+.opponent-note{width:100%;color:var(--muted);font-size:.82rem;line-height:1.45}.mode-row{margin-top:10px}
+.text-input{min-width:0;flex:1;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:#071009;color:#fff;outline:none;font-size:16px}
+.text-input:focus{border-color:var(--glow);box-shadow:0 0 0 3px rgba(184,255,99,.09)}
+.mode-btn{min-height:44px;border-radius:999px;padding:11px 16px;font-weight:900;color:#fff;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.22);cursor:pointer}
+.mode-btn.active{background:var(--glow);color:#071009;border-color:var(--glow)}
+.net-status{margin-top:9px;font-size:.87rem;color:#d7e4da}.net-status.good{color:var(--glow)}.net-status.bad{color:#ffb6b6}
+.match-code{font:900 .92rem "Courier New",monospace;color:var(--gold);word-break:break-all;margin-top:8px}
+.ultimate-score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;background:#071009}
+.u-side{font-weight:900}.u-side.right{text-align:right}.u-clock{text-align:center;font:900 1rem "Courier New",monospace;color:var(--gold)}.u-score{font-size:1.35rem;color:#fff}
+.canvas-wrap{position:relative;border:1px solid rgba(255,255,255,.22);border-radius:0 0 20px 20px;overflow:hidden;background:#08120b}
+#matchCanvas{display:block;width:100%;aspect-ratio:16/9;background:#0d351a;outline:none}
+.canvas-hint{position:absolute;left:14px;bottom:14px;padding:9px 11px;border-radius:10px;background:rgba(3,8,5,.76);border:1px solid rgba(255,255,255,.16);color:#e9f7ec;font-size:.78rem;pointer-events:none}
+#gameMsg{min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--glow);font-weight:900;padding:12px}
+.controls{grid-template-columns:repeat(5,1fr)!important}.control{min-width:0}
+@media(max-width:820px){.game-lobby{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:520px){.controls{grid-template-columns:1fr!important}.ultimate-score{font-size:.8rem}.u-score{font-size:1.05rem}}
+
+</style>
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+<nav><div class="wrap"><div class="brand">SAABA NERU — BIRTHDAY MATCHDAY</div><div class="live"><span class="dot"></span>LIVE: LEVEL 15</div></div></nav>
+
+<section>
+<div class="wrap hero">
+<div class="eyebrow">Special Birthday Edition</div>
+<h1>SAABA NERU.<br>IT'S FINALLY<br>YOUR BIRTHDAY.</h1>
+<div class="ball">⚽</div>
+<p>Pretty sure you were 14 for forever, but somehow we finally made it to the next season.</p>
+<button class="cta" onclick="kickoff()">Kick Off Your Birthday</button>
+</div>
+</section>
+
+<section id="score"><div class="wrap"><div class="score-shell reveal">
+<div class="score-header"><span>BIRTHDAY LEAGUE</span><span>MATCH CENTRE</span><span>FULL TIME</span></div>
+<div class="scoreboard">
+<div class="team"><div class="team-name">AGE 14</div><div class="score-num">0</div><div class="team-sub">season complete</div></div>
+<div class="clock"><div class="minute">90:00</div><div class="finaltag">FINAL</div></div>
+<div class="team"><div class="team-name">AGE 15</div><div class="score-num">1</div><div class="team-sub">new season unlocked</div></div>
+</div>
+<div class="score-footer"><span><b>Possession:</b> Growing Up 100%</span><span><b>Man of the Match:</b> Saaba Neru</span></div>
+</div></div></section>
+
+<section><div class="wrap"><div class="card panel reveal">
+<div class="eyebrow">A message from your brother</div>
+<p class="quote">Oh my God, it’s finally your birthday. Seems like you were <span>14 forever</span>. Pretty sure I say that every year, but yeah, you’re really growing up on me.</p>
+<p class="sub">Well don’t stop now. Don’t die or anything. I can’t wait until we’re all grown up. Of course I have all the best advice, so you can still come to me for advice about everything. As long as it’s not goofy stuff.</p>
+<div class="advice-grid">
+<div class="advice"><b>Soccer decisions</b><small>Approved. I will act like a professional coach even if I have no clue.</small></div>
+<div class="advice"><b>Life advice</b><small>Also approved. Confidence level: extremely high.</small></div>
+<div class="advice"><b>Goofy stuff</b><small>Request denied. Come back when the question makes sense.</small></div>
+</div>
+</div></div></section>
+
+<section><div class="wrap"><div class="quote-card panel reveal">
+<div class="eyebrow">Important Message</div>
+<h2>You’re only 15. That’s okay.</h2>
+<p class="sigma">As a great, amazing, wise, phenomenal, sigma, anime-built, smart, gonna-be-rich man with a mustache once said: “Don’t move too fast in life or success can’t catch up with you.”</p>
+</div></div></section>
+
+<section><div class="wrap"><div class="hotline panel reveal">
+<div class="eyebrow">Big Brother Advice Hotline</div>
+<h2>Need elite advice?</h2>
+<p class="copy">Press the button and receive one highly qualified piece of wisdom.</p>
+<p class="repeat-note">Click it as many times as you want. There are tons of different ones.</p>
+<button class="secondary" onclick="advice()">Give me advice</button>
+<div id="adviceResult">Your first piece of advice is waiting.</div>
+</div></div></section>
+
+<section id="gameSection"><div class="game-wrap panel reveal">
+<div class="eyebrow">Birthday Match Engine</div>
+<h2 id="gameTitle">Saaba vs Seshmuab</h2>
+<p class="copy">High-resolution canvas graphics, smoother animations, sprinting, tackles, charged shots, skill moves, tougher AI, and real two-player online mode.</p>
+
+<div class="opponent-picker" id="opponentPicker">
+  <strong>Solo opponent</strong>
+  <div class="opponent-options">
+    <button class="opponent-btn" id="robotOpponentBtn">Robot</button>
+    <button class="opponent-btn active" id="seshOpponentBtn">Seshmuab</button>
+  </div>
+  <div class="opponent-note" id="opponentNote">Seshmuab mode: elite AI with faster pressure, smarter defending, stronger tackling, and more skill moves.</div>
+</div>
+
+<div class="game-lobby">
+  <div class="lobby-card">
+    <h3>Player Login</h3>
+    <p>Enter your player name. In solo mode, use the opponent toggle above to switch between Robot and Seshmuab. Online lets a second device control the other side.</p>
+    <div class="field-row"><input id="playerName" class="text-input" maxlength="18" value="Saaba" aria-label="Player name"></div>
+    <div class="mode-row">
+      <button class="mode-btn active" id="soloBtn">Solo Match</button>
+      <button class="mode-btn" id="hostBtn">Host Online</button>
+      <button class="mode-btn" id="joinShowBtn">Join Match</button>
+    </div>
+  </div>
+  <div class="lobby-card">
+    <h3>Online Match</h3>
+    <p>Host to get a match code. On another device, open this same website, enter that code, and join.</p>
+    <div class="field-row">
+      <input id="joinCode" class="text-input" maxlength="80" placeholder="Enter match code" aria-label="Match code">
+      <button class="secondary" id="joinBtn">Join</button>
+    </div>
+    <div id="netStatus" class="net-status">Offline / solo mode</div>
+    <div id="hostCode" class="match-code"></div>
+  </div>
+</div>
+
+<div class="ultimate-score">
+  <div class="u-side"><span id="leftName">SAABA</span> <span class="u-score" id="leftScore">0</span></div>
+  <div class="u-clock"><span id="matchClock">00:00</span><br><small id="modeLabel">SOLO</small></div>
+  <div class="u-side right"><span class="u-score" id="rightScore">0</span> <span id="rightName">SESHMUAB</span></div>
+</div>
+<div class="canvas-wrap">
+  <canvas id="matchCanvas" tabindex="0" aria-label="Birthday soccer game"></canvas>
+  <div class="canvas-hint">Click the pitch first · Arrow keys move</div>
+</div>
+<div id="gameMsg">Solo mode ready. Click the pitch and play.</div>
+<div class="controls">
+  <div class="control"><b>Move</b><span>Use the arrow keys.</span></div>
+  <div class="control"><b><span class="key">Shift</span> Sprint</b><span>Faster run, slightly less control.</span></div>
+  <div class="control"><b><span class="key">X</span> Tackle</b><span>Time it when you are close.</span></div>
+  <div class="control"><b><span class="key">Z</span> Shoot</b><span>Hold briefly for more power.</span></div>
+  <div class="control"><b><span class="key">C</span> Skill</b><span>Quick feint and burst past a defender.</span></div>
+</div>
+</div></section>
+
+<section><div class="wrap final reveal">
+<div class="eyebrow">Final Whistle</div>
+<h2>HAPPY<br>BIRTHDAY, SAABA.</h2>
+<p>Keep getting better, keep having fun, and enjoy the next season of life. Fifteen looks good on you. Just don’t get too grown and start acting like you don’t need me.</p>
+<button class="cta" onclick="confetti()">Celebrate Again</button>
+<div class="signature">— your brother</div>
+</div></section>
+
+<script>
+const wisdom=[
+"If you’re going to do something dumb, at least don’t make it obvious.",
+"Pass the ball sometimes. You are not prime Messi every possession.",
+"If Mom already said no, asking me probably will not save you.",
+"Do your homework before saying you have nothing to do.",
+"If you lose, blame the ref for five seconds, then get over it.",
+"Never argue with somebody who is clearly committed to being wrong.",
+"If your haircut looks bad, wear confidence until it grows back.",
+"Do not text something you would be embarrassed to see on a giant screen.",
+"If you have to ask whether something is goofy, it probably is.",
+"A clean room makes it way harder for people to yell at you.",
+"Save some money. Future you will be less annoyed.",
+"If you borrow my stuff, return it before I notice.",
+"Being funny is good. Being annoying is not the same thing.",
+"When in doubt, drink water and think for ten more seconds.",
+"Do not quit just because you are bad at something for one day.",
+"If the coach is talking, look like you are listening even if you are tired.",
+"Good players make mistakes. Smart players stop making the same one.",
+"Do not start drama you do not have time to finish.",
+"If your friend says 'trust me' before doing something ridiculous, be careful.",
+"Never let one bad game convince you that you are a bad player.",
+"If somebody helps you, remember it.",
+"If somebody keeps disrespecting you, stop giving them unlimited chances.",
+"Confidence is quiet. You do not have to prove everything.",
+"Take pictures sometimes. One day you will actually want them.",
+"Do not spend all your money the same day you get it.",
+"You are allowed to change your mind when you learn something new.",
+"Being older does not automatically mean being smarter, so keep learning.",
+"Do not overthink a simple pass. Same goes for life sometimes.",
+"If you are mad, wait before sending the message.",
+"Stay close with the people who actually show up for you.",
+"You do not need to win every argument.",
+"If you make a promise, try to keep it.",
+"Sometimes the best response is literally no response.",
+"Take care of your cleats. Somehow they get expensive fast.",
+"Eat before a game. Running on nothing is not a strategy.",
+"Do not fake an injury unless you are prepared for everybody to remember it forever.",
+"If you score, act like you have done it before. Or celebrate. It is your birthday.",
+"Listen to me at least 37 percent of the time. That should be enough.",
+"If the idea starts with 'bro watch this,' think twice.",
+"Do not let one embarrassing moment become your whole personality.",
+"Ask for help before the problem becomes ten times harder.",
+"Do not compare your chapter 3 to somebody else's chapter 20.",
+"Keep people around who want you to win too.",
+"You are 15 now. Unfortunately, chores still exist.",
+"You can always call me. Just do not call me for something completely ridiculous.",
+"Finish what you start. Even the small stuff matters.",
+"If you start cleaning the kitchen, finish the whole kitchen and check behind you before you leave.",
+"Little habits become big habits. Learn to finish small things now so you can finish big things later.",
+"Before you walk away from something, look back and ask yourself: did I actually finish it?",
+"Half-done work creates twice the stress later.",
+"Do the last five percent. That is usually the part people skip.",
+"Being dependable starts with tiny things nobody is clapping for.",
+"A person who finishes small jobs can be trusted with bigger ones.",
+"Do not rush through something just because nobody is watching.",
+"Your future is built out of boring little choices you make every day.",
+"When you say you are going to do something, become the type of person who actually does it.",
+"Clean up after yourself before somebody has to remind you. That is growth.",
+"Sometimes discipline is literally just checking the room one more time before you leave.",
+"Do not chase being older. Fifteen is allowed to feel like fifteen.",
+"You do not have to have your whole life figured out right now.",
+"Move with purpose, not panic.",
+"Success does not need you to sprint every second.",
+"Take your time becoming the person you are supposed to be.",
+"You can be serious about your future and still enjoy being a kid.",
+"Keep your standards high without making life miserable for yourself.",
+"You will make mistakes. Just do not waste them.",
+"A bad day is not a bad life.",
+"You do not have to prove yourself every second.",
+"The goal is not to look disciplined. The goal is to actually be disciplined.",
+"If you want people to trust your word, start by trusting yourself to follow through.",
+"Do not leave easy wins unfinished.",
+"Small responsibilities are practice for big opportunities.",
+"Handle what is in front of you before worrying about what is ten years away.",
+"There is nothing cool about pretending not to care.",
+"Care about your work. Care about your people. Care about yourself.",
+"If you know you can do better, do better the next time instead of just saying it.",
+"Stay humble enough to learn and confident enough to try.",
+"You do not need to be the loudest person in the room to be the strongest one.",
+"When life gets bigger, the habits you build now come with you.",
+"Check behind yourself. Literally and metaphorically.",
+"Do not make future Saaba clean up present Saaba's mess.",
+"If you start it, own it. If you own it, finish it.",
+"One good habit can quietly change a whole year.",
+"Do not wait until something is important to learn how to be responsible.",
+"The little stuff is training.",
+"Keep going when the exciting part is over.",
+"Finish the kitchen. Then check the counters. Then check the floor. Then you are done.",
+"Doing something right the first time is usually faster than being told twice.",
+"You are allowed to grow slowly. Just keep growing.",
+"You can take your time without wasting your time.",
+"When your moment comes, you want your habits to already know what to do.",
+"Do not confuse being busy with actually finishing something.",
+"Be the teammate people trust when the game gets hard.",
+"Learn how to lose without becoming somebody nobody wants to be around.",
+"Celebrate your wins without becoming unbearable.",
+"Do the simple things well. That carries farther than people think.",
+"Your name means more when people know your word is good.",
+"Sometimes maturity is just doing the thing before anybody asks twice.",
+"Finish the boring part too. That is usually where discipline actually starts.",
+"Do not let talent make you lazy.",
+"Being naturally good is cool. Being reliable is better.",
+"If you mess up, fix it before making excuses.",
+"Give people a reason to trust you without having to keep asking.",
+"Try hard even when the result is not guaranteed.",
+"Do not make a permanent decision because of a temporary mood.",
+"Keep people around who tell you the truth, not just what sounds good.",
+"You can be confident without acting like everybody else is beneath you.",
+"Protect your peace, but do not use that as an excuse to avoid responsibility."
+];
+
+function kickoff(){
+  document.getElementById("score").scrollIntoView({behavior:"smooth"});
+  setTimeout(()=>confetti(90),650);
+}
+function advice(){
+  const el=document.getElementById("adviceResult");
+  let next=wisdom[Math.floor(Math.random()*wisdom.length)];
+  if(next===el.textContent) next=wisdom[(wisdom.indexOf(next)+1)%wisdom.length];
+  el.textContent=next;
+}
+
+const canvas=document.getElementById("matchCanvas");
+const ctx=canvas.getContext("2d");
+const msg=document.getElementById("gameMsg");
+const playerNameInput=document.getElementById("playerName");
+const joinCodeInput=document.getElementById("joinCode");
+const hostCodeEl=document.getElementById("hostCode");
+const netStatus=document.getElementById("netStatus");
+const modeLabel=document.getElementById("modeLabel");
+const leftNameEl=document.getElementById("leftName");
+const rightNameEl=document.getElementById("rightName");
+const leftScoreEl=document.getElementById("leftScore");
+const rightScoreEl=document.getElementById("rightScore");
+const clockEl=document.getElementById("matchClock");
+const soloBtn=document.getElementById("soloBtn");
+const hostBtn=document.getElementById("hostBtn");
+const joinShowBtn=document.getElementById("joinShowBtn");
+const joinBtn=document.getElementById("joinBtn");
+const robotOpponentBtn=document.getElementById("robotOpponentBtn");
+const seshOpponentBtn=document.getElementById("seshOpponentBtn");
+const opponentNote=document.getElementById("opponentNote");
+const opponentPicker=document.getElementById("opponentPicker");
+const gameTitle=document.getElementById("gameTitle");
+
+const W=1600,H=900;
+const FIELD={left:120,right:1480,top:155,bottom:790,goalTop:360,goalBottom:540};
+const GOAL_L=84,GOAL_R=1516;
+const S={
+  mode:"solo",role:"host",aiType:"seshmuab",last:0,time:0,leftScore:0,rightScore:0,
+  keys:new Set(),remoteKeys:new Set(),
+  saaba:{x:430,y:470,vx:0,vy:0,dir:0,skill:0,tackle:0,name:"Saaba"},
+  sesh:{x:1120,y:470,vx:0,vy:0,dir:Math.PI,skill:0,tackle:0,name:"Seshmuab"},
+  ball:{x:510,y:470,vx:0,vy:0,owner:"saaba",spin:0},
+  charging:false,shotCharge:0,aiSkillCooldown:0,resetTimer:0,
+  peer:null,conn:null,connected:false,lastNetSend:0
+};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const norm=(x,y)=>{const l=Math.hypot(x,y)||1;return{x:x/l,y:y/l}};
+
+function fitCanvas(){
+  const rect=canvas.getBoundingClientRect();
+  const dpr=Math.min(window.devicePixelRatio||1,2.5);
+  const pw=Math.max(1,Math.round(rect.width*dpr));
+  const ph=Math.max(1,Math.round(rect.width*9/16*dpr));
+  if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph}
+  ctx.setTransform(pw/W,0,0,ph/H,0,0);
+}
+window.addEventListener("resize",fitCanvas);fitCanvas();
+
+function drawGoal(x,left){
+  const x0=left?x:FIELD.right, width=left?FIELD.left-x:GOAL_R-FIELD.right;
+  const minX=Math.min(x0,FIELD.left),maxX=Math.max(x0,FIELD.left);
+  ctx.strokeStyle="rgba(245,250,245,.95)";ctx.lineWidth=6;ctx.strokeRect(minX,FIELD.goalTop,Math.abs(width),FIELD.goalBottom-FIELD.goalTop);
+  ctx.strokeStyle="rgba(255,255,255,.35)";ctx.lineWidth=1.5;
+  for(let xx=minX;xx<=maxX;xx+=12){ctx.beginPath();ctx.moveTo(xx,FIELD.goalTop);ctx.lineTo(xx,FIELD.goalBottom);ctx.stroke()}
+  for(let yy=FIELD.goalTop;yy<=FIELD.goalBottom;yy+=12){ctx.beginPath();ctx.moveTo(minX,yy);ctx.lineTo(maxX,yy);ctx.stroke()}
+}
+function drawStadium(){
+  ctx.clearRect(0,0,W,H);
+  let g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,"#07121a");g.addColorStop(1,"#10271f");ctx.fillStyle=g;ctx.fillRect(0,0,W,250);
+  ctx.fillStyle="#111915";ctx.fillRect(0,70,W,125);
+  const colors=["#dce4dd","#728178","#c1ff62","#abb4ad","#f1d76a"];
+  for(let r=0;r<5;r++)for(let i=0;i<92;i++){const x=(i*19+r*8)%W,y=87+r*20+(i%3)*2;ctx.fillStyle=colors[(i+r*2)%colors.length];ctx.fillRect(x,y,5,5)}
+  for(const x of [145,1455]){let glow=ctx.createRadialGradient(x,40,5,x,40,105);glow.addColorStop(0,"rgba(255,255,235,.9)");glow.addColorStop(.2,"rgba(255,255,220,.22)");glow.addColorStop(1,"rgba(255,255,220,0)");ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,40,105,0,Math.PI*2);ctx.fill()}
+  ctx.fillStyle="#126b32";ctx.fillRect(FIELD.left,FIELD.top,FIELD.right-FIELD.left,FIELD.bottom-FIELD.top);
+  const stripe=(FIELD.right-FIELD.left)/10;for(let i=0;i<10;i++){ctx.fillStyle=i%2?"rgba(8,72,31,.21)":"rgba(78,165,91,.12)";ctx.fillRect(FIELD.left+i*stripe,FIELD.top,stripe,FIELD.bottom-FIELD.top)}
+  g=ctx.createLinearGradient(0,FIELD.top,0,FIELD.bottom);g.addColorStop(0,"rgba(255,255,255,.065)");g.addColorStop(.55,"rgba(255,255,255,0)");g.addColorStop(1,"rgba(0,0,0,.13)");ctx.fillStyle=g;ctx.fillRect(FIELD.left,FIELD.top,FIELD.right-FIELD.left,FIELD.bottom-FIELD.top);
+  ctx.strokeStyle="rgba(245,255,246,.93)";ctx.lineWidth=5;ctx.strokeRect(FIELD.left,FIELD.top,FIELD.right-FIELD.left,FIELD.bottom-FIELD.top);
+  ctx.beginPath();ctx.moveTo(800,FIELD.top);ctx.lineTo(800,FIELD.bottom);ctx.stroke();ctx.beginPath();ctx.arc(800,472,92,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle="#eef7ef";ctx.beginPath();ctx.arc(800,472,6,0,Math.PI*2);ctx.fill();
+  ctx.strokeRect(FIELD.left,300,180,345);ctx.strokeRect(FIELD.right-180,300,180,345);ctx.strokeRect(FIELD.left,390,70,165);ctx.strokeRect(FIELD.right-70,390,70,165);
+  drawGoal(GOAL_L,true);drawGoal(GOAL_R,false);
+}
+function drawPlayer(p,side,t){
+  const speed=Math.hypot(p.vx,p.vy), phase=t*10*(.45+Math.min(speed/350,1));
+  const bob=Math.sin(phase*2)*Math.min(4,speed/80),leg=Math.sin(phase)*Math.min(15,5+speed/25),arm=-leg*.7;
+  const spin=p.skill>0?(1-p.skill/.55)*Math.PI*2:0,tilt=p.tackle>0?-.35:0;
+  ctx.save();ctx.translate(p.x,p.y+bob);ctx.rotate(spin+tilt);
+  ctx.save();ctx.rotate(-spin-tilt);ctx.fillStyle="rgba(0,0,0,.28)";ctx.beginPath();ctx.ellipse(0,29,27,9,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  ctx.strokeStyle="#5a351f";ctx.lineWidth=9;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(-10+leg*.45,38);ctx.stroke();ctx.beginPath();ctx.moveTo(8,14);ctx.lineTo(10-leg*.45,38);ctx.stroke();
+  ctx.strokeStyle=side==="saaba"?"#f1f1f1":"#b9ff5e";ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-10+leg*.45,30);ctx.lineTo(-11+leg*.45,39);ctx.stroke();ctx.beginPath();ctx.moveTo(10-leg*.45,30);ctx.lineTo(11-leg*.45,39);ctx.stroke();
+  const j1=side==="saaba"?"#f4f4f4":"#b9ff5e",j2=side==="saaba"?"#cfd3d0":"#79b936";let tg=ctx.createLinearGradient(-18,-18,18,20);tg.addColorStop(0,j1);tg.addColorStop(1,j2);ctx.fillStyle=tg;ctx.beginPath();ctx.roundRect(-18,-22,36,40,9);ctx.fill();ctx.strokeStyle="#0b0d0c";ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle="#101412";ctx.beginPath();ctx.roundRect(-18,11,36,16,4);ctx.fill();
+  ctx.strokeStyle="#5a351f";ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-16,-12);ctx.lineTo(-26+arm*.35,8);ctx.stroke();ctx.beginPath();ctx.moveTo(16,-12);ctx.lineTo(26-arm*.35,8);ctx.stroke();
+  ctx.fillStyle="#5a351f";ctx.beginPath();ctx.arc(0,-38,14,0,Math.PI*2);ctx.fill();ctx.fillStyle="#10110f";ctx.beginPath();ctx.arc(0,-44,14,Math.PI,Math.PI*2);ctx.fill();
+  ctx.fillStyle="rgba(0,0,0,.72)";ctx.beginPath();ctx.roundRect(-36,-72,72,19,7);ctx.fill();ctx.fillStyle="#fff";ctx.font="800 11px system-ui";ctx.textAlign="center";ctx.fillText((side==="saaba"?S.saaba.name:S.sesh.name).toUpperCase(),0,-58);
+  if(p.skill>0){ctx.strokeStyle="rgba(193,255,98,.85)";ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,35+Math.sin(t*22)*4,0,Math.PI*2);ctx.stroke()}
+  ctx.restore();
+}
+function drawBall(){
+  const b=S.ball;ctx.save();ctx.translate(b.x,b.y);ctx.fillStyle="rgba(0,0,0,.25)";ctx.beginPath();ctx.ellipse(2,11,12,4,0,0,Math.PI*2);ctx.fill();ctx.rotate(b.spin);
+  let rg=ctx.createRadialGradient(-5,-6,2,0,0,15);rg.addColorStop(0,"#fff");rg.addColorStop(1,"#ccd2cd");ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,12,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#111";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle="#111";for(let i=0;i<5;i++){const a=i*Math.PI*2/5;ctx.beginPath();ctx.arc(Math.cos(a)*6,Math.sin(a)*6,2.2,0,Math.PI*2);ctx.fill()}ctx.restore();
+}
+function draw(){
+  fitCanvas();drawStadium();drawPlayer(S.saaba,"saaba",S.time);drawPlayer(S.sesh,"sesh",S.time);drawBall();
+  ctx.fillStyle="rgba(3,8,5,.72)";ctx.fillRect(590,170,420,56);ctx.fillStyle="#fff";ctx.font="900 18px system-ui";ctx.textAlign="center";ctx.fillText(`${S.saaba.name.toUpperCase()}  ${S.leftScore}  —  ${S.rightScore}  ${S.sesh.name.toUpperCase()}`,800,195);ctx.fillStyle="#ffd65a";ctx.font="800 12px system-ui";ctx.fillText(S.mode==="solo"?"BIRTHDAY EXHIBITION":"ONLINE FRIENDLY",800,215);
+}
+function resetKickoff(owner="saaba"){
+  Object.assign(S.saaba,{x:430,y:470,vx:0,vy:0});Object.assign(S.sesh,{x:1120,y:470,vx:0,vy:0});S.ball.x=owner==="saaba"?500:1050;S.ball.y=470;S.ball.vx=S.ball.vy=0;S.ball.owner=owner;S.resetTimer=.7;
+}
+function hasMove(keys){return keys.has("arrowleft")||keys.has("arrowright")||keys.has("arrowup")||keys.has("arrowdown")}
+function movePlayer(p,keys,dt){
+  if(!hasMove(keys)){p.vx*=.82;p.vy*=.82;return}let x=0,y=0;if(keys.has("arrowleft"))x--;if(keys.has("arrowright"))x++;if(keys.has("arrowup"))y--;if(keys.has("arrowdown"))y++;let v=norm(x,y),max=keys.has("shift")?365:275;p.vx+=(v.x*max-p.vx)*Math.min(1,dt*8);p.vy+=(v.y*max-p.vy)*Math.min(1,dt*8);p.x=clamp(p.x+p.vx*dt,FIELD.left+22,FIELD.right-22);p.y=clamp(p.y+p.vy*dt,FIELD.top+28,FIELD.bottom-28);p.dir=Math.atan2(p.vy,p.vx);
+}
+function aiUpdate(dt){
+  const p=S.sesh,b=S.ball,e=S.saaba;S.aiSkillCooldown=Math.max(0,S.aiSkillCooldown-dt);
+  const elite=S.aiType==="seshmuab";
+  const profile=elite
+    ? {defSpeed:340,attSpeed:355,press:180,tackle:2.25,skillRange:85,skillCd:2.1,shootRate:.78}
+    : {defSpeed:295,attSpeed:305,press:145,tackle:1.15,skillRange:62,skillCd:3.4,shootRate:.48};
+  let tx,ty,sprint=false;
+  if(b.owner==="sesh"){
+    tx=FIELD.left+35;
+    ty=clamp(p.y+(p.y-e.y)*(elite?.45:.28)+Math.sin(S.time*(elite?2.4:1.7))*(elite?80:48),FIELD.top+60,FIELD.bottom-60);
+    sprint=distance(p,e)>(elite?105:145);
+    if(distance(p,e)<profile.skillRange&&S.aiSkillCooldown<=0){
+      p.skill=.55;S.aiSkillCooldown=profile.skillCd;
+      p.y=clamp(p.y+(p.y<e.y?-1:1)*(elite?80:52),FIELD.top+35,FIELD.bottom-35);
+    }
+  }else if(b.owner==="saaba"){
+    tx=clamp(e.x+(elite?85:105),650,FIELD.right-60);ty=e.y;
+    if(distance(p,e)<profile.press){tx=e.x+(elite?25:42);ty=e.y;sprint=true}
+  }else{tx=b.x;ty=b.y;sprint=true}
+  let v=norm(tx-p.x,ty-p.y);
+  let max=sprint?(b.owner==="sesh"?profile.attSpeed:profile.defSpeed):(elite?285:255);
+  p.vx+=(v.x*max-p.vx)*Math.min(1,dt*(elite?7.5:6.4));
+  p.vy+=(v.y*max-p.vy)*Math.min(1,dt*(elite?7.5:6.4));
+  p.x=clamp(p.x+p.vx*dt,FIELD.left+22,FIELD.right-22);
+  p.y=clamp(p.y+p.vy*dt,FIELD.top+28,FIELD.bottom-28);
+  p.dir=Math.atan2(p.vy,p.vx);
+  if(b.owner==="saaba"&&distance(p,e)<48&&e.skill<=0&&Math.random()<dt*profile.tackle){
+    b.owner="sesh";msg.textContent=S.sesh.name+" read it and took the ball.";
+  }
+  if(b.owner==="sesh"&&p.x<FIELD.left+310&&Math.abs(p.y-450)<160&&Math.random()<dt*profile.shootRate){
+    doShoot("sesh",(elite?.72:.62)+Math.random()*(elite?.22:.18));
+  }
+}
+function actionTackle(side){
+  const me=side==="saaba"?S.saaba:S.sesh,other=side==="saaba"?S.sesh:S.saaba;me.tackle=.38;
+  if(distance(me,other)<58&&S.ball.owner!==side&&Math.random()<.73){S.ball.owner=side;msg.textContent=(side==="saaba"?S.saaba.name:S.sesh.name)+" wins it."}
+}
+function actionSkill(side){
+  const p=side==="saaba"?S.saaba:S.sesh;if(p.skill>0)return;p.skill=.55;let d=norm(p.vx||(side==="saaba"?1:-1),p.vy||0);p.x=clamp(p.x+d.x*72,FIELD.left+22,FIELD.right-22);p.y=clamp(p.y+d.y*72,FIELD.top+28,FIELD.bottom-28);if(S.ball.owner===side){S.ball.x=p.x+d.x*38;S.ball.y=p.y+d.y*38}
+}
+function doShoot(side,power=.72){
+  if(S.ball.owner!==side)return;let goal=side==="saaba"?{x:GOAL_R,y:450}:{x:GOAL_L,y:450},aimY=clamp(goal.y+(Math.random()-.5)*110,FIELD.goalTop+18,FIELD.goalBottom-18),v=norm(goal.x-S.ball.x,aimY-S.ball.y),speed=680+power*520;S.ball.owner=null;S.ball.vx=v.x*speed;S.ball.vy=v.y*speed;S.ball.spin+=(Math.random()-.5)*.6;msg.textContent=(side==="saaba"?S.saaba.name:S.sesh.name)+" shoots!";
+}
+function updateBall(dt){
+  let b=S.ball;if(b.owner){let p=b.owner==="saaba"?S.saaba:S.sesh,d=norm(p.vx||(b.owner==="saaba"?1:-1),p.vy||0),lead=34+Math.min(Math.hypot(p.vx,p.vy)/20,12);b.x=p.x+d.x*lead;b.y=p.y+d.y*lead;b.vx=p.vx;b.vy=p.vy}else{b.x+=b.vx*dt;b.y+=b.vy*dt;b.spin+=Math.hypot(b.vx,b.vy)*dt*.01;let drag=Math.pow(.992,dt*60);b.vx*=drag;b.vy*=drag;for(const side of ["saaba","sesh"]){let p=side==="saaba"?S.saaba:S.sesh;if(distance(p,b)<34&&Math.hypot(b.vx,b.vy)<560){b.owner=side;break}}}
+  if(b.y<FIELD.top+8){b.y=FIELD.top+8;b.vy=Math.abs(b.vy)*.55}if(b.y>FIELD.bottom-8){b.y=FIELD.bottom-8;b.vy=-Math.abs(b.vy)*.55}
+  let inGoal=b.y>FIELD.goalTop&&b.y<FIELD.goalBottom;if(b.x<GOAL_L&&inGoal)scoreGoal("sesh");if(b.x>GOAL_R&&inGoal)scoreGoal("saaba");if(b.x<FIELD.left&&!inGoal){b.x=FIELD.left;b.vx=Math.abs(b.vx)*.55}if(b.x>FIELD.right&&!inGoal){b.x=FIELD.right;b.vx=-Math.abs(b.vx)*.55}
+}
+function scoreGoal(side){
+  if(S.resetTimer>0)return;if(side==="saaba")S.leftScore++;else S.rightScore++;leftScoreEl.textContent=S.leftScore;rightScoreEl.textContent=S.rightScore;msg.textContent=(side==="saaba"?S.saaba.name:S.sesh.name).toUpperCase()+" SCORES!";if(side==="saaba")confetti(28);S.resetTimer=1.1;S.ball.vx=S.ball.vy=0;S.ball.x=800;S.ball.y=472;S.ball.owner=null;setTimeout(()=>resetKickoff(side==="saaba"?"sesh":"saaba"),900);
+}
+function serializeState(){return{t:"state",time:S.time,leftScore:S.leftScore,rightScore:S.rightScore,saaba:{...S.saaba},sesh:{...S.sesh},ball:{...S.ball}}}
+function applyRemoteState(d){S.time=d.time||S.time;S.leftScore=d.leftScore||0;S.rightScore=d.rightScore||0;Object.assign(S.saaba,d.saaba||{});Object.assign(S.sesh,d.sesh||{});Object.assign(S.ball,d.ball||{});leftScoreEl.textContent=S.leftScore;rightScoreEl.textContent=S.rightScore;leftNameEl.textContent=S.saaba.name.toUpperCase();rightNameEl.textContent=S.sesh.name.toUpperCase()}
+function update(dt){
+  S.time+=dt;if(S.resetTimer>0)S.resetTimer-=dt;for(const p of [S.saaba,S.sesh]){p.skill=Math.max(0,p.skill-dt);p.tackle=Math.max(0,p.tackle-dt)}
+  if(S.mode==="solo"){movePlayer(S.saaba,S.keys,dt);aiUpdate(dt);updateBall(dt)}
+  else if(S.role==="host"){movePlayer(S.saaba,S.keys,dt);movePlayer(S.sesh,S.remoteKeys,dt);updateBall(dt);S.lastNetSend+=dt;if(S.conn&&S.conn.open&&S.lastNetSend>.045){S.conn.send(serializeState());S.lastNetSend=0}}
+  let m=Math.floor(S.time/60),sec=Math.floor(S.time%60);clockEl.textContent=String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+}
+function loop(t){if(!S.last)S.last=t;let dt=Math.min((t-S.last)/1000,.033);S.last=t;update(dt);draw();requestAnimationFrame(loop)}requestAnimationFrame(loop);
+
+function cleanupPeer(){if(S.conn){try{S.conn.close()}catch(e){}}if(S.peer){try{S.peer.destroy()}catch(e){}}S.conn=null;S.peer=null;S.connected=false;hostCodeEl.textContent=""}
+function setModeBtn(id){[soloBtn,hostBtn,joinShowBtn].forEach(b=>b.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function applyOpponentChoice(type){
+  S.aiType=type==="robot"?"robot":"seshmuab";
+  const robot=S.aiType==="robot";
+  robotOpponentBtn.classList.toggle("active",robot);
+  seshOpponentBtn.classList.toggle("active",!robot);
+  S.sesh.name=robot?"Robot":"Seshmuab";
+  rightNameEl.textContent=S.sesh.name.toUpperCase();
+  gameTitle.textContent="Saaba vs "+S.sesh.name;
+  opponentNote.textContent=robot
+    ?"Robot mode: strong standard AI. Still competitive, but gives you more room to create chances."
+    :"Seshmuab mode: elite AI with faster pressure, smarter defending, stronger tackling, and more skill moves.";
+  if(S.mode==="solo")msg.textContent=S.sesh.name+" selected. Click the pitch and play.";
+}
+function setSolo(){
+  cleanupPeer();S.mode="solo";S.role="host";
+  opponentPicker.style.opacity="1";opponentPicker.style.pointerEvents="auto";
+  S.saaba.name=(playerNameInput.value.trim()||"Saaba").slice(0,18);
+  applyOpponentChoice(S.aiType);
+  leftNameEl.textContent=S.saaba.name.toUpperCase();
+  modeLabel.textContent="SOLO";
+  netStatus.className="net-status";netStatus.textContent="Offline / solo mode";
+  setModeBtn("soloBtn");resetKickoff("saaba");
+}
+function bindConnection(conn,isHost){
+  S.conn=conn;conn.on("open",()=>{S.connected=true;netStatus.className="net-status good";netStatus.textContent="Connected — online match live";modeLabel.textContent="ONLINE";msg.textContent="Online opponent connected. Kick off.";conn.send({t:"hello",name:(playerNameInput.value.trim()||(isHost?"Saaba":"Player 2")).slice(0,18)});if(isHost)conn.send(serializeState())});
+  conn.on("data",d=>{if(!d||typeof d!=="object")return;if(d.t==="hello"&&isHost){S.sesh.name=(d.name||"Player 2").slice(0,18);rightNameEl.textContent=S.sesh.name.toUpperCase();conn.send({t:"hello_ack",hostName:S.saaba.name,guestName:S.sesh.name})}if(d.t==="hello_ack"&&!isHost){S.saaba.name=(d.hostName||"Saaba").slice(0,18);S.sesh.name=(d.guestName||"Player 2").slice(0,18);leftNameEl.textContent=S.saaba.name.toUpperCase();rightNameEl.textContent=S.sesh.name.toUpperCase()}if(d.t==="input"&&isHost)S.remoteKeys=new Set(Array.isArray(d.keys)?d.keys:[]);if(d.t==="action"&&isHost){if(d.action==="tackle")actionTackle("sesh");if(d.action==="skill")actionSkill("sesh");if(d.action==="shoot")doShoot("sesh",d.power||.7)}if(d.t==="state"&&!isHost)applyRemoteState(d)});
+  conn.on("close",()=>{S.connected=false;netStatus.className="net-status bad";netStatus.textContent="Opponent disconnected";msg.textContent="Online connection ended."});conn.on("error",()=>{netStatus.className="net-status bad";netStatus.textContent="Connection error"});
+}
+function hostOnline(){cleanupPeer();opponentPicker.style.opacity='.5';opponentPicker.style.pointerEvents='none';if(typeof Peer==="undefined"){netStatus.className="net-status bad";netStatus.textContent="Online library could not load. Check internet access.";return}S.mode="online";S.role="host";S.saaba.name=(playerNameInput.value.trim()||"Saaba").slice(0,18);S.sesh.name="Player 2";leftNameEl.textContent=S.saaba.name.toUpperCase();rightNameEl.textContent="PLAYER 2";modeLabel.textContent="WAITING";netStatus.className="net-status";netStatus.textContent="Creating online match...";setModeBtn("hostBtn");let peer=new Peer();S.peer=peer;peer.on("open",id=>{hostCodeEl.textContent="MATCH CODE: "+id;netStatus.className="net-status good";netStatus.textContent="Match created. Send this code to the other player."});peer.on("connection",c=>bindConnection(c,true));peer.on("error",e=>{netStatus.className="net-status bad";netStatus.textContent="Online error: "+(e.type||"connection failed")});resetKickoff("saaba")}
+function showJoin(){setModeBtn("joinShowBtn");joinCodeInput.focus();netStatus.className="net-status";netStatus.textContent="Enter the host's match code, then press Join."}
+function joinOnline(){opponentPicker.style.opacity='.5';opponentPicker.style.pointerEvents='none';let code=joinCodeInput.value.trim();if(!code){netStatus.className="net-status bad";netStatus.textContent="Enter a match code first.";return}cleanupPeer();if(typeof Peer==="undefined"){netStatus.className="net-status bad";netStatus.textContent="Online library could not load. Check internet access.";return}S.mode="online";S.role="guest";S.sesh.name=(playerNameInput.value.trim()||"Player 2").slice(0,18);rightNameEl.textContent=S.sesh.name.toUpperCase();modeLabel.textContent="CONNECTING";netStatus.textContent="Connecting to host...";setModeBtn("joinShowBtn");let peer=new Peer();S.peer=peer;peer.on("open",()=>bindConnection(peer.connect(code,{reliable:true,metadata:{name:S.sesh.name}}),false));peer.on("error",e=>{netStatus.className="net-status bad";netStatus.textContent="Online error: "+(e.type||"connection failed")})}
+soloBtn.addEventListener("click",setSolo);
+hostBtn.addEventListener("click",hostOnline);
+joinShowBtn.addEventListener("click",showJoin);
+joinBtn.addEventListener("click",joinOnline);
+robotOpponentBtn.addEventListener("click",()=>{if(S.mode==="solo"){applyOpponentChoice("robot");resetKickoff("saaba")}});
+seshOpponentBtn.addEventListener("click",()=>{if(S.mode==="solo"){applyOpponentChoice("seshmuab");resetKickoff("saaba")}});
+canvas.addEventListener("click",()=>canvas.focus());
+function controlledSide(){return S.mode==="solo"||S.role==="host"?"saaba":"sesh"}
+const GAME_KEYS=new Set(["arrowleft","arrowright","arrowup","arrowdown","shift","x","z","c"]);
+window.addEventListener("keydown",e=>{let k=e.key.toLowerCase(),active=document.activeElement;if(active&&["INPUT","TEXTAREA"].includes(active.tagName))return;if(!GAME_KEYS.has(k)||document.activeElement!==canvas)return;e.preventDefault();S.keys.add(k);let side=controlledSide();if(k==="x"&&!e.repeat){if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"action",action:"tackle"});else actionTackle(side)}if(k==="c"&&!e.repeat){if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"action",action:"skill"});else actionSkill(side)}if(k==="z"&&!e.repeat){S.charging=true;S.shotCharge=0}if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"input",keys:[...S.keys]})},{passive:false});
+window.addEventListener("keyup",e=>{let k=e.key.toLowerCase();if(!GAME_KEYS.has(k))return;S.keys.delete(k);if(k==="z"&&S.charging){S.charging=false;let power=clamp(.55+S.shotCharge,.55,1),side=controlledSide();if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"action",action:"shoot",power});else doShoot(side,power);S.shotCharge=0}if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"input",keys:[...S.keys]})});
+setInterval(()=>{if(S.charging)S.shotCharge=Math.min(.45,S.shotCharge+.035);if(S.mode==="online"&&S.role==="guest"&&S.conn?.open)S.conn.send({t:"input",keys:[...S.keys]})},50);
+setSolo();
+
+function confetti(count=90){
+  const colors=["#a7ff4f","#ffd85a","#fff","#70d6ff","#ff70a6"];
+  for(let i=0;i<count;i++){
+    const p=document.createElement("div");
+    p.className="confetti";
+    p.style.left=Math.random()*100+"vw";
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration=(2.2+Math.random()*2.2)+"s";
+    p.style.animationDelay=(Math.random()*.5)+"s";
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),5000);
+  }
+}
+
+resetRound("saaba");
+requestAnimationFrame(loop);
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")});
+},{threshold:.16});
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
