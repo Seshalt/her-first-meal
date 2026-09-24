@@ -1878,4 +1878,4 @@ html:has(.landing-cinematic) body {
   .hfm-receipt-terminal.is-success {
     transform: none;
   }
-} .hfm-pay-card:hover,.hfm-pay-card.is-processing { transform:none; } }
+}
