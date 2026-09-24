@@ -36,6 +36,7 @@ import { getCookie } from "@tanstack/react-start/server";
 import { randomBytes } from "node:crypto";
 import { Pool } from "pg";
 import { getPglite, normalizePostgresUrl } from "../db";
+import { sendHouseMail } from "../server/mail";
 import { emailAndPasswordEnabled } from "./email-password";
 import { GATE_PROVIDER_ID, gateIdentitySessions } from "./gate-session.server";
 import { GROK_PROVIDERS } from "./providers";
@@ -225,6 +226,26 @@ export const auth = betterAuth({
           enabled: true,
           minPasswordLength: 10,
           maxPasswordLength: 128,
+          resetPasswordTokenExpiresIn: 60 * 60,
+          sendResetPassword: async ({ user, url }) => {
+            const result = await sendHouseMail({
+              to: user.email,
+              subject: "Reset your Her First Meal password",
+              text: [
+                `Hi${user.name ? ` ${user.name}` : ""},`,
+                "",
+                "Use this secure link to reset your Her First Meal password:",
+                url,
+                "",
+                "This link expires in one hour. If you did not request this, you can ignore this email.",
+                "",
+                "Her First Meal",
+              ].join("\n"),
+            });
+            if (!result.sent) {
+              throw new Error("Password reset email could not be delivered.");
+            }
+          },
         },
       }
     : {}),

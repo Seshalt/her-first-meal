@@ -170,6 +170,11 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            <div className="-mt-1 text-right">
+              <Link to="/forgot-password" className="text-xs text-primary underline-offset-4 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <HumanCheck
               checked={guard.human}
               onChecked={guard.setHuman}

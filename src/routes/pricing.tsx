@@ -25,7 +25,7 @@ function Pricing() {
   const { site, content } = usePublicSite();
   const monthly = priced?.settings.monthlyPriceCents ?? 4900;
   const yearly = priced?.settings.yearlyPriceCents ?? 49000;
-  const consult = priced?.products.find((p) => p.kind === "consultation" || p.slug === "consultation");
+  const consult = priced?.products.find((p: { kind: string; slug: string }) => p.kind === "consultation" || p.slug === "consultation");
   const meeting = consult?.price_cents ?? 12000;
   const [yearlyOn, setYearlyOn] = useState(true);
 
