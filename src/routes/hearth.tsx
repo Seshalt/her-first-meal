@@ -21,8 +21,7 @@ function Hearth() {
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState("");
   const [mode, setMode] = useState<"save" | "enter">("save");
-  const [hasAdmin, setHasAdmin] = useState(true);
-  const [lastingStore, setLastingStore] = useState(true);
+    const [lastingStore, setLastingStore] = useState(true);
   const guard = useFormGuard();
 
   useEffect(() => {
@@ -40,8 +39,7 @@ function Hearth() {
     restoreOwnerToken();
     void hasAdministrator()
       .then((s) => {
-        setHasAdmin(s.hasAdmin);
-        setLastingStore(s.lastingStore !== false);
+                setLastingStore(s.lastingStore !== false);
         if (!s.hasAdmin) setMode("save");
       })
       .catch(() => undefined);

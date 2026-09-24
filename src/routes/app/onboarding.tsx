@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MapPin, ShieldCheck, Store } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Wordmark } from "@/components/brand/logo";
 import { Input, Label, Textarea } from "@/components/ui/input";
@@ -58,6 +58,7 @@ function Onboarding() {
   const user = useCurrentUser();
   const navigate = useNavigate();
   const { t, locale, setLocale } = useI18n();
+  const initialLocale = useRef(locale);
   const [step, setStep] = useState(0);
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
   const [location, setLocation] = useState("");
@@ -96,7 +97,10 @@ function Onboarding() {
           const home = await getMyHome();
           if (!live) return;
           if (home.profile.displayName) setDisplayName(home.profile.displayName);
-          if (home.profile.language) setLocale(home.profile.language as typeof locale);
+          const savedLocale = home.profile.language
+            ? (home.profile.language as typeof locale)
+            : initialLocale.current;
+          if (home.profile.language) setLocale(savedLocale);
           if (home.profile.stage) setStage(home.profile.stage);
           if (home.profile.stateCode) setStateCode(home.profile.stateCode);
           if (home.profile.city) setLocation(home.profile.city);
@@ -106,7 +110,7 @@ function Onboarding() {
           if (home.grocery.stores.length) setStores(home.grocery.stores);
           if (home.grocery.appliances.length) setAppliances(home.grocery.appliances);
           if (home.diet.diets.length) setDiets(home.diet.diets);
-          else if (stored.length) await saveJoinDiets({ data: { diets: stored, language: locale } }).catch(() => undefined);
+          else if (stored.length) await saveJoinDiets({ data: { diets: stored, language: savedLocale } }).catch(() => undefined);
           setSessionReady(true);
           setSessionError(false);
           return;
@@ -121,7 +125,7 @@ function Onboarding() {
     return () => {
       live = false;
     };
-  }, []);
+  }, [setLocale]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

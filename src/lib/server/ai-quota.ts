@@ -54,8 +54,7 @@ export async function takeAiTurn(userId: string, kind: AiKind): Promise<{ ok: bo
   if (peek.houseUsed >= peek.houseLimit || peek[leftKey] <= 0) {
     return { ok: false, left: peek[leftKey] };
   }
-  const col = kind === "recipes" ? "recipes" : kind === "nouri" ? "nouri" : "grocery";
-  await sql`
+    await sql`
     insert into ai_usage (user_id, day, recipes, nouri, grocery)
     values (
       ${userId},

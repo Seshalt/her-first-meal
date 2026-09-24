@@ -20,6 +20,8 @@ export const Route = createFileRoute("/app/")({ component: Today });
 
 function Today() {
   const [home, setHome] = useState<Awaited<ReturnType<typeof getMyHome>> | null>(null);
+  const hasHome = home !== null;
+  const onboardingCompleted = home?.profile.onboardingCompleted;
 
   useEffect(() => {
     void getMyHome()
@@ -28,7 +30,7 @@ function Today() {
   }, []);
 
   useEffect(() => {
-    if (!home) return;
+    if (!hasHome) return;
     const nodes = Array.from(document.querySelectorAll<HTMLElement>(".member-reveal"));
     const frame = window.requestAnimationFrame(() => {
       nodes.forEach((node, index) => {
@@ -36,7 +38,7 @@ function Today() {
       });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [home?.profile.onboardingCompleted]);
+  }, [hasHome, onboardingCompleted]);
 
   const week = useMemo(() => {
     if (!home) return null;

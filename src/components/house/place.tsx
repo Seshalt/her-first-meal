@@ -13,7 +13,7 @@ export type PlaceSaved = {
 
 export function PlaceAsk({
   label,
-  permission,
+  permission: _permission,
   onSaved,
 }: {
   label?: string | null;
