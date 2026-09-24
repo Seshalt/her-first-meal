@@ -82,7 +82,10 @@ export const confirmStripeCheckout = createServerFn({ method: "POST" })
   .validator((input: { sessionId: string }) => input)
   .handler(async ({ data }) => {
     const paid = await stripeSessionPaid(data.sessionId);
-    if (!paid.paid) throw new Error("Stripe has not marked this payment complete.");
+    if (!paid.paid) throw new Error("Stripe has not marked this payment paid.");
+    if (!paid.token || !paid.token.startsWith("chk")) {
+      throw new Error("That Stripe checkout is not a Her First Meal membership payment.");
+    }
     const sql = await getSql();
 
     if (paid.token) {
@@ -92,15 +95,6 @@ export const confirmStripeCheckout = createServerFn({ method: "POST" })
         where checkout_token = ${paid.token} and status = 'pending'
       `;
     }
-    if (paid.email) {
-      await sql`
-        insert into purchases (email, amount_cents, status)
-        select email, price_cents, 'paid' from memberships
-        where lower(email) = ${paid.email.toLowerCase()} and status = 'active'
-        order by id desc limit 1
-      `;
-    }
-
     const row = paid.token
       ? await sql<{ email: string; plan: string; price_cents: number; checkout_token: string }>`
           select email, plan, price_cents, checkout_token
@@ -111,6 +105,19 @@ export const confirmStripeCheckout = createServerFn({ method: "POST" })
       : [];
 
     if (paid.token && !row[0]) throw new Error("Payment was confirmed, but the membership could not be activated.");
+    if (paid.plan && row[0] && paid.plan !== (row[0].plan === "yearly" ? "yearly" : "monthly")) {
+      throw new Error("Stripe payment plan did not match the membership record.");
+    }
+
+    if (row[0]) {
+      await sql`
+        insert into purchases (email, amount_cents, status, stripe_session)
+        select ${row[0].email}, ${Number(row[0].price_cents)}, 'paid', ${data.sessionId}
+        where not exists (
+          select 1 from purchases where stripe_session = ${data.sessionId}
+        )
+      `;
+    }
 
     return {
       token: row[0]?.checkout_token ?? paid.token ?? "",

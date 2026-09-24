@@ -121,6 +121,7 @@ export async function stripeSessionPaid(sessionId: string): Promise<{
   productId?: number;
   startsAt?: string;
   type?: string;
+  plan?: "monthly" | "yearly";
 }> {
   const key = stripeKey();
   if (!key) return { paid: false };
@@ -132,10 +133,12 @@ export async function stripeSessionPaid(sessionId: string): Promise<{
     status?: string;
     customer_email?: string | null;
     customer_details?: { email?: string | null };
-    metadata?: { token?: string; kind?: string; userId?: string; productId?: string; startsAt?: string; type?: string };
+    metadata?: { token?: string; kind?: string; userId?: string; productId?: string; startsAt?: string; type?: string; plan?: string };
     client_reference_id?: string | null;
   };
-  const paid = json.payment_status === "paid" || json.status === "complete";
+  // A completed Checkout Session is not, by itself, proof of payment.
+  // Memberships and meeting credits only open after Stripe reports the payment as paid.
+  const paid = json.payment_status === "paid";
   return {
     paid,
     token: json.metadata?.token || json.client_reference_id || undefined,
@@ -145,5 +148,6 @@ export async function stripeSessionPaid(sessionId: string): Promise<{
     productId: json.metadata?.productId ? Number(json.metadata.productId) : undefined,
     startsAt: json.metadata?.startsAt,
     type: json.metadata?.type,
+    plan: json.metadata?.plan === "yearly" ? "yearly" : json.metadata?.plan === "monthly" ? "monthly" : undefined,
   };
 }
