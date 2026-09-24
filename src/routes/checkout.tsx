@@ -161,6 +161,7 @@ function Checkout() {
             plan={plan}
             amountCents={price}
             email={email}
+            reference={session_id}
             onDone={() => {
               if (mock) {
                 void navigate({ to: "/app" });
@@ -173,7 +174,12 @@ function Checkout() {
       ) : (
         <div className="mx-auto grid max-w-5xl gap-10 px-4 py-16 md:grid-cols-[1fr_0.9fr]">
           <div>
-            <CheckoutCardAnimation amount={formatCurrency(price)} processing={busy} />
+            <CheckoutCardAnimation
+              amount={formatCurrency(price)}
+              name={name}
+              plan={plan}
+              processing={busy}
+            />
             <p className="mt-10 text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
             <h1 className="mt-3 font-display text-4xl">{site.checkoutTitle}</h1>
             <p className="mt-3 text-muted-foreground">
