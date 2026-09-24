@@ -64,7 +64,13 @@ export const startMembershipCheckout = createServerFn({ method: "POST" })
       priceCents: price,
       origin,
     });
-    if ("error" in session) throw new Error(session.error);
+    if ("error" in session) {
+      await sql`
+        delete from memberships
+        where checkout_token = ${token} and status = 'pending'
+      `;
+      throw new Error(session.error);
+    }
 
     return {
       token,
@@ -105,6 +111,9 @@ export const confirmStripeCheckout = createServerFn({ method: "POST" })
       : [];
 
     if (paid.token && !row[0]) throw new Error("Payment was confirmed, but the membership could not be activated.");
+    if (paid.email && row[0] && paid.email.toLowerCase() !== row[0].email.toLowerCase()) {
+      throw new Error("Stripe payment email did not match the membership record.");
+    }
     if (paid.plan && row[0] && paid.plan !== (row[0].plan === "yearly" ? "yearly" : "monthly")) {
       throw new Error("Stripe payment plan did not match the membership record.");
     }
