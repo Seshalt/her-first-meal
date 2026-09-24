@@ -7,8 +7,12 @@ function env(name: string): string | undefined {
   return value || undefined;
 }
 
+function configuredFrom(): string | undefined {
+  return env("MAIL_FROM") ?? env("RESEND_FROM");
+}
+
 export function mailConfigured(): boolean {
-  return Boolean(env("RESEND_API_KEY"));
+  return Boolean(env("RESEND_API_KEY") && configuredFrom());
 }
 
 export async function sendHouseMail(input: {
@@ -20,9 +24,9 @@ export async function sendHouseMail(input: {
   const to = input.to.trim().toLowerCase();
   if (!to.includes("@")) return { sent: false, reason: "missing-to" };
 
-  const from = env("MAIL_FROM") ?? env("RESEND_FROM") ?? "Her First Meal <onboarding@resend.dev>";
+  const from = configuredFrom();
   const resend = env("RESEND_API_KEY");
-  if (resend) {
+  if (resend && from) {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -45,7 +49,7 @@ export async function sendHouseMail(input: {
     return { sent: true };
   }
 
-  console.warn("No RESEND_API_KEY — first-sign-in code was not emailed.");
+  console.warn("Transactional email is not fully configured — RESEND_API_KEY and MAIL_FROM/RESEND_FROM are required.");
   return { sent: false, reason: "not-configured" };
 }
 
