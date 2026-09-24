@@ -9,8 +9,22 @@ const rawDatabaseUrl =
   typeof process !== "undefined"
     ? process.env.HFM_DATABASE_URL || process.env.DATABASE_URL
     : undefined;
-const databaseUrl =
-  rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
+export function normalizePostgresUrl(value: string | undefined): string | undefined {
+  const raw = value?.trim();
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw);
+    const sslmode = url.searchParams.get("sslmode");
+    if (sslmode === "require" || sslmode === "prefer" || sslmode === "verify-ca") {
+      url.searchParams.set("sslmode", "verify-full");
+    }
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
+
+const databaseUrl = normalizePostgresUrl(rawDatabaseUrl);
 
 /**
  * Active backend: real **Neon** when `DATABASE_URL` is set (deployed / configured

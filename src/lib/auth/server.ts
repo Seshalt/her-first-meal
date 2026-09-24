@@ -35,7 +35,7 @@ import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { randomBytes } from "node:crypto";
 import { Pool } from "pg";
-import { getPglite } from "../db";
+import { getPglite, normalizePostgresUrl } from "../db";
 import { emailAndPasswordEnabled } from "./email-password";
 import { GATE_PROVIDER_ID, gateIdentitySessions } from "./gate-session.server";
 import { GROK_PROVIDERS } from "./providers";
@@ -129,7 +129,7 @@ const trustedOrigins: string[] = explicitBaseURL
       ...vercelTrusted,
     ];
 
-const databaseUrl = env("HFM_DATABASE_URL") ?? env("DATABASE_URL");
+const databaseUrl = normalizePostgresUrl(env("HFM_DATABASE_URL") ?? env("DATABASE_URL"));
 
 // Static broker OAuth endpoints (skip OIDC discovery on every sign-in / callback).
 // Discovery would cost an extra network hop to the broker before the popup can

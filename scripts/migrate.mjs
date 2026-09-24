@@ -18,8 +18,24 @@ import { dirname, join } from "node:path";
 import pg from "pg";
 import { pendingMigrations } from "./migration-plan.mjs";
 
-const databaseUrl =
-  process.env.HFM_DATABASE_URL?.trim() || process.env.DATABASE_URL?.trim();
+function normalizePostgresUrl(value) {
+  const raw = value?.trim();
+  if (!raw) return undefined;
+  try {
+    const url = new URL(raw);
+    const sslmode = url.searchParams.get("sslmode");
+    if (sslmode === "require" || sslmode === "prefer" || sslmode === "verify-ca") {
+      url.searchParams.set("sslmode", "verify-full");
+    }
+    return url.toString();
+  } catch {
+    return raw;
+  }
+}
+
+const databaseUrl = normalizePostgresUrl(
+  process.env.HFM_DATABASE_URL || process.env.DATABASE_URL,
+);
 if (!databaseUrl) {
   console.log(
     "[migrate] HFM_DATABASE_URL/DATABASE_URL not set — skipping (the PGLite fallback migrates itself).",
