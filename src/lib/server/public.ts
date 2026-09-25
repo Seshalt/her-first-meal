@@ -247,14 +247,13 @@ export const recoverOwner = createServerFn({ method: "POST" })
       limit 1
     `;
     if (anyAdmin[0]) {
-      const ownerEmail = anyAdmin[0].email.trim().toLowerCase();
-      if (ownerEmail && ownerEmail !== email) {
-        await dummyPasswordWork();
-        await padAuthDuration(started);
-        throw new Error("Use the owner email already on this house.");
-      }
-      targetId = anyAdmin[0].id;
-    } else if (!targetId) {
+      // Owner recovery used to reset the existing admin password directly.
+      // That bypasses MFA, so once an owner exists this bootstrap path is closed.
+      await dummyPasswordWork();
+      await padAuthDuration(started);
+      throw new Error("The owner account already exists. Sign in or use the secure password reset link.");
+    }
+    if (!targetId) {
       const created = await ctx.internalAdapter.createUser({
         name: "Maat",
         email,
@@ -367,29 +366,9 @@ export const enterOwner = createServerFn({ method: "POST" })
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
     await rateLimitClient("enter-owner", 8, 15 * 60 * 1000);
     rateLimit("enter-owner", 20, 15 * 60 * 1000);
-    const started = Date.now();
-    const email = data.email.trim().toLowerCase();
-    const password = data.password;
-    const { dummyPasswordWork, padAuthDuration } = await import("@/lib/auth/constant-time");
-    const { auth } = await import("@/lib/auth/server");
-    const ctx = await auth.$context;
-
-    const found = await ctx.internalAdapter.findUserByEmail(email, { includeAccounts: true });
-    const credential = found?.accounts?.find((a) => a.providerId === "credential");
-    const hash = credential?.password;
-    const ok = hash ? await ctx.password.verify({ hash, password }) : false;
-    if (!found?.user?.id || !ok) {
-      await dummyPasswordWork();
-      await padAuthDuration(started);
-      throw new Error("That email or password does not match.");
-    }
-
-    const session = await ctx.internalAdapter.createSession(found.user.id, false);
-    if (!session?.token) {
-      await padAuthDuration(started);
-      throw new Error("Could not open a session. Try Set new password.");
-    }
-    await padAuthDuration(started);
-    return { ok: true, token: session.token };
+    // Disabled on purpose. Direct session creation here would bypass Better
+    // Auth's two-factor challenge. The hearth now signs in through
+    // /api/auth/sign-in/email so TOTP is always enforced for the owner.
+    throw new Error("Use the secure admin sign-in form.");
   });
 

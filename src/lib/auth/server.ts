@@ -30,7 +30,7 @@
  * a verified id via `@/lib/auth/middleware`.
  */
 import { betterAuth } from "better-auth";
-import { bearer, genericOAuth } from "better-auth/plugins";
+import { bearer, genericOAuth, twoFactor } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getCookie } from "@tanstack/react-start/server";
 import { randomBytes } from "node:crypto";
@@ -274,6 +274,20 @@ export const auth = betterAuth({
     // One genericOAuth provider per upstream (when auth is on), all federating
     // to the broker with the SAME client and differing only by the `idp` hint.
     ...(grokOAuthPlugin ? [grokOAuthPlugin] : []),
+
+    // Strong owner/admin MFA. TOTP is kept local to the user's authenticator app;
+    // backup codes are encrypted at rest by Better Auth. The admin door never
+    // trusts a device, so each fresh password sign-in requires the second factor.
+    twoFactor({
+      issuer: "Her First Meal Admin",
+      twoFactorCookieMaxAge: 10 * 60,
+      trustDeviceMaxAge: 0,
+      accountLockout: {
+        enabled: true,
+        maxFailedAttempts: 8,
+        durationSeconds: 15 * 60,
+      },
+    }),
 
     // Accept `Authorization: Bearer <session-token>` as an alternative to the
     // cookie. Needed for the LIVE PREVIEW: the app runs in an embedded iframe

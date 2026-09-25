@@ -18,30 +18,42 @@ function deny() {
 
 async function requireAdmin(userId: string) {
   const sql = await getSql();
-  const rows = await sql<{ role: string }>`select role from profiles where user_id = ${userId}`;
-  if (rows[0]?.role !== "admin") deny();
+  const rows = await sql<{ role: string; mfa_enabled: boolean }>`
+    select p.role, coalesce(u."twoFactorEnabled", false) as mfa_enabled
+    from profiles p
+    join "user" u on u.id = p.user_id
+    where p.user_id = ${userId}
+    limit 1
+  `;
+  if (rows[0]?.role !== "admin" || !rows[0]?.mfa_enabled) deny();
 }
 
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: { displayName: string }) => input)
-  .handler(async ({ context, data }) => {
-    const sql = await getSql();
-    const existing = await sql<{ count: number }>`select count(*)::int as count from profiles where role = 'admin'`;
-    if (Number(existing[0]?.count ?? 0) > 0) deny();
-    await ensureProfile(context.userId, null, data.displayName);
-    await sql`
-      update profiles set role = 'admin', display_name = ${data.displayName}, onboarding_completed = true, updated_at = now()
-      where user_id = ${context.userId}
-    `;
-    return { ok: true };
+  .handler(async () => {
+    // The private hearth is the only supported owner bootstrap path.
+    // Keeping this endpoint fail-closed prevents a signed-in member from
+    // racing to claim ownership before the real owner finishes setup.
+    deny();
   });
 
 export const getMyRole = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const profile = await ensureProfile(context.userId);
-    return { role: profile.role, setupNeeded: false };
+    const sql = await getSql();
+    const rows = await sql<{ mfa_enabled: boolean }>`
+      select coalesce("twoFactorEnabled", false) as mfa_enabled
+      from "user"
+      where id = ${context.userId}
+      limit 1
+    `;
+    return {
+      role: profile.role,
+      setupNeeded: false,
+      mfaEnabled: Boolean(rows[0]?.mfa_enabled),
+    };
   });
 
 export const saveSetupWizard = createServerFn({ method: "POST" })
