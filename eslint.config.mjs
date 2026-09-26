@@ -42,6 +42,20 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+  {
+    files: [
+      "src/components/security/human-check.tsx",
+      "src/components/theme-paint.tsx",
+      "src/components/ui/button.tsx",
+      "src/lib/i18n/provider.tsx",
+      "src/lib/theme.tsx",
+    ],
+    rules: {
+      // These modules intentionally export hooks/helpers next to components.
+      // TanStack/Vite handles them correctly; this avoids dev-only Fast Refresh noise.
+      "react-refresh/only-export-components": "off",
+    },
+  },
   // Disable rules that conflict with Prettier formatting.
   prettier,
 );
