@@ -22,7 +22,7 @@ function Store() {
       <RoomHero
         kicker="The only extra"
         title="A meeting with Maat"
-        body="Membership already holds the table, the studio, Nouri, and the pantry. The only thing billed beyond that is time with Maat — paid on Stripe, not with a pretend click."
+        body="Membership already includes the table, the studio, personal support, and the pantry. A private live session with Maat is the only optional service billed separately."
         src="/images/binding-hands.jpg"
         alt={altFor("/images/binding-hands.jpg")}
         tone="gold"
@@ -47,7 +47,7 @@ function Store() {
                 <h2 className="mt-4 font-display text-[clamp(2.2rem,4vw,3.8rem)]">{p.name}</h2>
                 <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{p.description}</p>
                 <p className="mt-6 font-display text-4xl tabular-nums">{formatCurrency(p.price_cents)}</p>
-                <p className="mt-2 text-sm text-ink-soft">Per session. Not included in membership. Stripe opens so you can pay for real.</p>
+                <p className="mt-2 text-sm text-ink-soft">Per session. Not included in membership. Payment is handled securely through Stripe.</p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button
                     variant="blush"
@@ -73,7 +73,7 @@ function Store() {
                 </div>
                 {!data.stripeReady ? (
                   <p className="mt-4 max-w-md text-sm text-ink-soft">
-                    Stripe is not connected yet. Add STRIPE_SECRET_KEY in Vercel — we will not pretend this is paid.
+                    Live-session checkout is temporarily unavailable. Your membership features are unaffected.
                   </p>
                 ) : null}
               </div>
