@@ -103,7 +103,7 @@ function Appointments() {
             </p>
             {!open?.stripeReady && !(open?.credits ?? 0) ? (
               <p className="mt-4 rounded-2xl bg-wash-blush p-4 text-sm text-blush-deep">
-                Stripe setup is not available to this deployment yet, so live-session payment is temporarily disabled.
+                Live-session payment is temporarily unavailable. Your membership features are still available.
               </p>
             ) : null}
           </div>
