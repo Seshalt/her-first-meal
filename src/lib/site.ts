@@ -37,7 +37,7 @@ export const DEFAULT_SITE_COPY = {
   contactKicker: "The house",
   contactTitle: "Contact us.",
   contactIntro:
-    "Write, call, or visit. Maat reads every note. Use the fields below — every line here can be changed in the atelier.",
+    "Questions about meals, belly binding, membership, or this season of the body are welcome here. Maat reads every note. This is not an emergency service.",
   contactStudioLabel: "Studio",
   contactStudioName: "Her First Meal",
   contactEmailLabel: "Email",
@@ -127,7 +127,7 @@ export const DEFAULT_SITE_COPY = {
   loginPhotoLine: "The world celebrated the baby. This house remembers you.",
   loginEyebrow: "Welcome back",
   loginTitle: "Sign in.",
-  loginBody: "After purchase, this is the door. If you own the house, the same email opens the atelier.",
+  loginBody: "After purchase, this is the member door. Owner access uses the private admin door with multi-factor authentication.",
 
   joinKicker: "Membership first",
   joinPhotoLine: "Then a door with your name on it.",
@@ -141,8 +141,8 @@ export const DEFAULT_SITE_COPY = {
   factorLabel: "Email code",
   factorCta: "Confirm and enter",
   factorResend: "Send a new code",
-  factorNoMail: "The house could not send mail yet. Add a Resend key in Vercel so codes reach inboxes. Ask Maat if you are stuck.",
-  factorSendFail: "The code was written, but the mail carrier did not accept it. Try again in a moment.",
+  factorNoMail: "Email verification is temporarily unavailable. Please try again shortly or contact support if you are unable to continue.",
+  factorSendFail: "We could not deliver that code. Please try again in a moment.",
 
   checkoutKicker: "Secure checkout",
   checkoutTitle: "Hold your place at the table.",
