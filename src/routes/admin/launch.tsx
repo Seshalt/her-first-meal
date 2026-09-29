@@ -32,7 +32,9 @@ function LaunchReadiness() {
     try {
       const raw = window.localStorage.getItem(KEY);
       if (raw) setHumanDone(JSON.parse(raw) as Record<string, boolean>);
-    } catch {}
+    } catch {
+      // Ignore a blocked or malformed local preference and show unchecked items.
+    }
   }, []);
 
   const refresh = useCallback(async () => {
@@ -52,7 +54,9 @@ function LaunchReadiness() {
   function toggle(id: string) {
     setHumanDone((prev) => {
       const next = { ...prev, [id]: !prev[id] };
-      try { window.localStorage.setItem(KEY, JSON.stringify(next)); } catch {}
+      try { window.localStorage.setItem(KEY, JSON.stringify(next)); } catch {
+        // Keep the checkbox usable when browser storage is unavailable.
+      }
       return next;
     });
   }
