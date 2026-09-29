@@ -499,3 +499,57 @@ export const adminAnalytics = createServerFn({ method: "GET" })
     }
     return { byStage, savedRecipes: Number(recipes[0]?.count ?? 0), workouts: Number(workouts[0]?.count ?? 0), visits, visitPaths };
   });
+
+
+export const adminLaunchReadiness = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    await requireAdmin(context.userId);
+
+    const has = (key: string) => Boolean(process.env[key]?.trim());
+    const baseUrl = (process.env.BETTER_AUTH_URL ?? process.env.APP_URL ?? "").trim();
+    const stripeSecret = (process.env.STRIPE_SECRET_KEY ?? "").trim();
+    const stripePublic = (
+      process.env.STRIPE_PUBLISHABLE_KEY ??
+      process.env.VITE_STRIPE_PUBLISHABLE_KEY ??
+      ""
+    ).trim();
+    const mailFrom = (process.env.MAIL_FROM ?? process.env.RESEND_FROM ?? "").trim();
+    const usingDedicatedHfmDatabase = has("HFM_DATABASE_URL");
+    const usingAnyDatabase = usingDedicatedHfmDatabase || has("DATABASE_URL");
+
+    const sql = await getSql();
+    const dbProbe = await sql<{ ok: number }>`select 1::int as ok`;
+    const databaseHealthy = Number(dbProbe[0]?.ok ?? 0) === 1;
+
+    return {
+      database: {
+        configured: usingAnyDatabase,
+        dedicated: usingDedicatedHfmDatabase,
+        healthy: databaseHealthy,
+      },
+      auth: {
+        enabled: process.env.VITE_AUTH_ENABLED !== "false",
+        secretConfigured: has("BETTER_AUTH_SECRET"),
+        baseUrlConfigured: Boolean(baseUrl),
+        productionDomain:
+          baseUrl.includes("herfirstmeal.app") ||
+          (process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "").includes("herfirstmeal"),
+      },
+      payments: {
+        secretConfigured: Boolean(stripeSecret),
+        publishableConfigured: Boolean(stripePublic),
+        liveSecret: stripeSecret.startsWith("sk_live_"),
+        livePublishable: stripePublic.startsWith("pk_live_"),
+      },
+      email: {
+        apiConfigured: has("RESEND_API_KEY"),
+        senderConfigured: Boolean(mailFrom),
+        senderUsesDomain: /@(?:www\.)?herfirstmeal\.app>?$/i.test(mailFrom),
+      },
+      site: {
+        productionUrl: "https://www.herfirstmeal.app",
+        sitemapUrl: "https://www.herfirstmeal.app/sitemap.xml",
+      },
+    };
+  });
