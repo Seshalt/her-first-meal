@@ -41,7 +41,7 @@ export const DEFAULT_SITE_COPY = {
   contactStudioLabel: "Studio",
   contactStudioName: "Her First Meal",
   contactEmailLabel: "Email",
-  contactEmail: "hello@herfirstmeal.com",
+  contactEmail: "hello@herfirstmeal.app",
   contactPhoneLabel: "Phone",
   contactPhone: "",
   contactHoursLabel: "Hours",
