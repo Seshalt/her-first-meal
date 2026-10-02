@@ -11,18 +11,18 @@ function applyOne(edit: VisualOverride) {
   }
   if (!element) return;
   if (edit.kind === "text") {
-    element.textContent = edit.value;
+    if (element.textContent !== edit.value) element.textContent = edit.value;
     element.setAttribute("data-hfm-visual-overridden", "text");
     return;
   }
   if (edit.kind === "image" && element instanceof HTMLImageElement) {
-    element.src = edit.value;
-    if (typeof edit.alt === "string") element.alt = edit.alt;
+    if (element.src !== edit.value) element.src = edit.value;
+    if (typeof edit.alt === "string" && element.alt !== edit.alt) element.alt = edit.alt;
     element.setAttribute("data-hfm-visual-overridden", "image");
     return;
   }
   if (edit.kind === "link" && element instanceof HTMLAnchorElement) {
-    element.href = edit.value;
+    if (element.href !== edit.value) element.href = edit.value;
     element.setAttribute("data-hfm-visual-overridden", "link");
   }
 }

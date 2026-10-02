@@ -58,7 +58,7 @@ const TABS = [
   ...SITE_FIELD_GROUPS.map((g) => ({ id: g.id, label: g.label })),
   { id: "photos", label: "Photographs" },
   { id: "steps", label: "Binding steps" },
-  { id: "ai", label: "Letters note" },
+  { id: "ai", label: "Copy assistant" },
   { id: "colors", label: "Colors" },
   { id: "layout", label: "Layout" },
 ] as const;
@@ -75,6 +75,7 @@ function WebsiteEditor() {
   const [steps, setSteps] = useState<BindingStep[]>(defaultBindingSteps());
   const [saving, setSaving] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiDraft, setAiDraft] = useState("");
 
   useEffect(() => {
     void getLanding().then((page) => {
@@ -281,7 +282,7 @@ function WebsiteEditor() {
       {tab === "ai" ? (
         <div className="mt-8 max-w-2xl space-y-4">
           <p className="text-sm text-white/60">
-            Tell ChatGPT what to change. It writes onto the public pages immediately — including extra binding steps.
+            Ask Groq for a short draft, then review and paste it into the website fields. Do not include member details or private health information.
           </p>
           <Textarea
             className="min-h-36 bg-white/8 text-[#efe6d6]"
@@ -296,23 +297,24 @@ function WebsiteEditor() {
               setSaving(true);
               void applyAtelierEdit({ data: { message: aiPrompt } })
                 .then((r) => {
-                  toast[r.ok ? "success" : "error"](r.text);
-                  if (r.ok) {
-                    setAiPrompt("");
-                    bustPublicSiteCache();
-                    void getLanding().then((page) => {
-                      setCopy(page.content);
-                      setSite(page.site);
-                      setSteps(page.bindingSteps);
-                    });
-                  }
+                  if (r.ok) setAiDraft(r.text);
+                  else toast.error(r.text);
                 })
-                .catch((err) => toast.error(err instanceof Error ? err.message : "ChatGPT could not edit."))
+                .catch((err) => toast.error(err instanceof Error ? err.message : "Groq could not draft."))
                 .finally(() => setSaving(false));
             }}
           >
-            {saving ? "Editing…" : "Apply to the public site"}
+            {saving ? "Drafting…" : "Draft short copy with Groq"}
           </Button>
+          {aiDraft ? (
+            <div className="space-y-2">
+              <Label className="text-[#efe6d6]">Review the draft before using it</Label>
+              <Textarea className="min-h-36 bg-white/8 text-[#efe6d6]" value={aiDraft} onChange={(event) => setAiDraft(event.target.value)} />
+              <Button type="button" variant="outline" onClick={() => void navigator.clipboard.writeText(aiDraft).then(() => toast.success("Draft copied."))}>
+                Copy draft
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

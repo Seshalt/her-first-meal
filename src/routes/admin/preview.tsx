@@ -18,6 +18,7 @@ const PAGES = [
   { path: "/about", label: "About" },
   { path: "/pricing", label: "Membership" },
   { path: "/belly-binding", label: "Belly binding" },
+  { path: "/doula", label: "Doula care" },
   { path: "/contact", label: "Contact" },
   { path: "/privacy", label: "Privacy" },
   { path: "/terms", label: "Terms" },
@@ -36,7 +37,7 @@ type Selection = {
 
 function candidateFrom(target: EventTarget | null) {
   if (!(target instanceof Element)) return null;
-  const candidate = target.closest<HTMLElement>("h1,h2,h3,h4,h5,h6,p,a,button,span,strong,em,li,img");
+  const candidate = target.closest<HTMLElement>("img") ?? target.closest<HTMLElement>("a") ?? target.closest<HTMLElement>("h1,h2,h3,h4,h5,h6,p,button,span,strong,em,li");
   if (!candidate || candidate.closest("[data-hfm-editor-ignore]")) return null;
   return candidate;
 }
@@ -105,6 +106,7 @@ function selectionFrom(element: HTMLElement): Selection {
 
 function WebsiteCanvas() {
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const inspectorRef = useRef<HTMLElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const [page, setPage] = useState("/");
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -132,7 +134,7 @@ function WebsiteCanvas() {
       [data-hfm-editor-hover="true"] { outline: 2px solid #e7ad3d !important; outline-offset: 4px !important; cursor: pointer !important; }
       [data-hfm-editor-selected="true"] { outline: 3px solid #40b9a4 !important; outline-offset: 5px !important; }
       body::after {
-        content: "Visual editor · click text, images, or links";
+        content: "Visual editor · click, right-click, or hold an element";
         position: fixed; right: 16px; bottom: 16px; z-index: 2147483647;
         background: rgba(7,17,14,.94); color: #fff8ed; border: 1px solid rgba(255,255,255,.16);
         border-radius: 999px; padding: 10px 14px; font: 600 11px/1 system-ui, sans-serif;
@@ -144,6 +146,16 @@ function WebsiteCanvas() {
 
     let hovered: HTMLElement | null = null;
     let selected: HTMLElement | null = null;
+    let holdTimer: ReturnType<typeof setTimeout> | null = null;
+    let suppressClick = false;
+    let holdTarget: HTMLElement | null = null;
+    let holdStart = { x: 0, y: 0 };
+    const menu = doc.createElement("button");
+    menu.type = "button";
+    menu.textContent = "Edit this element";
+    menu.dataset.hfmEditorIgnore = "true";
+    menu.style.cssText = "position:fixed;z-index:2147483647;display:none;padding:10px 14px;border:0;border-radius:999px;background:#10281f;color:#fff8ed;font:600 13px system-ui;box-shadow:0 12px 36px #0005;cursor:pointer";
+    doc.body.appendChild(menu);
 
     const clearHover = () => {
       hovered?.removeAttribute("data-hfm-editor-hover");
@@ -158,28 +170,104 @@ function WebsiteCanvas() {
       hovered?.setAttribute("data-hfm-editor-hover", "true");
     };
 
+    const select = (next: HTMLElement) => {
+      menu.style.display = "none";
+      selected?.removeAttribute("data-hfm-editor-selected");
+      selected = next;
+      selected.setAttribute("data-hfm-editor-selected", "true");
+      setSelection(selectionFrom(selected));
+      if (window.innerWidth < 1280) inspectorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    const stopHold = () => {
+      if (holdTimer) clearTimeout(holdTimer);
+      holdTimer = null;
+      holdTarget = null;
+    };
+
+    const offerEdit = (next: HTMLElement, x: number, y: number) => {
+      selected?.removeAttribute("data-hfm-editor-selected");
+      selected = next;
+      selected.setAttribute("data-hfm-editor-selected", "true");
+      const width = doc.defaultView?.innerWidth ?? 390;
+      const height = doc.defaultView?.innerHeight ?? 720;
+      menu.style.left = `${Math.max(8, Math.min(x, width - 170))}px`;
+      menu.style.top = `${Math.max(8, Math.min(y + 12, height - 55))}px`;
+      menu.style.display = "block";
+    };
+
     const onClick = (event: MouseEvent) => {
+      if (event.target === menu) return;
+      if (suppressClick && event.target instanceof Node && selected?.contains(event.target)) {
+        suppressClick = false;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      suppressClick = false;
       const next = candidateFrom(event.target);
       if (!next) return;
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      selected?.removeAttribute("data-hfm-editor-selected");
-      selected = next;
-      selected.setAttribute("data-hfm-editor-selected", "true");
-      setSelection(selectionFrom(selected));
+      select(next);
     };
+
+    const onPointerDown = (event: PointerEvent) => {
+      stopHold();
+      if (event.button !== 0) return;
+      holdTarget = candidateFrom(event.target);
+      if (!holdTarget) return;
+      holdStart = { x: event.clientX, y: event.clientY };
+      holdTimer = setTimeout(() => {
+        if (holdTarget) {
+          suppressClick = true;
+          offerEdit(holdTarget, holdStart.x, holdStart.y);
+        }
+        stopHold();
+      }, 550);
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (Math.hypot(event.clientX - holdStart.x, event.clientY - holdStart.y) > 12) stopHold();
+    };
+    const onContextMenu = (event: MouseEvent) => {
+      const next = candidateFrom(event.target);
+      if (!next) return;
+      event.preventDefault();
+      event.stopPropagation();
+      stopHold();
+      offerEdit(next, event.clientX, event.clientY);
+    };
+    const onMenuClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (selected) select(selected);
+    };
+    menu.addEventListener("click", onMenuClick);
 
     doc.addEventListener("mousemove", onMove, true);
     doc.addEventListener("mouseleave", clearHover, true);
     doc.addEventListener("click", onClick, true);
+    doc.addEventListener("pointerdown", onPointerDown, true);
+    doc.addEventListener("pointermove", onPointerMove, true);
+    doc.addEventListener("pointerup", stopHold, true);
+    doc.addEventListener("pointercancel", stopHold, true);
+    doc.addEventListener("contextmenu", onContextMenu, true);
 
     cleanupRef.current = () => {
+      stopHold();
       clearHover();
       selected?.removeAttribute("data-hfm-editor-selected");
       doc.removeEventListener("mousemove", onMove, true);
       doc.removeEventListener("mouseleave", clearHover, true);
       doc.removeEventListener("click", onClick, true);
+      doc.removeEventListener("pointerdown", onPointerDown, true);
+      doc.removeEventListener("pointermove", onPointerMove, true);
+      doc.removeEventListener("pointerup", stopHold, true);
+      doc.removeEventListener("pointercancel", stopHold, true);
+      doc.removeEventListener("contextmenu", onContextMenu, true);
+      menu.removeEventListener("click", onMenuClick);
+      menu.remove();
       style.remove();
     };
   }
@@ -266,7 +354,7 @@ function WebsiteCanvas() {
           <p className="text-xs uppercase tracking-[0.22em] text-[#d3a34d]">Website studio</p>
           <h1 className="mt-2 font-display text-4xl">Edit the real page, not a list of fields.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
-            Hover the website, click an element, edit it in the inspector, and save it live. Gold is hover; teal is your selected element.
+            Click, right-click, or press and hold text or an image. Choose “Edit this element,” change it in the inspector, and save it live.
           </p>
         </div>
         <a href={page} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs text-white/70 hover:bg-white/8 hover:text-white">
@@ -336,12 +424,12 @@ function WebsiteCanvas() {
             </div>
           </div>
 
-          <aside className="border-t border-white/10 bg-[#0b1713] p-5 xl:border-l xl:border-t-0">
+          <aside ref={inspectorRef} className="border-t border-white/10 bg-[#0b1713] p-5 xl:border-l xl:border-t-0">
             {!selection ? (
               <div className="sticky top-4">
                 <div className="grid size-11 place-items-center rounded-2xl bg-[#d3a34d]/12 text-[#d3a34d]"><MousePointer2 className="size-5" /></div>
-                <h2 className="mt-4 font-display text-2xl text-[#fff8ed]">Click what you want to change.</h2>
-                <p className="mt-3 text-sm leading-relaxed text-white/52">Hover over the real website. Click a word, photo, or link and its controls open here.</p>
+                <h2 className="mt-4 font-display text-2xl text-[#fff8ed]">Choose what you want to change.</h2>
+                <p className="mt-3 text-sm leading-relaxed text-white/52">Click an element directly, or press and hold it to reveal an Edit button. Right-click works too.</p>
                 <div className="mt-5 space-y-2 text-xs text-white/45">
                   <p className="flex items-center gap-2"><Type className="size-3.5" /> Text, headings, labels, buttons</p>
                   <p className="flex items-center gap-2"><ImageIcon className="size-3.5" /> Images and alt text</p>
