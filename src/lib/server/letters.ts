@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { sendHouseMail } from "./mail";
-import { DEFAULT_SITE_COPY, type SiteCopy } from "@/lib/site";
+import { DEFAULT_SITE_COPY, mergeSite, type SiteCopy } from "@/lib/site";
 import { asJson } from "./json";
 
 function ownerInbox(sqlReady?: { contactEmail?: string }) {
@@ -14,7 +14,7 @@ async function contactEmailFromSettings() {
   const rows = await sql<{ branding: unknown }>`select branding from business_settings where id = 1`;
   const branding = asJson<Record<string, unknown>>(rows[0]?.branding, {});
   const site = asJson<Partial<SiteCopy>>(branding.site, {});
-  return ownerInbox({ contactEmail: site.contactEmail });
+  return ownerInbox({ contactEmail: mergeSite(site).contactEmail });
 }
 
 export const sendPublicLetter = createServerFn({ method: "POST" })

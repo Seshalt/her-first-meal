@@ -187,6 +187,7 @@ export function mergeSite(partial: Partial<SiteCopy> | null | undefined): SiteCo
     if (key === "aboutP3" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
     if (key === "pricingBody" && /only extra after you join/i.test(trimmed)) continue;
     if (key === "pricingMeetingSub" && /only extra beyond membership/i.test(trimmed)) continue;
+    if (key === "contactEmail" && trimmed.toLowerCase() === "hello@herfirstmeal.com") continue;
     out[key] = value;
   }
   return out;
