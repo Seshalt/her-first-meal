@@ -5,6 +5,7 @@ import { mergeLanding } from "@/lib/landing";
 import { getLanding } from "@/lib/server/public";
 import { formatCurrency } from "@/lib/utils";
 import { useT } from "@/lib/i18n/provider";
+import { usePublicSite } from "@/lib/use-public-site";
 import "../landing-v3.css";
 
 export const Route = createFileRoute("/")({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const t = useT();
+  const { site } = usePublicSite();
   const page = Route.useLoaderData();
   const content = page?.content ?? mergeLanding(null);
   const monthly = page?.monthlyPriceCents ?? 4900;
@@ -183,6 +185,24 @@ function Home() {
             <h2>Need a person? Ask one.</h2>
             <p>Send Maat a private note or book a live Zoom when you want human eyes on a question.</p>
             <Link to="/nouri" className="hfm4-arrow-link">See human support <ArrowRight className="size-4" /></Link>
+          </div>
+        </section>
+
+        <section className="bg-[#eee7dc] px-4 py-16 text-ink md:px-6 md:py-24">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-[1fr_1.1fr]">
+            <div className="overflow-hidden rounded-[30px]">
+              <img src={content.images.family} alt={content.alts.family} className="aspect-[4/3] w-full object-cover" loading="lazy" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-clay">{site.doulaKicker}</p>
+              <h2 className="mt-4 font-display text-[clamp(2.5rem,5vw,4.5rem)] leading-none">{site.doulaTitle}</h2>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-ink-soft">{site.doulaIntro}</p>
+              <p className="mt-6 font-display text-4xl">{site.doulaPrice}</p>
+              <p className="mt-2 text-sm text-ink-soft">{site.doulaPriceNote}</p>
+              <Link to="/doula" className="mt-7 inline-flex items-center gap-2 border-b border-clay pb-1 text-sm font-semibold text-clay">
+                {site.navDoula} <ArrowRight className="size-4" />
+              </Link>
+            </div>
           </div>
         </section>
 

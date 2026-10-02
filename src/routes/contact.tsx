@@ -63,6 +63,12 @@ function Contact() {
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">{t("contact.intro")}</p>
           </Reveal>
 
+          <div className="glass-panel mt-10 max-w-2xl border border-clay/20 p-6 md:p-8">
+            <p className="text-xs uppercase tracking-[0.22em] text-clay">{site.doulaKicker}</p>
+            <h2 className="mt-2 font-display text-3xl">{site.doulaPriceLabel} · {site.doulaPrice}</h2>
+            <p className="mt-3 text-sm leading-6 text-ink-soft">{site.doulaPriceNote}</p>
+          </div>
+
           <form onSubmit={onSend} className="glass-panel mt-14 max-w-2xl space-y-4 p-6 md:p-8">
             <div>
               <Label htmlFor="cname">{t("contact.name")}</Label>

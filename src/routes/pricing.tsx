@@ -122,6 +122,20 @@ function Pricing() {
             />
           </div>
 
+          <section className="mx-auto mt-10 grid max-w-5xl items-center gap-6 rounded-[30px] border border-gold/35 bg-ink/75 p-6 text-left backdrop-blur md:grid-cols-[1fr_auto] md:p-9" aria-labelledby="doula-price-title">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-gold">{site.doulaKicker}</p>
+              <h2 id="doula-price-title" className="mt-3 font-display text-3xl text-paper md:text-4xl">{site.doulaPriceLabel}</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-paper/70">{site.doulaPriceNote}</p>
+            </div>
+            <div className="md:text-right">
+              <p className="font-display text-5xl text-paper">{site.doulaPrice}</p>
+              <Button asChild variant="gold" className="mt-4">
+                <Link to="/doula">{site.doulaCta}</Link>
+              </Button>
+            </div>
+          </section>
+
           <p className="mx-auto mt-12 max-w-xl px-2 text-sm text-paper/55">{site.pricingFoot}</p>
         </div>
       </section>

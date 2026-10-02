@@ -5,6 +5,7 @@ export const DEFAULT_SITE_COPY = {
   brandTagline: "We remember the mother.",
   navAbout: "About",
   navBinding: "Belly binding",
+  navDoula: "Doula care",
   navNouri: "Support",
   navMembership: "Membership",
   navSignIn: "Sign in",
@@ -17,6 +18,7 @@ export const DEFAULT_SITE_COPY = {
   footerEnter: "Enter",
   footerStory: "Maat's story",
   footerStudio: "Belly Binding Studio",
+  footerDoula: "Doula care",
   footerNouri: "Support",
   footerMembership: "Membership",
   footerSignIn: "Sign in",
@@ -49,6 +51,25 @@ export const DEFAULT_SITE_COPY = {
   contactAddressLabel: "Address",
   contactAddress: "",
   contactNote: "Membership questions, belly binding reviews, and press all come through this door.",
+
+  doulaKicker: "One-to-one birth support",
+  doulaTitle: "You deserve to be supported through birth.",
+  doulaIntro:
+    "Her First Meal offers doula care as a separate, personal service. We begin with a conversation about your needs, your birth preferences, and whether our support is the right fit.",
+  doulaWhatTitle: "What is a doula?",
+  doulaWhatBody:
+    "A doula is a non-medical support person who offers steady emotional, practical, and physical comfort through pregnancy and birth. A doula can help you prepare questions, explore comfort options, and feel heard alongside your chosen care team. Your doctor or midwife remains responsible for medical care.",
+  doulaSupportTitle: "Care centered on you",
+  doulaSupportPoints:
+    "A conversation about your hopes and questions for birth\nCalm, continuous support and comfort during labor\nSpace for your partner or support people to feel included\nA person who listens as you make your own choices",
+  doulaExperienceTitle: "Meet Maat",
+  doulaExperienceBody:
+    "Maat brings deep personal experience with birth and maternal care to this work. Her approach is warm, attentive, and grounded in listening to the person giving birth. Contact us to talk about her experience and the support available for your birth.",
+  doulaPriceLabel: "Doula services",
+  doulaPrice: "$1,500",
+  doulaPriceNote: "Separate from the Her First Meal membership. Please contact us first so we can discuss your needs and arrange care personally.",
+  doulaCta: "Ask about doula care",
+  doulaMedicalNote: "Doula care is non-medical support and does not replace your doctor, midwife, or other clinical team.",
 
   ticker:
     "Personalized meals\nBelly Binding Studio\nHuman support\nMovement\nGrocery lists\nPartner lane\nWeek-by-week journey\nFourth trimester care",
@@ -107,12 +128,12 @@ export const DEFAULT_SITE_COPY = {
   pricingKicker: "Membership",
   pricingTitle: "One house. Two ways to pay.",
   pricingBody:
-    "Monthly and yearly are the same membership — every room, every tool. Yearly is simply a kinder bill. The only extra after you join is a private meeting with Maat.",
+    "Monthly and yearly are the same membership — every room, every tool. Private sessions and doula care are separate services.",
   pricingToggleOn: "Save with yearly billing",
   pricingMonthlyName: "The House · Monthly",
   pricingYearlyName: "The House · Yearly",
   pricingMeetingName: "A meeting with Maat",
-  pricingMeetingSub: "The only extra beyond membership",
+  pricingMeetingSub: "A separate private session",
   pricingMonthlyCta: "Join monthly",
   pricingYearlyCta: "Join yearly",
   pricingMeetingCta: "Members book inside",
@@ -164,6 +185,8 @@ export function mergeSite(partial: Partial<SiteCopy> | null | undefined): SiteCo
     if ((key === "nouriPageKicker" || key === "nouriPageTitle" || key === "nouriPageBody") && /nouri|\bai\b|chatbot|companion/i.test(trimmed)) continue;
     if (key === "pricingIncludes" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
     if (key === "aboutP3" && /nouri|\bai\b|chatbot/i.test(trimmed)) continue;
+    if (key === "pricingBody" && /only extra after you join/i.test(trimmed)) continue;
+    if (key === "pricingMeetingSub" && /only extra beyond membership/i.test(trimmed)) continue;
     out[key] = value;
   }
   return out;
@@ -185,6 +208,7 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "brandTagline", label: "Logo · small line under the name (footer)" },
       { key: "navAbout", label: "Nav · About" },
       { key: "navBinding", label: "Nav · Belly binding" },
+      { key: "navDoula", label: "Nav · Doula care" },
       { key: "navNouri", label: "Nav · Support" },
       { key: "navMembership", label: "Nav · Membership" },
       { key: "navSignIn", label: "Nav · Sign in" },
@@ -198,6 +222,7 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "footerConnect", label: "Footer · Connect heading" },
       { key: "footerStory", label: "Footer · story link" },
       { key: "footerStudio", label: "Footer · studio link" },
+      { key: "footerDoula", label: "Footer · doula link" },
       { key: "footerNouri", label: "Footer · Support link" },
       { key: "footerMembership", label: "Footer · membership link" },
       { key: "footerContact", label: "Footer · Contact us link" },
@@ -262,6 +287,26 @@ export const SITE_FIELD_GROUPS: { id: string; label: string; fields: { key: Site
       { key: "nouriPageBody", label: "Body", multiline: true },
       { key: "nouriPageCta", label: "Button" },
       { key: "nouriPills", label: "Support features (one line each)", multiline: true },
+    ],
+  },
+  {
+    id: "doula",
+    label: "Doula care",
+    fields: [
+      { key: "doulaKicker", label: "Kicker" },
+      { key: "doulaTitle", label: "Headline", multiline: true },
+      { key: "doulaIntro", label: "Introduction", multiline: true },
+      { key: "doulaWhatTitle", label: "What is a doula? heading" },
+      { key: "doulaWhatBody", label: "What is a doula? explanation", multiline: true },
+      { key: "doulaSupportTitle", label: "Support heading" },
+      { key: "doulaSupportPoints", label: "Support points (one per line)", multiline: true },
+      { key: "doulaExperienceTitle", label: "Experience heading" },
+      { key: "doulaExperienceBody", label: "Experience copy", multiline: true },
+      { key: "doulaPriceLabel", label: "Price label" },
+      { key: "doulaPrice", label: "Price shown on the site" },
+      { key: "doulaPriceNote", label: "Price and contact note", multiline: true },
+      { key: "doulaCta", label: "Contact button" },
+      { key: "doulaMedicalNote", label: "Non-medical note", multiline: true },
     ],
   },
   {

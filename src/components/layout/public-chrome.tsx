@@ -13,11 +13,13 @@ import { LOCALES } from "@/lib/i18n/locales";
 export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const t = useT();
+  const { site } = usePublicSite();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const links = [
     { to: "/about" as const, label: t("nav.about") },
     { to: "/belly-binding" as const, label: t("nav.binding") },
+    { to: "/doula" as const, label: site.navDoula },
     { to: "/nouri" as const, label: t("nav.write") },
     { to: "/pricing" as const, label: t("nav.membership") },
     { to: "/contact" as const, label: t("nav.contact") },
@@ -213,6 +215,7 @@ export function PublicFooter() {
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
             <li><Link to="/about">{t("footer.story")}</Link></li>
             <li><Link to="/belly-binding">{site.footerStudio}</Link></li>
+            <li><Link to="/doula">{site.footerDoula}</Link></li>
             <li><Link to="/nouri">{t("footer.write")}</Link></li>
             <li><Link to="/pricing">{t("footer.membership")}</Link></li>
             <li><Link to="/contact">{t("footer.contact")}</Link></li>

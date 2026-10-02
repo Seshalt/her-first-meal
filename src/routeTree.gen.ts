@@ -18,6 +18,7 @@ import { Route as BellyBindingRouteImport } from './routes/belly-binding'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as DoulaRouteImport } from './routes/doula'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HearthRouteImport } from './routes/hearth'
 import { Route as JoinRouteImport } from './routes/join'
@@ -99,6 +100,11 @@ const ContactRoute = ContactRouteImport.update({
 const CookiesRoute = CookiesRouteImport.update({
   id: '/cookies',
   path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DoulaRoute = DoulaRouteImport.update({
+  id: '/doula',
+  path: '/doula',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/doula': typeof DoulaRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/doula': typeof DoulaRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
@@ -392,6 +400,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/doula': typeof DoulaRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/hearth': typeof HearthRoute
   '/join': typeof JoinRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/cookies'
+    | '/doula'
     | '/forgot-password'
     | '/hearth'
     | '/join'
@@ -488,6 +498,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/cookies'
+    | '/doula'
     | '/forgot-password'
     | '/hearth'
     | '/join'
@@ -536,6 +547,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/cookies'
+    | '/doula'
     | '/forgot-password'
     | '/hearth'
     | '/join'
@@ -585,6 +597,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
+  DoulaRoute: typeof DoulaRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HearthRoute: typeof HearthRoute
   JoinRoute: typeof JoinRoute
@@ -660,6 +673,13 @@ declare module '@tanstack/react-router' {
       path: '/cookies'
       fullPath: '/cookies'
       preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doula': {
+      id: '/doula'
+      path: '/doula'
+      fullPath: '/doula'
+      preLoaderRoute: typeof DoulaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -1014,6 +1034,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
+  DoulaRoute: DoulaRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HearthRoute: HearthRoute,
   JoinRoute: JoinRoute,
@@ -1028,3 +1049,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
