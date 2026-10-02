@@ -69,6 +69,18 @@ export const LANDING_IMAGE_SLOTS = [
     alt: "Indian woman cooking at a stove",
   },
   {
+    id: "doulaHero",
+    label: "Doula care · opening photograph",
+    fallback: "/images/postpartum-rest.jpg",
+    alt: "Mother resting with her newborn on a bed",
+  },
+  {
+    id: "doulaExperience",
+    label: "Doula care · experience photograph",
+    fallback: "/images/binding-hands.jpg",
+    alt: "Pregnant woman holding her belly outdoors",
+  },
+  {
     id: "login",
     label: "Sign in · photograph",
     fallback: "/images/hero-kitchen.jpg",

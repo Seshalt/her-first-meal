@@ -36,7 +36,7 @@ function DoulaPage() {
               </Button>
             </div>
             <div className="relative">
-              <img src={content.images.family} alt={content.alts.family} className="media aspect-[4/5] w-full rounded-[32px] object-cover" />
+              <img src={content.images.doulaHero} alt={content.alts.doulaHero} className="media aspect-[4/5] w-full rounded-[32px] object-cover" />
               <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/20 bg-ink/85 p-5 text-paper backdrop-blur md:bottom-6 md:left-6 md:right-6">
                 <p className="text-xs uppercase tracking-[0.22em] text-gold">{site.doulaPriceLabel}</p>
                 <p className="mt-2 font-display text-5xl">{site.doulaPrice}</p>
@@ -64,7 +64,7 @@ function DoulaPage() {
 
           <section className="bg-ink px-4 py-16 text-paper md:px-6 md:py-24">
             <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-              <img src={content.images.about} alt={content.alts.about} className="aspect-[4/3] w-full rounded-[28px] object-cover" loading="lazy" />
+              <img src={content.images.doulaExperience} alt={content.alts.doulaExperience} className="aspect-[4/3] w-full rounded-[28px] object-cover" loading="lazy" />
               <div>
                 <p className="text-xs uppercase tracking-[0.25em] text-gold">Her First Meal</p>
                 <h2 className="mt-4 font-display text-5xl">{site.doulaExperienceTitle}</h2>
