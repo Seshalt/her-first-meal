@@ -12,25 +12,6 @@ type I18nValue = {
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-// These keys were briefly translated around the retired Nouri AI feature. Force the
-// current human-support copy until every locale pack is refreshed so no language can
-// surface retired product branding.
-const AI_FREE_KEYS = new Set<MsgKey>([
-  "nav.write",
-  "footer.write",
-  "today.write",
-  "today.writeBody",
-  "today.writeLink",
-  "ask.kicker",
-  "ask.title",
-  "ask.body",
-  "ask.send",
-  "ask.thanks",
-  "room.write",
-  "privacy.aiTitle",
-  "privacy.aiBody",
-]);
-
 // New global-language promise is deliberately complete across every selectable locale.
 // Keeping it here prevents an English fallback in the exact place where we advertise
 // multilingual support.
@@ -118,7 +99,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       setLocale,
       t: (key, vars) => {
         const special = SPECIAL_COPY[locale]?.[key];
-        const translated = special ?? (AI_FREE_KEYS.has(key) ? EN[key] : (pack[key] ?? EN[key] ?? key));
+        const translated = special ?? (pack[key] ?? EN[key] ?? key);
         return interpolate(translated, vars);
       },
     };
