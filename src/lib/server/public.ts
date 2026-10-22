@@ -14,6 +14,7 @@ import { mergeStudio, type StudioTheme } from "@/lib/theme-studio";
 import { mergeBindingSteps, type BindingStep } from "@/lib/binding-steps";
 import { assertHuman, rateLimit, rateLimitClient } from "./abuse";
 import { cookieNoticeSeen, markCookieNotice } from "./cookie-notice";
+import { ownerBootstrapAvailable, ownerBootstrapAuthorized } from "@/lib/auth/owner-bootstrap";
 
 type SettingsRow = {
   business_name: string;
@@ -127,9 +128,10 @@ export const hasAdministrator = createServerFn({ method: "GET" }).handler(async 
       hasAdmin: Number(rows[0]?.count ?? 0) > 0,
       setupCompleted: Boolean(setup[0]?.completed),
       lastingStore: dbSource === "neon",
+      bootstrapAvailable: ownerBootstrapAvailable(dbSource, process.env.NODE_ENV, process.env.HFM_OWNER_BOOTSTRAP_TOKEN),
     };
   } catch {
-    return { hasAdmin: false, setupCompleted: false, lastingStore: dbSource === "neon" };
+    return { hasAdmin: false, setupCompleted: false, lastingStore: dbSource === "neon", bootstrapAvailable: false };
   }
 });
 
@@ -215,9 +217,13 @@ export const recoverOwner = createServerFn({ method: "POST" })
       honey?: string;
       startedAt?: number;
       human?: boolean;
+      bootstrapToken?: string;
     }) => input,
   )
   .handler(async ({ data }) => {
+    if (!ownerBootstrapAuthorized(dbSource, process.env.NODE_ENV, process.env.HFM_OWNER_BOOTSTRAP_TOKEN, data.bootstrapToken)) {
+      throw new Error("Owner setup requires a private setup key configured by the site operator.");
+    }
     assertHuman({ honey: data.honey, startedAt: data.startedAt, human: data.human });
     await rateLimitClient("recover-owner", 3, 15 * 60 * 1000);
     rateLimit("recover-owner", 10, 15 * 60 * 1000);

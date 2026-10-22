@@ -1,3 +1,4 @@
+import { requireAdmin } from "./admin-access";
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
@@ -30,15 +31,6 @@ function validateSelector(selector: string) {
   return clean;
 }
 
-async function requireAdmin(userId: string) {
-  const sql = await getSql();
-  const rows = await sql<{ role: string }>`select role from profiles where user_id = ${userId}`;
-  if (rows[0]?.role !== "admin") {
-    const err = new Error("Unauthorized");
-    (err as Error & { status?: number }).status = 401;
-    throw err;
-  }
-}
 
 function readStore(value: unknown): VisualOverrideStore {
   const raw = asJson<Record<string, unknown>>(value, {});

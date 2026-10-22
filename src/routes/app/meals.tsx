@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
 import { getMealWeek, swapMeal, toggleFavoriteRecipe } from "@/lib/server/meals";
@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { CoverFlowCarousel, type CoverFlowItem } from "@/components/ui/3-d-coverflow-carousel";
 import { altFor } from "@/lib/landing";
 import { RECIPE_IMAGE_ALT, STAGE_LABEL, type Recipe } from "@/lib/content/catalog";
-import { useT } from "@/lib/i18n/provider";
+import { useI18n, useT } from "@/lib/i18n/provider";
+import { MEAL_STATUS } from "@/lib/i18n/meal-status";
 
 export const Route = createFileRoute("/app/meals")({ component: Meals });
 
@@ -16,15 +17,19 @@ function todayDay() {
 }
 
 function Meals() {
-  const t = useT();
+  const { t, locale } = useI18n();
+  const statusCopy = MEAL_STATUS[locale];
+  const [failed, setFailed] = useState(false);
   const [data, setData] = useState<Awaited<ReturnType<typeof getMealWeek>> | null>(null);
   const [openDay, setOpenDay] = useState<string | null>(todayDay());
   const [swapDay, setSwapDay] = useState<string | null>(null);
   const [openLibrary, setOpenLibrary] = useState<string | null>(null);
 
-  useEffect(() => {
-    void getMealWeek().then(setData);
+  const load = useCallback(() => {
+    setFailed(false);
+    void getMealWeek().then(setData).catch(() => setFailed(true));
   }, []);
+  useEffect(load, [load]);
 
   const todayMeal = useMemo(() => data?.meals.find((m) => m.day === todayDay()) ?? data?.meals[0], [data]);
   const recipeSlides = useMemo<CoverFlowItem[]>(
@@ -47,6 +52,7 @@ function Meals() {
     [data, openLibrary],
   );
 
+  if (failed) return <div className="px-5 py-32" role="alert"><p>{statusCopy[2]}</p><Button onClick={load} className="mt-4">{statusCopy[3]}</Button></div>;
   if (!data) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">{t("meals.planning")}</p>;
 
   return (
@@ -59,6 +65,11 @@ function Meals() {
         alt={RECIPE_IMAGE_ALT[todayMeal?.recipe.image ?? ""] ?? altFor("/images/meal-bowl.jpg")}
         tone="clay"
       />
+
+      <div className="mx-auto max-w-5xl px-5 py-8" role="status">
+        {!data.meals.length ? <p className="mb-4 rounded-2xl border border-border p-6">{statusCopy[0]}</p> : null}
+        <p className="text-sm leading-relaxed text-muted-foreground">{statusCopy[1]}</p>
+      </div>
 
       <div>
         {data.meals.map((m, i) => {

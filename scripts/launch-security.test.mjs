@@ -7,9 +7,9 @@ async function source(path) {
 }
 
 test("admin access requires both admin role and MFA", async () => {
-  const admin = await source("src/lib/server/admin.ts");
+  const admin = await source("src/lib/server/admin-access.ts");
   assert.match(admin, /twoFactorEnabled/);
-  assert.match(admin, /role !== "admin" \|\| !rows\[0\]\?\.mfa_enabled/);
+  assert.match(admin, /hasAdminAccess\(rows\[0\]\?\.role, rows\[0\]\?\.mfa_enabled\)/);
 });
 
 test("Better Auth registers TOTP MFA on server and client", async () => {
@@ -45,5 +45,5 @@ test("transactional email requires both API key and verified sender", async () =
 
 test("Her First Meal database override takes precedence", async () => {
   const db = await source("src/lib/db.ts");
-  assert.match(db, /HFM_DATABASE_URL \|\| process\.env\.DATABASE_URL/);
+  assert.match(db, /HFM_DATABASE_URL\?\.trim\(\) \|\| process\.env\.DATABASE_URL/);
 });

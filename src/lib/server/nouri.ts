@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
-import { authMiddleware } from "@/lib/auth/middleware";
+import { memberMiddleware } from "@/lib/auth/member-middleware";
 import { ensureProfile } from "./profile";
 import { guideFor } from "@/lib/content/phase";
 import type { Stage } from "@/lib/content/catalog";
@@ -8,7 +8,7 @@ import { pregnancyWeekFromDueDate, postpartumWeekFromBirthday } from "@/lib/util
 import { WEEKS } from "@/lib/content/catalog";
 
 export const getPhaseGuide = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const profile = await ensureProfile(context.userId);
     const stage = (profile.stage as Stage | null) ?? "postpartum";
@@ -36,7 +36,7 @@ const ANGLE_NOTES: Record<string, string> = {
 };
 
 export const compareBindingPhotos = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { angle: string; notes?: string; imageData?: string }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();

@@ -7,7 +7,7 @@ export type DbSource = "neon" | "pglite";
 // "unset" — otherwise production would silently run on the PGLite fallback.
 const rawDatabaseUrl =
   typeof process !== "undefined"
-    ? process.env.HFM_DATABASE_URL || process.env.DATABASE_URL
+    ? process.env.HFM_DATABASE_URL?.trim() || process.env.DATABASE_URL
     : undefined;
 export function normalizePostgresUrl(value: string | undefined): string | undefined {
   const raw = value?.trim();

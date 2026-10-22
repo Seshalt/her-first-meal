@@ -140,13 +140,22 @@ export const getMembershipAccess = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
-    const profile = await ensureProfile(context.userId);
+    await ensureProfile(context.userId);
 
-    if (profile.email) {
+    const verified = await sql<{ email: string; verified: boolean; admin: boolean }>`
+      select u.email, p.email_factor_ok as verified,
+        (p.role = 'admin' and coalesce(u."twoFactorEnabled", false)) as admin
+      from profiles p join "user" u on u.id = p.user_id
+      where p.user_id = ${context.userId} limit 1
+    `;
+    if (verified[0]?.admin) return { active: true, plan: "owner", expiresAt: null };
+    if (!verified[0]?.verified) return { active: false, plan: null, expiresAt: null };
+
+    if (verified[0]?.email) {
       await sql`
         update memberships
         set user_id = ${context.userId}
-        where lower(email) = ${profile.email.toLowerCase()}
+        where lower(email) = ${verified[0].email.toLowerCase()}
           and status = 'active'
           and user_id is null
       `;

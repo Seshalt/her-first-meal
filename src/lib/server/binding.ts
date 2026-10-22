@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
-import { authMiddleware } from "@/lib/auth/middleware";
+import { memberMiddleware } from "@/lib/auth/member-middleware";
 import { createStripeMeetingCheckout, publicOrigin, stripeConfigured } from "./stripe";
 
 export const listBindingUploads = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     const uploads = await sql<{
@@ -29,7 +29,7 @@ export const listBindingUploads = createServerFn({ method: "GET" })
   });
 
 export const addBindingJournal = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { entry: string }) => ({ entry: input.entry.trim().slice(0, 4000) }))
   .handler(async ({ context, data }) => {
     if (!data.entry) return { ok: false };
@@ -39,7 +39,7 @@ export const addBindingJournal = createServerFn({ method: "POST" })
   });
 
 export const logWorkout = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { workoutId: string; minutes?: number }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
@@ -48,7 +48,7 @@ export const logWorkout = createServerFn({ method: "POST" })
   });
 
 export const listStore = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     const products = await sql<{
@@ -71,7 +71,7 @@ export const listStore = createServerFn({ method: "GET" })
   });
 
 export const startMeetingCheckout = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { productId: number; startsAt?: string; type?: string }) => input)
   .handler(async ({ context, data }) => {
     if (!stripeConfigured()) {

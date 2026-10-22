@@ -1,3 +1,4 @@
+import { memberMiddleware } from "@/lib/auth/member-middleware";
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
@@ -77,6 +78,7 @@ export async function ensureProfile(userId: string, email?: string | null, name?
   await sql`
     insert into profiles (user_id, email, display_name, partner_invite_code)
     values (${userId}, ${email ?? null}, ${name ?? null}, ${invite})
+    on conflict (user_id) do nothing
   `;
   await sql`insert into dietary_profiles (user_id) values (${userId}) on conflict (user_id) do nothing`;
   await sql`insert into grocery_preferences (user_id) values (${userId}) on conflict (user_id) do nothing`;
@@ -85,7 +87,7 @@ export async function ensureProfile(userId: string, email?: string | null, name?
 }
 
 export const getMyHome = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     const profile = await ensureProfile(context.userId);
@@ -110,17 +112,11 @@ export const getMyHome = createServerFn({ method: "GET" })
     }>`
       select id, plan, status, price_cents, started_at, expires_at
       from memberships
-      where (user_id = ${context.userId} or (email is not null and email = ${profile.email}))
+      where user_id = ${context.userId}
         and status = 'active'
       order by started_at desc
       limit 1
     `;
-    if (membershipRows[0] && !membershipRows[0].id) {
-      /* noop */
-    }
-    if (membershipRows[0] && profile.email) {
-      await sql`update memberships set user_id = ${context.userId} where email = ${profile.email} and user_id is null`;
-    }
     const membership: Membership | null = membershipRows[0]
       ? {
           id: membershipRows[0].id,

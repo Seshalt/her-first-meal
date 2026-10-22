@@ -1,3 +1,5 @@
+import { ingredientTextAllowed } from "./food-restrictions.ts";
+
 export type DietFlag =
   | "vegan"
   | "vegetarian"
@@ -209,7 +211,7 @@ export const RECIPES: Recipe[] = [
       { name: "Lemon", qty: "1", dept: "Produce" },
     ],
     steps: [
-      "Bake salmon at 275°F until just opaque.",
+      "Bake salmon until a food thermometer reads 145°F (63°C) in the thickest part.",
       "Stir yogurt with dill, lemon, and grated cucumber.",
       "Serve with rice or warm flatbread.",
     ],
@@ -279,7 +281,7 @@ export const RECIPES: Recipe[] = [
     ],
     steps: [
       "Sauté vegetables until soft.",
-      "Pour beaten eggs, bake until just set, finish with herbs.",
+      "Pour in beaten eggs and bake until the center reaches 160°F (71°C), then finish with herbs.",
     ],
     why: "A fridge-clearing meal that still feels like someone cooked for you.",
   },
@@ -348,7 +350,7 @@ export const RECIPES: Recipe[] = [
       { name: "Parsley", qty: "1 handful", dept: "Produce" },
     ],
     steps: [
-      "Simmer chicken with carrot, onion, and salt until tender.",
+      "Simmer chicken with carrot, onion, and salt until a food thermometer reads 165°F (74°C).",
       "Shred the meat, add orzo, cook until soft.",
       "Finish with lemon and parsley off the heat.",
     ],
@@ -371,7 +373,7 @@ export const RECIPES: Recipe[] = [
       { name: "Herbs", qty: "1 handful", dept: "Produce" },
     ],
     steps: [
-      "Boil eggs 7 minutes, then ice.",
+      "Boil eggs until both the yolks and whites are firm, then cool in ice water.",
       "Toast the bread, drizzle oil, slice eggs on top, finish with herbs and salt.",
     ],
     why: "Protein in twelve minutes when the morning is already spoken for.",
@@ -576,7 +578,7 @@ export const RECIPES: Recipe[] = [
     ],
     steps: [
       "Toss everything with oil, salt, and paprika.",
-      "Roast at 400°F until the chicken is cooked through and the squash is soft.",
+      "Roast at 400°F until a food thermometer reads 165°F (74°C) in the thickest part of the chicken and the squash is soft.",
     ],
     why: "One tray, leftover lunch, almost no dishes.",
   },
@@ -857,13 +859,14 @@ export const RESOURCE_LIBRARY = [
   },
 ];
 
-export function recipesFor(stage: Stage | null, diets: string[], dislikes: string) {
+export function recipesFor(stage: Stage | null, diets: string[], dislikes: string, allergies: string[] = []) {
   const dislike = (dislikes || "").toLowerCase();
   const dislikeBits = dislike.split(/[,;]+/).map((s) => s.trim()).filter(Boolean);
   const flags = diets.filter((d): d is DietFlag => DIET_IDS.has(d));
   return RECIPES.filter((r) => {
     if (stage && !r.stage.includes(stage)) return false;
     if (flags.length && !flags.every((d) => r.diets.includes(d))) return false;
+    if (!ingredientTextAllowed([r.title, ...r.ingredients.map((i) => i.name), ...r.steps].join(" "), allergies)) return false;
     if (dislikeBits.some((bit) => r.title.toLowerCase().includes(bit) || r.ingredients.some((ing) => ing.name.toLowerCase().includes(bit)))) {
       return false;
     }
@@ -871,11 +874,6 @@ export function recipesFor(stage: Stage | null, diets: string[], dislikes: strin
   });
 }
 
-export function recipePool(stage: Stage | null, diets: string[], dislikes: string) {
-  const full = recipesFor(stage, diets, dislikes);
-  if (full.length) return full;
-  const one = diets.length ? recipesFor(stage, diets.slice(0, 1), dislikes) : [];
-  if (one.length) return one;
-  const byStage = recipesFor(stage, [], dislikes);
-  return byStage.length ? byStage : RECIPES;
+export function recipePool(stage: Stage | null, diets: string[], dislikes: string, allergies: string[] = []) {
+  return recipesFor(stage, diets, dislikes, allergies);
 }

@@ -29,6 +29,8 @@ function Hearth() {
   const [mode, setMode] = useState<DoorMode>("signin");
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [lastingStore, setLastingStore] = useState(true);
+  const [bootstrapAvailable, setBootstrapAvailable] = useState(false);
+  const [bootstrapToken, setBootstrapToken] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -57,6 +59,7 @@ function Hearth() {
       .then((status) => {
         setHasAdmin(status.hasAdmin);
         setLastingStore(status.lastingStore !== false);
+        setBootstrapAvailable(status.bootstrapAvailable);
         setMode(status.hasAdmin ? "signin" : "bootstrap");
       })
       .catch(() => {
@@ -119,6 +122,7 @@ function Hearth() {
           honey: guard.honey,
           startedAt: guard.startedAt,
           human: guard.human,
+          bootstrapToken,
         },
       });
       if (saved.lastingStore === false) {
@@ -317,12 +321,22 @@ function Hearth() {
           </p>
         ) : null}
 
-        {authEnabled && !initialLoading && mode === "bootstrap" ? (
+        {authEnabled && !initialLoading && mode === "bootstrap" && !bootstrapAvailable ? (
+          <p className="mt-6 rounded-2xl border border-white/10 p-5 text-sm leading-relaxed text-[#efe6d6]/70" role="status">
+            Owner setup is locked. The site operator must configure a private setup key before the first owner account can be created.
+          </p>
+        ) : null}
+
+        {authEnabled && !initialLoading && mode === "bootstrap" && bootstrapAvailable ? (
           <>
             <p className="mt-4 text-sm leading-relaxed text-[#efe6d6]/70">
               Create the one owner account. After this, the recovery door closes and every admin login requires an authenticator code.
             </p>
             <form onSubmit={onBootstrap} className="mt-8 space-y-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
+              {lastingStore ? <div>
+                <Label htmlFor="owner-setup-key">Private setup key</Label>
+                <Input id="owner-setup-key" type="password" autoComplete="off" required value={bootstrapToken} onChange={(e) => setBootstrapToken(e.target.value)} className="bg-[#efe6d6] text-[#101918]" />
+              </div> : null}
               <div>
                 <Label htmlFor="owner-email">Owner email</Label>
                 <Input id="owner-email" type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#efe6d6] text-[#101918]" />

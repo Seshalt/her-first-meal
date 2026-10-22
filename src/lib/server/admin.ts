@@ -1,3 +1,4 @@
+import { requireAdmin } from "./admin-access";
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
@@ -16,17 +17,6 @@ function deny() {
   throw err;
 }
 
-async function requireAdmin(userId: string) {
-  const sql = await getSql();
-  const rows = await sql<{ role: string; mfa_enabled: boolean }>`
-    select p.role, coalesce(u."twoFactorEnabled", false) as mfa_enabled
-    from profiles p
-    join "user" u on u.id = p.user_id
-    where p.user_id = ${userId}
-    limit 1
-  `;
-  if (rows[0]?.role !== "admin" || !rows[0]?.mfa_enabled) deny();
-}
 
 export const claimFirstAdmin = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
@@ -521,12 +511,18 @@ export const adminLaunchReadiness = createServerFn({ method: "GET" })
     const sql = await getSql();
     const dbProbe = await sql<{ ok: number }>`select 1::int as ok`;
     const databaseHealthy = Number(dbProbe[0]?.ok ?? 0) === 1;
+    const migrations = await sql<{ name: string }>`select name from _migrations order by name`;
+    const migrationNames = new Set(migrations.map((row) => row.name));
+    const migrationsCurrent = migrationNames.size >= 13 &&
+      migrationNames.has("0012_privacy_hardening.sql") && migrationNames.has("0013_admin_mfa.sql");
 
     return {
       database: {
         configured: usingAnyDatabase,
         dedicated: usingDedicatedHfmDatabase,
         healthy: databaseHealthy,
+        migrationsCurrent,
+        appliedMigrations: migrationNames.size,
       },
       auth: {
         enabled: process.env.VITE_AUTH_ENABLED !== "false",

@@ -34,7 +34,7 @@ function normalizePostgresUrl(value) {
 }
 
 const databaseUrl = normalizePostgresUrl(
-  process.env.HFM_DATABASE_URL || process.env.DATABASE_URL,
+  process.env.HFM_DATABASE_URL_UNPOOLED?.trim() || process.env.HFM_DATABASE_URL?.trim() || process.env.DATABASE_URL_UNPOOLED?.trim() || process.env.DATABASE_URL,
 );
 if (!databaseUrl) {
   console.log(

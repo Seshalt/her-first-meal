@@ -47,7 +47,7 @@ function Login() {
         }
         if (live) setHome("/app");
       } catch {
-        if (live) setHome("/app");
+        if (live) setFactor({ needed: true, sent: false, configured: false, emailMasked: "your email" });
       }
     })();
     return () => {

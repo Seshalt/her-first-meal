@@ -1,3 +1,5 @@
+import { requireAdmin } from "./admin-access";
+import { rateLimitClient } from "./abuse";
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
@@ -26,6 +28,7 @@ export const sendPublicLetter = createServerFn({ method: "POST" })
     subject: input.subject?.trim().slice(0, 160) || "A letter to the house",
   }))
   .handler(async ({ data }) => {
+    await rateLimitClient("public-letter", 5, 15 * 60 * 1000);
     if (!data.email.includes("@") || data.message.length < 8) {
       return { ok: false as const, error: "Please include an email and a longer note." };
     }
@@ -60,7 +63,7 @@ export const sendMemberLetter = createServerFn({ method: "POST" })
       language: string;
     }>`select display_name, email, stage, language from profiles where user_id = ${context.userId}`;
     const name = profile[0]?.display_name || "Member";
-    const email = profile[0]?.email || "member@herfirstmeal.com";
+    const email = profile[0]?.email || "member@herfirstmeal.app";
     await sql`
       insert into house_letters (user_id, name, email, locale, stage, subject, body)
       values (
@@ -93,8 +96,7 @@ export const listHouseLetters = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
-    const role = await sql<{ role: string }>`select role from profiles where user_id = ${context.userId}`;
-    if (role[0]?.role !== "admin") throw new Error("Unauthorized");
+    await requireAdmin(context.userId);
     return sql<{
       id: number;
       name: string | null;
@@ -118,8 +120,7 @@ export const markLetterRead = createServerFn({ method: "POST" })
   .validator((input: { id: number }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
-    const role = await sql<{ role: string }>`select role from profiles where user_id = ${context.userId}`;
-    if (role[0]?.role !== "admin") throw new Error("Unauthorized");
+    await requireAdmin(context.userId);
     await sql`update house_letters set read_at = now() where id = ${data.id} and read_at is null`;
     return { ok: true };
   });

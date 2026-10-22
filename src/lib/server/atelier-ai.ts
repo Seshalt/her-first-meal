@@ -1,20 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/lib/auth/middleware";
-import { getSql } from "@/lib/db";
+import { requireAdmin } from "./admin-access";
 
-function deny() {
-  const err = new Error("Unauthorized");
-  (err as Error & { status?: number }).status = 401;
-  throw err;
-}
 
 export const applyAtelierEdit = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator((input: { message: string }) => ({ message: input.message.trim().slice(0, 600) }))
   .handler(async ({ context, data }) => {
-    const sql = await getSql();
-    const rows = await sql<{ role: string }>`select role from profiles where user_id = ${context.userId}`;
-    if (rows[0]?.role !== "admin") deny();
+    await requireAdmin(context.userId);
     if (!data.message) return { ok: false as const, text: "Describe the short piece of copy you need." };
     const key = process.env.GROQ_API_KEY;
     if (!key) return { ok: false as const, text: "Groq is not connected yet. Add GROQ_API_KEY as a server-only Vercel environment variable." };

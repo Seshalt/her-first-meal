@@ -1,6 +1,7 @@
+import { ingredientTextAllowed, recipeFitsKitchen } from "@/lib/content/food-restrictions";
 import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
-import { authMiddleware } from "@/lib/auth/middleware";
+import { memberMiddleware } from "@/lib/auth/member-middleware";
 import { RECIPES, recipePool, type Recipe, type Stage } from "@/lib/content/catalog";
 import { PANTRY_STAPLES, seasonalProduce } from "@/lib/content/places";
 import { asJson } from "./json";
@@ -19,31 +20,6 @@ function startOfWeekISO() {
 
 type MealSlot = { day: string; recipeId: string };
 
-const APPLIANCE_HINTS: Record<string, string[]> = {
-  oven: ["bake", "baked", "roast", "roasted", "oven", "sheet-pan", "frittata"],
-  stovetop: ["simmer", "skillet", "stew", "soup", "porridge", "curry", "broth", "pan"],
-  microwave: ["microwave"],
-  "air-fryer": ["air fryer"],
-  "pressure-cooker": ["pressure cooker", "instant pot"],
-  "slow-cooker": ["slow cooker"],
-  toaster: ["toast"],
-  blender: ["blend", "smoothie"],
-  "food-processor": ["food processor", "process"],
-  "rice-cooker": ["rice", "porridge"],
-  grill: ["grill", "grilled"],
-  kettle: ["tea", "steep", "kettle"],
-};
-
-function recipeFitsKitchen(recipe: Recipe, appliances: string[]) {
-  if (!appliances.length || appliances.includes("basic-kitchen")) return true;
-  const text = [recipe.title, recipe.summary, ...recipe.steps].join(" ").toLowerCase();
-  const explicitlyNeeds = Object.entries(APPLIANCE_HINTS)
-    .filter(([, hints]) => hints.some((hint) => text.includes(hint)))
-    .map(([id]) => id);
-  if (!explicitlyNeeds.length) return true;
-  return explicitlyNeeds.some((id) => appliances.includes(id));
-}
-
 async function applianceRow(sql: Awaited<ReturnType<typeof getSql>>, userId: string) {
   const rows = await sql<{ appliances: unknown }>`
     select appliances from grocery_preferences where user_id = ${userId}
@@ -57,20 +33,21 @@ async function kitchenRecipePool(
   stage: Stage | null,
   diets: string[],
   dislikes: string,
+  allergies: string[],
 ) {
-  const base = recipePool(stage, diets, dislikes);
+  const base = recipePool(stage, diets, dislikes, allergies);
   const appliances = await applianceRow(sql, userId);
-  const matched = base.filter((recipe) => recipeFitsKitchen(recipe, appliances));
-  return { pool: matched.length >= 3 ? matched : base, appliances };
+  const matched = base.filter((recipe) => recipeFitsKitchen(recipe.id, appliances));
+  return { pool: matched, appliances };
 }
 
 async function dietRow(sql: Awaited<ReturnType<typeof getSql>>, userId: string) {
-  const diet = await sql<{ diets: unknown; dislikes: string | null; allergies: unknown }>`
-    select diets, dislikes, allergies from dietary_profiles where user_id = ${userId}
+  const diet = await sql<{ diets: unknown; dislikes: string | null; avoids: string | null; allergies: unknown }>`
+    select diets, dislikes, avoids, allergies from dietary_profiles where user_id = ${userId}
   `;
   return {
     diets: asJson<string[]>(diet[0]?.diets, []),
-    dislikes: diet[0]?.dislikes ?? "",
+    dislikes: [diet[0]?.dislikes, diet[0]?.avoids].filter(Boolean).join(","),
     allergies: asJson<string[]>(diet[0]?.allergies, []),
   };
 }
@@ -79,9 +56,9 @@ export async function rebuildMealWeek(userId: string) {
   const sql = await getSql();
   const profile = await ensureProfile(userId);
   const diet = await dietRow(sql, userId);
-  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes);
+  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes, diet.allergies);
   const weekStart = startOfWeekISO();
-  const meals: MealSlot[] = DAYS.map((day, i) => ({ day, recipeId: pool[i % pool.length].id }));
+  const meals: MealSlot[] = pool.length ? DAYS.map((day, i) => ({ day, recipeId: pool[i % pool.length].id })) : [];
   await sql`
     insert into meal_plans (user_id, week_start, meals)
     values (${userId}, ${weekStart}, ${JSON.stringify(meals)}::jsonb)
@@ -95,7 +72,7 @@ async function ensureMealWeek(userId: string) {
   const sql = await getSql();
   const profile = await ensureProfile(userId);
   const diet = await dietRow(sql, userId);
-  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes);
+  const { pool } = await kitchenRecipePool(sql, userId, profile.stage as Stage | null, diet.diets, diet.dislikes, diet.allergies);
   const allowed = new Set(pool.map((r) => r.id));
   const weekStart = startOfWeekISO();
   const existing = await sql<{ meals: unknown }>`
@@ -104,7 +81,7 @@ async function ensureMealWeek(userId: string) {
   let meals = asJson<MealSlot[]>(existing[0]?.meals, []);
   const stale = !meals.length || meals.some((m) => !allowed.has(m.recipeId));
   if (stale) {
-    meals = DAYS.map((day, i) => ({ day, recipeId: pool[i % pool.length].id }));
+    meals = pool.length ? DAYS.map((day, i) => ({ day, recipeId: pool[i % pool.length].id })) : [];
     await sql`
       insert into meal_plans (user_id, week_start, meals)
       values (${userId}, ${weekStart}, ${JSON.stringify(meals)}::jsonb)
@@ -115,7 +92,7 @@ async function ensureMealWeek(userId: string) {
 }
 
 export const getMealWeek = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     const { meals, pool, diet, profile, weekStart } = await ensureMealWeek(context.userId);
@@ -139,12 +116,13 @@ export const getMealWeek = createServerFn({ method: "GET" })
   });
 
 export const swapMeal = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { day: string; recipeId: string }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
     if (!RECIPES.some((r) => r.id === data.recipeId)) return { ok: false };
-    const { meals, weekStart } = await ensureMealWeek(context.userId);
+    const { meals, pool, weekStart } = await ensureMealWeek(context.userId);
+    if (!DAYS.includes(data.day) || !pool.some((recipe) => recipe.id === data.recipeId)) return { ok: false };
     const next = meals.map((m) => (m.day === data.day ? { day: data.day, recipeId: data.recipeId } : m));
     await sql`
       insert into meal_plans (user_id, week_start, meals)
@@ -156,17 +134,17 @@ export const swapMeal = createServerFn({ method: "POST" })
   });
 
 export const rebuildThisWeek = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     await rebuildMealWeek(context.userId);
     return { ok: true };
   });
 
 export const getGroceryList = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
-    const { meals, profile, weekStart } = await ensureMealWeek(context.userId);
+    const { meals, profile, weekStart, diet } = await ensureMealWeek(context.userId);
     const recipeMap = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
     const pantry = await sql<{ name: string }>`select name from pantry_items where user_id = ${context.userId}`;
     const pantryNames = new Set(pantry.map((p) => p.name.toLowerCase()));
@@ -183,6 +161,7 @@ export const getGroceryList = createServerFn({ method: "GET" })
       for (const ing of recipe.ingredients) add(ing.name, ing.qty, ing.dept, recipe.title);
     }
     for (const produce of seasonalProduce(profile.stateCode)) {
+      if (!ingredientTextAllowed(produce.name, diet.allergies)) continue;
       add(produce.name, produce.qty, produce.dept, "seasonal");
     }
     const saved = await sql<{ items: unknown }>`
@@ -213,7 +192,7 @@ export const getGroceryList = createServerFn({ method: "GET" })
   });
 
 export const toggleGroceryItem = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { name: string; checked: boolean }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
@@ -232,7 +211,7 @@ export const toggleGroceryItem = createServerFn({ method: "POST" })
   });
 
 export const listPantry = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     return sql<{
@@ -246,7 +225,7 @@ export const listPantry = createServerFn({ method: "GET" })
   });
 
 export const upsertPantry = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { id?: number; name: string; quantity: number; unit: string; low?: boolean }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
@@ -266,7 +245,7 @@ export const upsertPantry = createServerFn({ method: "POST" })
   });
 
 export const stockPantryStaples = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .handler(async ({ context }) => {
     const sql = await getSql();
     const existing = await sql<{ name: string }>`select name from pantry_items where user_id = ${context.userId}`;
@@ -282,7 +261,7 @@ export const stockPantryStaples = createServerFn({ method: "POST" })
   });
 
 export const removePantry = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { id: number }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
@@ -291,7 +270,7 @@ export const removePantry = createServerFn({ method: "POST" })
   });
 
 export const toggleFavoriteRecipe = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([memberMiddleware])
   .validator((input: { recipeId: string }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();

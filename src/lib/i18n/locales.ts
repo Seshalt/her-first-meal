@@ -32,18 +32,20 @@ export function localeMeta(id: LocaleId) {
   return LOCALES.find((l) => l.id === id) ?? LOCALES[0];
 }
 
+export function browserLocale(language: string): LocaleId {
+  const nav = language.toLowerCase();
+  if (nav.startsWith("zh-hk") || nav.startsWith("zh-mo") || nav.startsWith("yue")) return "yue";
+  if (nav.startsWith("zh")) return "zh";
+  if (nav.startsWith("tl")) return "fil";
+  return LOCALES.find((l) => nav === l.id || nav.startsWith(`${l.id}-`))?.id ?? DEFAULT_LOCALE;
+}
+
 export function readStoredLocale(): LocaleId {
   if (typeof window === "undefined") return DEFAULT_LOCALE;
   try {
     const stored = localStorage.getItem(LOCALE_STORAGE);
     if (isLocale(stored)) return stored;
-    const nav = navigator.language.toLowerCase();
-    const exact = LOCALES.find((l) => nav === l.id || nav.startsWith(`${l.id}-`));
-    if (exact) return exact.id;
-    if (nav.startsWith("zh-hk") || nav.startsWith("zh-mo") || nav.includes("yue")) return "yue";
-    if (nav.startsWith("zh")) return "zh";
-    if (nav.startsWith("pt")) return "pt";
-    if (nav.startsWith("fil") || nav.startsWith("tl")) return "fil";
+    return browserLocale(navigator.language);
   } catch {
     /* ignore */
   }

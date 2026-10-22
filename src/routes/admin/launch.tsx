@@ -64,7 +64,7 @@ function LaunchReadiness() {
   const automatic = useMemo(() => {
     if (!status) return [];
     return [
-      { label: "Production database responds", good: status.database.configured && status.database.healthy, note: status.database.dedicated ? "Using the dedicated Her First Meal database override." : "Database works, but the dedicated Her First Meal database override is not set." },
+      { label: "Dedicated production database and migrations", good: status.database.dedicated && status.database.healthy && status.database.migrationsCurrent, note: status.database.dedicated ? `${status.database.appliedMigrations} migrations recorded in the dedicated Her First Meal database.` : "The dedicated Her First Meal database override is not set." },
       { label: "Real authentication is enabled", good: status.auth.enabled && status.auth.secretConfigured && status.auth.baseUrlConfigured, note: status.auth.productionDomain ? "Production domain is recognized." : "Production authentication URL still needs attention." },
       { label: "Live Stripe secret key", good: status.payments.liveSecret, note: status.payments.secretConfigured ? "A Stripe secret exists, but it is not a live key." : "Live Stripe secret key is still missing." },
       { label: "Live Stripe publishable key", good: status.payments.livePublishable, note: status.payments.publishableConfigured ? "A publishable key exists, but it is not a live key." : "Live Stripe publishable key is still missing." },

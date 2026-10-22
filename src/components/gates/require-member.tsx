@@ -19,7 +19,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
     }
     let live = true;
     void Promise.all([
-      getEmailFactorStatus().catch(() => ({ needed: false })),
+      getEmailFactorStatus().catch(() => ({ needed: true })),
       getMembershipAccess().catch(() => ({ active: false, plan: null, expiresAt: null })),
     ]).then(([factor, membership]) => {
       if (!live) return;
@@ -40,6 +40,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
   }
 
   if (!user) return <RedirectToSignIn to="/login" />;
+  if (factorNeeded) return <RedirectToSignIn to="/login" />;
 
   if (!membershipActive) {
     return (
