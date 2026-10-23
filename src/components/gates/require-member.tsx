@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { LockKeyhole } from "lucide-react";
@@ -7,6 +8,7 @@ import { getEmailFactorStatus } from "@/lib/server/email-factor";
 import { getMembershipAccess } from "@/lib/server/checkout";
 
 export function RequireMember({ children }: { children: ReactNode }) {
+  const localizeContent = useContentText();
   const { user, isPending } = useCurrentUserState();
   const [factorNeeded, setFactorNeeded] = useState<boolean | null>(null);
   const [membershipActive, setMembershipActive] = useState<boolean | null>(null);
@@ -34,7 +36,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
   if (isPending || (user && (factorNeeded === null || membershipActive === null))) {
     return (
       <div className="grid min-h-dvh place-items-center px-5 text-center">
-        <p className="font-display text-2xl text-muted-foreground">Checking your membership…</p>
+        <p className="font-display text-2xl text-muted-foreground">{localizeContent("Checking your membership…")}</p>
       </div>
     );
   }
@@ -49,21 +51,19 @@ export function RequireMember({ children }: { children: ReactNode }) {
           <div className="mx-auto grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
             <LockKeyhole className="size-5" />
           </div>
-          <p className="mt-5 text-xs uppercase tracking-[0.24em] text-earth">Membership required</p>
-          <h1 className="mt-3 font-display text-4xl leading-tight">Payment has to clear before the member app opens.</h1>
+          <p className="mt-5 text-xs uppercase tracking-[0.24em] text-earth">{localizeContent("Membership required")}</p>
+          <h1 className="mt-3 font-display text-4xl leading-tight">{localizeContent("Payment has to clear before the member app opens.")}</h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-muted-foreground">
-            Your account can stay signed in, but meals, grocery planning, readings, binding, and the rest of the member rooms unlock only after Stripe confirms an active membership.
-          </p>
+            {localizeContent("Your account can stay signed in, but meals, grocery planning, readings, binding, and the rest of the member rooms unlock only after Stripe confirms an active membership.")}</p>
           <Link
             to="/pricing"
             className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 active:scale-95"
           >
-            Choose membership
-          </Link>
+            {localizeContent("Choose membership")}</Link>
         </section>
       </main>
     );
   }
 
-  return <>{children}</>;
+  return <>{localizeContent(children)}</>;
 }

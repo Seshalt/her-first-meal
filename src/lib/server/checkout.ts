@@ -183,7 +183,16 @@ export const claimMembership = createServerFn({ method: "POST" })
   .validator((input: { token?: string }) => input)
   .handler(async ({ context, data }) => {
     const sql = await getSql();
-    const profile = await ensureProfile(context.userId);
+    await ensureProfile(context.userId);
+    const verified = await sql<{ email: string; email_factor_ok: boolean }>`
+      select u.email, p.email_factor_ok
+      from profiles p join "user" u on u.id = p.user_id
+      where p.user_id = ${context.userId} limit 1
+    `;
+    if (!verified[0]?.email_factor_ok || !verified[0].email) {
+      throw new Error("Verify your email before opening your membership.");
+    }
+    const verifiedEmail = verified[0].email.trim().toLowerCase();
 
     if (data.token) {
       const rows = await sql<{ id: number; email: string | null; status: string; user_id: string | null }>`
@@ -199,21 +208,22 @@ export const claimMembership = createServerFn({ method: "POST" })
       if (paidMembership.user_id && paidMembership.user_id !== context.userId) {
         throw new Error("This membership is already linked to another account.");
       }
-      if (profile.email && paidMembership.email && paidMembership.email.toLowerCase() !== profile.email.toLowerCase()) {
+      if (!paidMembership.email || paidMembership.email.toLowerCase() !== verifiedEmail) {
         throw new Error("Use the same email address that was used at checkout.");
       }
       await sql`
         update memberships
         set user_id = ${context.userId}
         where id = ${paidMembership.id}
+          and (user_id is null or user_id = ${context.userId})
       `;
     }
 
-    if (profile.email) {
+    if (verifiedEmail) {
       await sql`
         update memberships
         set user_id = ${context.userId}
-        where lower(email) = ${profile.email.toLowerCase()}
+        where lower(email) = ${verifiedEmail}
           and status = 'active'
           and user_id is null
       `;

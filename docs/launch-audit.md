@@ -1,6 +1,6 @@
 # Her First Meal launch audit
 
-Working audit, 2026-10-22. Stripe deliberately deferred by owner.
+Working audit, 2026-10-23. Stripe deliberately deferred by owner.
 
 ## Repair and verification queue
 
@@ -27,7 +27,7 @@ Working audit, 2026-10-22. Stripe deliberately deferred by owner.
 
 ## Observations
 
-- Latest deployed source: 643b71019f20600129cb1c40979f1999ef971807.
+- Latest deployed source: 02657b71efe16a5c55ee144cc3e5d4a732f807d9.
 - Production domain is verified and assigned to her-first-meal-now.
 - Intended HFM database: square-night-10002358; production br-empty-meadow-b44ng17x.
 - Migration test branch: br-lucky-firefly-b4isu7nz.
@@ -35,7 +35,7 @@ Working audit, 2026-10-22. Stripe deliberately deferred by owner.
 - Homepage Instagram fallback and loaded-site Instagram disagree; inspect before changing.
 - About photo alt text does not describe the rendered photo; inspect stored defaults.
 - Browser changes locale chrome, but major customer-facing page content remains English.
-- Production variable inventory has no RESEND_API_KEY or MAIL_FROM.
+- Production has MAIL_FROM configured as Her First Meal <security@herfirstmeal.app>; RESEND_API_KEY remains absent.
 
 ## Deferred owner/external tasks
 
@@ -73,3 +73,13 @@ Working audit, 2026-10-22. Stripe deliberately deferred by owner.
 - Unit/security tests: 44 passed (6 source/security checks + 38 behavior tests).
 - Production build passed locally; local migration step correctly skipped without secrets. Production migration history verified via Neon connector.
 - Full language conversion, authenticated member/browser tests and mobile browser verification remain open. Do not claim full audit or launch readiness.
+
+## Localization and visual editor repair
+
+- All 17 non-English shared interface packs explicitly contain every one of the 157 English message keys with matching placeholders.
+- Customer route/component copy now uses static editorial dictionaries, loaded once per selected locale. No translation API is called by the customer application.
+- Inventory covers 1,909 editorial strings, template strings, dynamic category/status labels and public authentication errors.
+- Dates in member pages and receipts use the selected app language, including Cantonese zh-HK.
+- Fixed cross-frame element checks in the visual editor: parent-window instanceof checks rejected valid elements from the iframe. Tag/node checks now work across frames.
+- Added an admin language selector and separate saved visual overrides per locale. English edits remain the base; language-specific edits override them.
+- Production language deployment and browser verification are pending.

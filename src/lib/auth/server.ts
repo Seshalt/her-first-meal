@@ -231,6 +231,7 @@ export const auth = betterAuth({
           minPasswordLength: 10,
           maxPasswordLength: 128,
           resetPasswordTokenExpiresIn: 60 * 60,
+          revokeSessionsOnPasswordReset: true,
           sendResetPassword: async ({ user, url }) => {
             const result = await sendHouseMail({
               to: user.email,

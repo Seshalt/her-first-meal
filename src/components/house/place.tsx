@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -20,12 +21,13 @@ export function PlaceAsk({
   permission?: string | null;
   onSaved?: (place: PlaceSaved) => void;
 }) {
+  const localizeContent = useContentText();
   const [busy, setBusy] = useState(false);
   const known = Boolean(label && label !== "not shared");
 
   async function share() {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
-      toast.error("This browser will not share a location. A city or ZIP is enough.");
+      toast.error(localizeContent("This browser will not share a location. A city or ZIP is enough."));
       return;
     }
     setBusy(true);
@@ -39,16 +41,16 @@ export function PlaceAsk({
           },
         })
           .then((place) => {
-            toast.success(place.location ? `Cooking from ${place.location}.` : "Location saved.");
+            toast.success(localizeContent(place.location ? `Cooking from ${place.location}.` : "Location saved."));
             onSaved?.(place);
           })
-          .catch((err) => toast.error(err instanceof Error ? err.message : "Could not save the place."))
+          .catch((err) => toast.error(localizeContent(err instanceof Error ? err.message : "Could not save the place.")))
           .finally(() => setBusy(false));
       },
       () => {
         void savePlace({ data: { permission: "denied" } }).catch(() => undefined);
         setBusy(false);
-        toast.error("Location stayed private. A city, ZIP, or U.S. state still builds the list.");
+        toast.error(localizeContent("Location stayed private. A city, ZIP, or U.S. state still builds the list."));
       },
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 10 * 60 * 1000 },
     );
@@ -58,16 +60,15 @@ export function PlaceAsk({
     <div className={cn("place-card", known && "is-known")}>
       <span className="place-pin" aria-hidden />
       <div className="min-w-0 flex-1">
-        <p className="text-xs uppercase tracking-[0.28em] text-gold">Where she shops</p>
+        <p className="text-xs uppercase tracking-[0.28em] text-gold">{localizeContent("Where she shops")}</p>
         <p className="mt-2 font-display text-2xl leading-tight">
-          {known ? label : "Share a place so lists come from your market."}
+          {localizeContent(known ? label : "Share a place so lists come from your market.")}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          The kitchen uses this for grocery lists and seasonal produce — never for ads, never sold. A typed city, ZIP, or state is enough if you would rather not share the pin.
-        </p>
+          {localizeContent("The kitchen uses this for grocery lists and seasonal produce — never for ads, never sold. A typed city, ZIP, or state is enough if you would rather not share the pin.")}</p>
       </div>
       <Button type="button" variant={known ? "outline" : "gold"} disabled={busy} onClick={() => void share()}>
-        {busy ? "Finding the market…" : known ? "Update location" : "Use my location"}
+        {localizeContent(busy ? "Finding the market…" : known ? "Update location" : "Use my location")}
       </Button>
     </div>
   );

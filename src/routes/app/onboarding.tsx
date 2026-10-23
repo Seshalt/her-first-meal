@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { MapPin, ShieldCheck, Store } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -55,6 +56,7 @@ const STEPS = [
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
 function Onboarding() {
+  const localizeContent = useContentText();
   const user = useCurrentUser();
   const navigate = useNavigate();
   const { t, locale, setLocale } = useI18n();
@@ -142,7 +144,7 @@ function Onboarding() {
 
   function findStoresNearMe() {
     if (!("geolocation" in navigator)) {
-      toast.error("Location is not available on this device. Add your ZIP or city instead.");
+      toast.error(localizeContent("Location is not available on this device. Add your ZIP or city instead."));
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -150,7 +152,7 @@ function Onboarding() {
         const query = encodeURIComponent(`grocery stores near ${coords.latitude},${coords.longitude}`);
         window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank", "noopener,noreferrer");
       },
-      () => toast.message("No problem. Add your ZIP or city and choose your usual stores below."),
+      () => toast.message(localizeContent("No problem. Add your ZIP or city and choose your usual stores below.")),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60 * 1000 },
     );
   }
@@ -206,13 +208,13 @@ function Onboarding() {
         await saveOnboarding({ data });
       }
       if (complete) {
-        toast.success("Your house is ready.");
+        toast.success(localizeContent("Your house is ready."));
         void navigate({ to: "/app" });
       } else {
         setStep(nextStep);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save yet.");
+      toast.error(localizeContent(err instanceof Error ? err.message : "Could not save yet."));
     } finally {
       setBusy(false);
     }
@@ -223,40 +225,40 @@ function Onboarding() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       <aside className="onboarding-photo" data-step={step}>
-        <img src={current.src} alt={current.alt} className="media" />
+        <img src={current.src} alt={localizeContent(current.alt)} className="media" />
         <div className="onboarding-photo-veil" />
         <div className="onboarding-photo-copy">
           <Wordmark to="/" className="text-paper" />
           <div className="onboarding-photo-message">
             <p className="onboarding-kicker">
-              {t(current.kicker as MsgKey)} · {step + 1} of {STEPS.length}
+              {localizeContent(t(current.kicker as MsgKey))} · {localizeContent(step + 1)} {localizeContent(" of ")}{localizeContent(STEPS.length)}
             </p>
-            <h1>{t(current.title as MsgKey)}</h1>
-            <p>{t(current.body as MsgKey)}</p>
+            <h1>{localizeContent(t(current.title as MsgKey))}</h1>
+            <p>{localizeContent(t(current.body as MsgKey))}</p>
           </div>
         </div>
       </aside>
 
       <main className="onboarding-panel">
         <div className="onboarding-form">
-          <p className="onboarding-step-label">{current.label}</p>
-          <div className="onboarding-progress" aria-label={`Step ${step + 1} of ${STEPS.length}`}>
+          <p className="onboarding-step-label">{localizeContent(current.label)}</p>
+          <div className="onboarding-progress" aria-label={localizeContent(`Step ${step + 1} of ${STEPS.length}`)}>
             <span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
           </div>
 
-          {!sessionReady ? (
+          {localizeContent(!sessionReady ? (
             <div className="onboarding-session">
-              {sessionError
+              {localizeContent(sessionError
                 ? "Your account exists, but the secure session did not finish. Refresh once or sign in again."
-                : "Securing your new account…"}
+                : "Securing your new account…")}
             </div>
-          ) : null}
+          ) : null)}
 
-          {step === 0 ? (
+          {localizeContent(step === 0 ? (
             <div className="onboarding-body space-y-5">
-              <Field label={t("join.name")} value={displayName} onChange={setDisplayName} />
+              <Field label={localizeContent(t("join.name"))} value={displayName} onChange={setDisplayName} />
               <Field
-                label="City or area"
+                label={localizeContent("City or area")}
                 value={location}
                 onChange={setLocation}
                 optional
@@ -268,99 +270,96 @@ function Onboarding() {
                     <MapPin className="size-5" />
                   </div>
                   <div>
-                    <strong className="block text-sm">Why we ask</strong>
+                    <strong className="block text-sm">{localizeContent("Why we ask")}</strong>
                     <p className="mt-1 text-sm leading-6">
-                      A city or ZIP helps your grocery list work around the stores and markets near you. Exact device location is only requested later if you tap “Find stores near me.”
-                    </p>
+                      {localizeContent("A city or ZIP helps your grocery list work around the stores and markets near you. Exact device location is only requested later if you tap “Find stores near me.”")}</p>
                   </div>
                 </div>
               </div>
               <div>
-                <Label>{t("join.language")}</Label>
+                <Label>{localizeContent(t("join.language"))}</Label>
                 <div className="mt-2">
                   <LocaleSwitch tone="gold" />
                 </div>
               </div>
             </div>
-          ) : null}
+          ) : null)}
 
-          {step === 1 ? (
+          {localizeContent(step === 1 ? (
             <div className="onboarding-body space-y-5">
               <div>
-                <Label>Where are you right now?</Label>
+                <Label>{localizeContent("Where are you right now?")}</Label>
                 <div className="onboarding-choice-grid mt-2">
-                  {(Object.keys(STAGE_LABEL) as Stage[]).map((value) => (
+                  {localizeContent((Object.keys(STAGE_LABEL) as Stage[]).map((value) => (
                     <Choice key={value} active={stage === value} onClick={() => setStage(value)}>
-                      {t(`stage.${value}` as MsgKey)}
+                      {localizeContent(t(`stage.${value}` as MsgKey))}
                     </Choice>
-                  ))}
+                  )))}
                 </div>
               </div>
-              {stage && stage !== "postpartum" && stage !== "trying" ? (
-                <Field label="Due date" value={dueDate} onChange={setDueDate} type="date" />
-              ) : null}
-              {stage === "postpartum" ? (
-                <Field label="Baby's birthday" value={babyBirthday} onChange={setBabyBirthday} type="date" />
-              ) : null}
+              {localizeContent(stage && stage !== "postpartum" && stage !== "trying" ? (
+                <Field label={localizeContent("Due date")} value={dueDate} onChange={setDueDate} type="date" />
+              ) : null)}
+              {localizeContent(stage === "postpartum" ? (
+                <Field label={localizeContent("Baby's birthday")} value={babyBirthday} onChange={setBabyBirthday} type="date" />
+              ) : null)}
               <label className="onboarding-check">
                 <input type="checkbox" checked={isFirstPregnancy} onChange={(e) => setIsFirstPregnancy(e.target.checked)} />
-                <span>First pregnancy</span>
+                <span>{localizeContent("First pregnancy")}</span>
               </label>
               <label className="onboarding-check">
                 <input type="checkbox" checked={isMultiple} onChange={(e) => setIsMultiple(e.target.checked)} />
-                <span>Multiple pregnancy</span>
+                <span>{localizeContent("Multiple pregnancy")}</span>
               </label>
               <Field
-                label="Previous pregnancies"
+                label={localizeContent("Previous pregnancies")}
                 value={String(previousPregnancies)}
                 onChange={(v) => setPreviousPregnancies(Number(v) || 0)}
                 type="number"
               />
             </div>
-          ) : null}
+          ) : null)}
 
-          {step === 2 ? (
+          {localizeContent(step === 2 ? (
             <div className="onboarding-body space-y-5">
               <div>
-                <Label>How do you eat?</Label>
-                <p className="onboarding-helper mb-3">Choose every option that should shape recipes. Tap again to remove it.</p>
+                <Label>{localizeContent("How do you eat?")}</Label>
+                <p className="onboarding-helper mb-3">{localizeContent("Choose every option that should shape recipes. Tap again to remove it.")}</p>
                 <DietPicks value={diets} onChange={setDiets} />
               </div>
-              <Field label="Allergies (comma separated)" value={allergies} onChange={setAllergies} optional />
+              <Field label={localizeContent("Allergies (comma separated)")} value={allergies} onChange={setAllergies} optional />
               <div>
-                <Label>What foods do you avoid?</Label>
+                <Label>{localizeContent("What foods do you avoid?")}</Label>
                 <Textarea value={avoids} onChange={(e) => setAvoids(e.target.value)} />
               </div>
               <div>
-                <Label>What foods do you dislike?</Label>
+                <Label>{localizeContent("What foods do you dislike?")}</Label>
                 <Textarea value={dislikes} onChange={(e) => setDislikes(e.target.value)} />
               </div>
               <div>
-                <Label>What foods do you love?</Label>
+                <Label>{localizeContent("What foods do you love?")}</Label>
                 <Textarea value={loves} onChange={(e) => setLoves(e.target.value)} />
               </div>
-              <Field label="Cuisines you enjoy" value={cuisines} onChange={setCuisines} optional />
+              <Field label={localizeContent("Cuisines you enjoy")} value={cuisines} onChange={setCuisines} optional />
             </div>
-          ) : null}
+          ) : null)}
 
-          {step === 3 ? (
+          {localizeContent(step === 3 ? (
             <div className="onboarding-body space-y-8">
               <section className="overflow-hidden rounded-[30px] border border-[var(--member-line)] bg-[var(--member-card)] p-5 shadow-[0_20px_60px_-42px_rgba(23,37,31,.45)] md:p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">01 · Your kitchen</p>
-                    <h2 className="mt-2 font-display text-3xl leading-tight">What can you cook with?</h2>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">{localizeContent("01 · Your kitchen")}</p>
+                    <h2 className="mt-2 font-display text-3xl leading-tight">{localizeContent("What can you cook with?")}</h2>
                     <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--member-muted)]">
-                      Pick everything you have. We save this with your kitchen preferences so your planning can stay realistic.
-                    </p>
+                      {localizeContent("Pick everything you have. We save this with your kitchen preferences so your planning can stay realistic.")}</p>
                   </div>
                   <span className="rounded-full bg-[color-mix(in_oklab,var(--member-gold)_14%,transparent)] px-3 py-1 text-xs text-[var(--member-gold)]">
-                    {appliances.length} selected
-                  </span>
+                    {localizeContent(appliances.length)} {localizeContent(" selected")}</span>
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {KITCHEN_APPLIANCES.map((item) => {
+                  {localizeContent(KITCHEN_APPLIANCES.map((item) => {
                     const active = appliances.includes(item.id);
                     return (
                       <button
@@ -375,7 +374,7 @@ function Onboarding() {
                         }
                       >
                         <div className="flex items-center justify-between">
-                          <span className="grid size-10 place-items-center rounded-2xl bg-[var(--member-card)] text-xl shadow-sm">{item.icon}</span>
+                          <span className="grid size-10 place-items-center rounded-2xl bg-[var(--member-card)] text-xl shadow-sm">{localizeContent(item.icon)}</span>
                           <span
                             className={
                               active
@@ -386,10 +385,10 @@ function Onboarding() {
                             ✓
                           </span>
                         </div>
-                        <span className="mt-4 block text-sm font-semibold">{item.label}</span>
+                        <span className="mt-4 block text-sm font-semibold">{localizeContent(item.label)}</span>
                       </button>
                     );
-                  })}
+                  }))}
                 </div>
               </section>
 
@@ -399,46 +398,44 @@ function Onboarding() {
                     <Store className="size-5" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">02 · Your market</p>
-                    <h2 className="mt-1 font-display text-3xl leading-tight">Where do you actually shop?</h2>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--member-gold)]">{localizeContent("02 · Your market")}</p>
+                    <h2 className="mt-1 font-display text-3xl leading-tight">{localizeContent("Where do you actually shop?")}</h2>
                     <p className="mt-2 text-sm leading-6 text-[var(--member-muted)]">
-                      Choose the stores you use most. Your grocery room will keep those stores one tap away and organize the week around one practical list.
-                    </p>
+                      {localizeContent("Choose the stores you use most. Your grocery room will keep those stores one tap away and organize the week around one practical list.")}</p>
                   </div>
                 </div>
 
                 <div className="mt-5 rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold">Find what is close to you</p>
-                      <p className="mt-1 text-xs leading-5 text-[var(--member-muted)]">Use your location once, or skip it and use ZIP/city below.</p>
+                      <p className="text-sm font-semibold">{localizeContent("Find what is close to you")}</p>
+                      <p className="mt-1 text-xs leading-5 text-[var(--member-muted)]">{localizeContent("Use your location once, or skip it and use ZIP/city below.")}</p>
                     </div>
                     <button type="button" onClick={findStoresNearMe} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[var(--member-teal)] px-5 text-sm font-semibold text-white transition hover:opacity-90">
-                      <MapPin className="size-4" /> Find stores near me
-                    </button>
+                      <MapPin className="size-4" /> {localizeContent(" Find stores near me")}</button>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="state">{t("onboarding.state")}</Label>
+                    <Label htmlFor="state">{localizeContent(t("onboarding.state"))}</Label>
                     <select id="state" value={stateCode} onChange={(e) => setStateCode(e.target.value)}>
-                      <option value="">Select your state</option>
-                      {US_STATES.map((state) => (
+                      <option value="">{localizeContent("Select your state")}</option>
+                      {localizeContent(US_STATES.map((state) => (
                         <option key={state.code} value={state.code}>
-                          {state.name}
+                          {localizeContent(state.name)}
                         </option>
-                      ))}
+                      )))}
                     </select>
                   </div>
-                  <Field label="ZIP code" value={zipCode} onChange={setZipCode} optional />
+                  <Field label={localizeContent("ZIP code")} value={zipCode} onChange={setZipCode} optional />
                 </div>
 
                 <div className="mt-5">
-                  <Label>Favorite stores</Label>
-                  <p className="onboarding-helper mb-3">Tap every store you use. You can change these later.</p>
+                  <Label>{localizeContent("Favorite stores")}</Label>
+                  <p className="onboarding-helper mb-3">{localizeContent("Tap every store you use. You can change these later.")}</p>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                    {STORES.map((store) => {
+                    {localizeContent(STORES.map((store) => {
                       const active = stores.includes(store);
                       return (
                         <button
@@ -453,57 +450,56 @@ function Onboarding() {
                           }
                         >
                           <span className="flex items-center justify-between gap-2">
-                            {store}
-                            <span className={active ? "text-[var(--member-gold)]" : "text-[var(--member-faint)]"}>{active ? "✓" : "+"}</span>
+                            {localizeContent(store)}
+                            <span className={active ? "text-[var(--member-gold)]" : "text-[var(--member-faint)]"}>{localizeContent(active ? "✓" : "+")}</span>
                           </span>
                         </button>
                       );
-                    })}
+                    }))}
                   </div>
                 </div>
 
                 <div className="mt-5 flex items-start gap-2 border-t border-[var(--member-line)] pt-4 text-xs leading-5 text-[var(--member-muted)]">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[var(--member-teal)]" />
-                  Your city, state, ZIP, and preferred stores are enough for normal planning. Precise location is only requested when you choose “Find stores near me.”
-                </div>
+                  {localizeContent("Your city, state, ZIP, and preferred stores are enough for normal planning. Precise location is only requested when you choose “Find stores near me.”")}</div>
               </section>
 
               <section className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
                   <Field
-                    label="Household size"
+                    label={localizeContent("Household size")}
                     value={String(householdSize)}
                     onChange={(v) => setHouseholdSize(Math.max(1, Number(v) || 1))}
                     type="number"
                   />
                 </div>
                 <div className="rounded-[24px] border border-[var(--member-line)] bg-[var(--member-surface)] p-4">
-                  <Field label="Weekly grocery budget" value={weeklyBudget} onChange={setWeeklyBudget} optional />
+                  <Field label={localizeContent("Weekly grocery budget")} value={weeklyBudget} onChange={setWeeklyBudget} optional />
                 </div>
               </section>
             </div>
-          ) : null}
+          ) : null)}
 
           <div className="onboarding-actions">
-            {step > 0 ? (
+            {localizeContent(step > 0 ? (
               <button type="button" className="onboarding-secondary" disabled={busy} onClick={() => setStep((value) => value - 1)}>
-                {t("back")}
+                {localizeContent(t("back"))}
               </button>
-            ) : null}
-            {step < STEPS.length - 1 ? (
+            ) : null)}
+            {localizeContent(step < STEPS.length - 1 ? (
               <button
                 type="button"
                 className="onboarding-primary"
                 disabled={busy || !sessionReady || (step === 0 && !displayName.trim())}
                 onClick={() => void persist(false, step + 1)}
               >
-                {busy ? "Saving…" : t("continue")}
+                {localizeContent(busy ? "Saving…" : t("continue"))}
               </button>
             ) : (
               <button type="button" className="onboarding-primary" disabled={busy || !sessionReady} onClick={() => void persist(true, step)}>
-                {busy ? t("onboarding.opening") : t("onboarding.enter")}
+                {localizeContent(busy ? t("onboarding.opening") : t("onboarding.enter"))}
               </button>
-            )}
+            ))}
           </div>
         </div>
       </main>
@@ -512,9 +508,10 @@ function Onboarding() {
 }
 
 function Choice({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  const localizeContent = useContentText();
   return (
     <button type="button" className="onboarding-choice" aria-pressed={active} onClick={onClick}>
-      {children}
+      {localizeContent(children)}
     </button>
   );
 }
@@ -534,15 +531,16 @@ function Field({
   optional?: boolean;
   helper?: string;
 }) {
+  const localizeContent = useContentText();
   const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div>
       <Label htmlFor={id}>
-        {label}
-        {optional ? <span className="ml-1 font-normal text-[var(--member-faint)]">(optional)</span> : null}
+        {localizeContent(label)}
+        {localizeContent(optional ? <span className="ml-1 font-normal text-[var(--member-faint)]">{localizeContent("(optional)")}</span> : null)}
       </Label>
       <Input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} />
-      {helper ? <p className="onboarding-helper">{helper}</p> : null}
+      {localizeContent(helper ? <p className="onboarding-helper">{localizeContent(helper)}</p> : null)}
     </div>
   );
 }

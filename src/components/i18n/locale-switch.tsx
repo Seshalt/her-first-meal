@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { LOCALES, type LocaleId } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
@@ -9,10 +10,11 @@ export function LocaleSwitch({
   className?: string;
   tone?: "ink" | "paper" | "gold";
 }) {
+  const localizeContent = useContentText();
   const { locale, setLocale, t } = useI18n();
   return (
     <label className={cn("inline-flex items-center gap-2 text-xs", className)}>
-      <span className="sr-only">{t("language")}</span>
+      <span className="sr-only">{localizeContent(t("language"))}</span>
       <select
         value={locale}
         onChange={(e) => setLocale(e.target.value as LocaleId)}
@@ -23,11 +25,11 @@ export function LocaleSwitch({
           tone === "ink" && "border-border text-foreground",
         )}
       >
-        {LOCALES.map((l) => (
+        {localizeContent(LOCALES.map((l) => (
           <option key={l.id} value={l.id} className="text-ink">
-            {l.native}
+            {localizeContent(l.native)}
           </option>
-        ))}
+        )))}
       </select>
     </label>
   );

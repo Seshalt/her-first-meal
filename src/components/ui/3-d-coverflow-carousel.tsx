@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,7 @@ export function CoverFlowCarousel({
   onCtaClick,
   onActiveChange,
 }: CoverFlowCarouselProps) {
+  const localizeContent = useContentText();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [compact, setCompact] = useState(false);
@@ -113,7 +115,7 @@ export function CoverFlowCarousel({
         color: "#fff8ed",
       }}
       aria-roledescription="carousel"
-      aria-label={sectionLabel}
+      aria-label={localizeContent(sectionLabel)}
       tabIndex={0}
       onKeyDown={(event) => {
         if (event.key === "ArrowLeft") {
@@ -154,7 +156,7 @@ export function CoverFlowCarousel({
       <div className="relative z-10 mx-auto flex min-h-[inherit] w-full max-w-7xl flex-col items-center px-3 py-10 sm:px-6 sm:py-12">
         <div className="mb-7 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#d3a34d]">
           <span className="h-px w-8 bg-gradient-to-r from-transparent to-[#d3a34d]" />
-          <span>{sectionLabel}</span>
+          <span>{localizeContent(sectionLabel)}</span>
           <span className="h-px w-8 bg-gradient-to-l from-transparent to-[#d3a34d]" />
         </div>
 
@@ -162,7 +164,7 @@ export function CoverFlowCarousel({
           className="relative flex w-full flex-1 items-center justify-center"
           style={{ minHeight: compact ? "450px" : "530px", perspective: compact ? "1050px" : "1500px" }}
         >
-          {items.map((item, index) => {
+          {localizeContent(items.map((item, index) => {
             const raw = (index - currentIndex + total) % total;
             const signed = raw > total / 2 ? raw - total : raw;
             const distance = Math.abs(signed);
@@ -206,7 +208,7 @@ export function CoverFlowCarousel({
               >
                 <img
                   src={item.image}
-                  alt={active ? item.alt : ""}
+                  alt={localizeContent(active ? item.alt : "")}
                   className="absolute inset-0 h-full w-full object-cover"
                   loading={distance <= 1 ? "eager" : "lazy"}
                 />
@@ -221,19 +223,19 @@ export function CoverFlowCarousel({
                 >
                   <div className="flex items-start justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.18em]">
                     <span className="rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-white/85 backdrop-blur-md">
-                      {item.tag}
+                      {localizeContent(item.tag)}
                     </span>
-                    {item.meta ? <span className="rounded-full bg-[#fff8ed]/90 px-3 py-1.5 text-[#10281f]">{item.meta}</span> : null}
+                    {localizeContent(item.meta ? <span className="rounded-full bg-[#fff8ed]/90 px-3 py-1.5 text-[#10281f]">{localizeContent(item.meta)}</span> : null)}
                   </div>
 
                   <div className="mt-auto flex flex-col items-center pb-1">
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d3a34d]">{item.subtitle}</p>
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d3a34d]">{localizeContent(item.subtitle)}</p>
                     <h3 className="max-w-[290px] font-display text-[clamp(2rem,4vw,2.65rem)] leading-[.92] text-[#fff8ed] [text-shadow:0_4px_18px_rgba(0,0,0,.78)]">
-                      {item.title}
+                      {localizeContent(item.title)}
                     </h3>
                     <div className="my-4 h-px w-12 bg-[#d3a34d]" />
                     <p className="max-w-[285px] text-sm leading-relaxed text-white/82 [text-shadow:0_2px_8px_rgba(0,0,0,.75)]">
-                      {item.description}
+                      {localizeContent(item.description)}
                     </p>
                     <button
                       type="button"
@@ -243,18 +245,18 @@ export function CoverFlowCarousel({
                         onCtaClick?.(item);
                       }}
                     >
-                      {item.ctaText ?? "Open recipe"}
+                      {localizeContent(item.ctaText ?? "Open recipe")}
                       <ArrowRightIcon />
                     </button>
                   </div>
                 </div>
               </article>
             );
-          })}
+          }))}
 
           <button
             type="button"
-            aria-label="Previous recipe"
+            aria-label={localizeContent("Previous recipe")}
             className="absolute left-2 top-1/2 z-50 grid size-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/45 text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:bg-black/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3a34d] sm:left-5"
             onClick={previous}
           >
@@ -262,7 +264,7 @@ export function CoverFlowCarousel({
           </button>
           <button
             type="button"
-            aria-label="Next recipe"
+            aria-label={localizeContent("Next recipe")}
             className="absolute right-2 top-1/2 z-50 grid size-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/45 text-white shadow-xl backdrop-blur-md transition hover:scale-105 hover:bg-black/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d3a34d] sm:right-5"
             onClick={next}
           >
@@ -270,20 +272,20 @@ export function CoverFlowCarousel({
           </button>
         </div>
 
-        <div className="mt-4 flex max-w-full items-center justify-center gap-1.5 overflow-hidden px-2" aria-label="Recipe carousel position">
-          {visibleDots.map((index) => (
+        <div className="mt-4 flex max-w-full items-center justify-center gap-1.5 overflow-hidden px-2" aria-label={localizeContent("Recipe carousel position")}>
+          {localizeContent(visibleDots.map((index) => (
             <button
               key={items[index]?.id ?? index}
               type="button"
-              aria-label={`Go to recipe ${index + 1}: ${items[index]?.title ?? ""}`}
+              aria-label={localizeContent(`Go to recipe ${index + 1}: ${items[index]?.title ?? ""}`)}
               aria-current={index === currentIndex ? "true" : undefined}
               onClick={() => goTo(index)}
               className="h-2 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff8ed]"
               style={{ width: index === currentIndex ? 28 : 8, background: index === currentIndex ? "#d3a34d" : "rgba(255,248,237,.24)" }}
             />
-          ))}
+          )))}
         </div>
-        <p className="mt-4 text-center text-xs text-white/50">Swipe, use the arrows, or press ← →. Hovering pauses the rotation.</p>
+        <p className="mt-4 text-center text-xs text-white/50">{localizeContent("Swipe, use the arrows, or press ← →. Hovering pauses the rotation.")}</p>
       </div>
     </section>
   );

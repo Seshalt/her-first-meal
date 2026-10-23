@@ -73,10 +73,13 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<LocaleId>(DEFAULT_LOCALE);
 
   useEffect(() => {
-    setLocaleState(readStoredLocale());
+    const query = new URLSearchParams(window.location.search);
+    const editingLocale = query.get("hfm_locale");
+    setLocaleState(query.get("hfm_visual_editor") === "1" && isLocale(editingLocale) ? editingLocale : readStoredLocale());
   }, []);
 
   const setLocale = useCallback((next: LocaleId) => {
+    if (new URLSearchParams(window.location.search).get("hfm_visual_editor") === "1") return;
     setLocaleState(next);
     try {
       localStorage.setItem(LOCALE_STORAGE, next);

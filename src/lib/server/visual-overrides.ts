@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getSql } from "@/lib/db";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { asJson } from "@/lib/server/json";
+import { isLocale, type LocaleId } from "@/lib/i18n/locales";
 
 export type VisualOverrideKind = "text" | "image" | "link";
 
@@ -14,6 +15,11 @@ export type VisualOverride = {
 };
 
 type VisualOverrideStore = Record<string, Record<string, VisualOverride>>;
+
+function overrideKey(page: string, locale: LocaleId = "en") {
+  if (!isLocale(locale)) throw new Error("Unsupported language.");
+  return locale === "en" ? page : `${locale}:${page}`;
+}
 
 function normalizePage(page: string) {
   const clean = page.trim().split("?")[0].split("#")[0] || "/";
@@ -38,13 +44,14 @@ function readStore(value: unknown): VisualOverrideStore {
 }
 
 export const getVisualOverrides = createServerFn({ method: "GET" })
-  .validator((input: { page: string }) => input)
+  .validator((input: { page: string; locale?: LocaleId }) => input)
   .handler(async ({ data }) => {
     const page = normalizePage(data.page);
+    const key = overrideKey(page, data.locale);
     const sql = await getSql();
     const rows = await sql<{ branding: unknown }>`select branding from business_settings where id = 1`;
     const store = readStore(rows[0]?.branding);
-    return store[page] ?? {};
+    return { ...(store[page] ?? {}), ...(store[key] ?? {}) };
   });
 
 export const adminSaveVisualOverride = createServerFn({ method: "POST" })
@@ -52,6 +59,7 @@ export const adminSaveVisualOverride = createServerFn({ method: "POST" })
   .validator(
     (input: {
       page: string;
+      locale?: LocaleId;
       selector: string;
       kind: VisualOverrideKind;
       value?: string;
@@ -62,6 +70,7 @@ export const adminSaveVisualOverride = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await requireAdmin(context.userId);
     const page = normalizePage(data.page);
+    const key = overrideKey(page, data.locale);
     const selector = validateSelector(data.selector);
     if (!["text", "image", "link"].includes(data.kind)) throw new Error("Unsupported edit type.");
 
@@ -69,7 +78,7 @@ export const adminSaveVisualOverride = createServerFn({ method: "POST" })
     const rows = await sql<{ branding: unknown }>`select branding from business_settings where id = 1`;
     const branding = asJson<Record<string, unknown>>(rows[0]?.branding, {});
     const store = readStore(branding);
-    const pageOverrides = { ...(store[page] ?? {}) };
+    const pageOverrides = { ...(store[key] ?? {}) };
 
     if (data.reset) {
       delete pageOverrides[selector];
@@ -97,7 +106,7 @@ export const adminSaveVisualOverride = createServerFn({ method: "POST" })
       };
     }
 
-    store[page] = pageOverrides;
+    store[key] = pageOverrides;
     branding.visualOverrides = store;
 
     await sql`
@@ -111,12 +120,13 @@ export const adminSaveVisualOverride = createServerFn({ method: "POST" })
 
 export const adminGetVisualOverrides = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .validator((input: { page: string }) => input)
+  .validator((input: { page: string; locale?: LocaleId }) => input)
   .handler(async ({ context, data }) => {
     await requireAdmin(context.userId);
     const page = normalizePage(data.page);
+    const key = overrideKey(page, data.locale);
     const sql = await getSql();
     const rows = await sql<{ branding: unknown }>`select branding from business_settings where id = 1`;
     const store = readStore(rows[0]?.branding);
-    return store[page] ?? {};
+    return store[key] ?? {};
   });

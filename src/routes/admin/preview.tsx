@@ -9,6 +9,7 @@ import {
   adminSaveVisualOverride,
   type VisualOverrideKind,
 } from "@/lib/server/visual-overrides";
+import { LOCALES, isLocale, type LocaleId } from "@/lib/i18n/locales";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/preview")({ component: WebsiteCanvas });
@@ -35,8 +36,20 @@ type Selection = {
   label: string;
 };
 
+function isElement(target: unknown): target is HTMLElement {
+  return typeof target === "object" && target !== null && "nodeType" in target && target.nodeType === 1;
+}
+
+function isImage(element: Element | null | undefined): element is HTMLImageElement {
+  return element?.tagName === "IMG";
+}
+
+function isAnchor(element: Element | null | undefined): element is HTMLAnchorElement {
+  return element?.tagName === "A";
+}
+
 function candidateFrom(target: EventTarget | null) {
-  if (!(target instanceof Element)) return null;
+  if (!isElement(target)) return null;
   const candidate = target.closest<HTMLElement>("img") ?? target.closest<HTMLElement>("a") ?? target.closest<HTMLElement>("h1,h2,h3,h4,h5,h6,p,button,span,strong,em,li");
   if (!candidate || candidate.closest("[data-hfm-editor-ignore]")) return null;
   return candidate;
@@ -80,10 +93,10 @@ function selectorFor(element: HTMLElement) {
 
 function selectionFrom(element: HTMLElement): Selection {
   const tag = element.tagName.toLowerCase();
-  const text = element instanceof HTMLImageElement ? element.alt : element.innerText.trim();
+  const text = isImage(element) ? element.alt : element.innerText.trim();
   const label = `${tag.toUpperCase()} · ${text.slice(0, 58) || "untitled element"}`;
 
-  if (element instanceof HTMLImageElement) {
+  if (isImage(element)) {
     return {
       selector: selectorFor(element),
       tag,
@@ -109,6 +122,7 @@ function WebsiteCanvas() {
   const inspectorRef = useRef<HTMLElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const [page, setPage] = useState("/");
+  const [locale, setLocale] = useState<LocaleId>("en");
   const [selection, setSelection] = useState<Selection | null>(null);
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const [frameKey, setFrameKey] = useState(0);
@@ -116,10 +130,10 @@ function WebsiteCanvas() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    void adminGetVisualOverrides({ data: { page } })
+    void adminGetVisualOverrides({ data: { page, locale } })
       .then((overrides) => setSavedCount(Object.keys(overrides).length))
       .catch(() => setSavedCount(0));
-  }, [page, frameKey]);
+  }, [page, locale, frameKey]);
 
   useEffect(() => () => cleanupRef.current?.(), []);
 
@@ -198,7 +212,7 @@ function WebsiteCanvas() {
 
     const onClick = (event: MouseEvent) => {
       if (event.target === menu) return;
-      if (suppressClick && event.target instanceof Node && selected?.contains(event.target)) {
+      if (suppressClick && isElement(event.target) && selected?.contains(event.target)) {
         suppressClick = false;
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -284,10 +298,10 @@ function WebsiteCanvas() {
     }
     if (!element) return;
 
-    if (next.kind === "image" && element instanceof HTMLImageElement) {
+    if (next.kind === "image" && isImage(element)) {
       element.src = next.value;
       element.alt = next.alt;
-    } else if (next.kind === "link" && element instanceof HTMLAnchorElement) {
+    } else if (next.kind === "link" && isAnchor(element)) {
       element.href = next.value;
     } else {
       element.textContent = next.value;
@@ -301,13 +315,14 @@ function WebsiteCanvas() {
       await adminSaveVisualOverride({
         data: {
           page,
+          locale,
           selector: selection.selector,
           kind: selection.kind,
           value: selection.value,
           alt: selection.alt,
         },
       });
-      const overrides = await adminGetVisualOverrides({ data: { page } });
+      const overrides = await adminGetVisualOverrides({ data: { page, locale } });
       setSavedCount(Object.keys(overrides).length);
       toast.success("That element is live.");
     } catch (error) {
@@ -322,7 +337,7 @@ function WebsiteCanvas() {
     setBusy(true);
     try {
       await adminSaveVisualOverride({
-        data: { page, selector: selection.selector, kind: selection.kind, reset: true },
+        data: { page, locale, selector: selection.selector, kind: selection.kind, reset: true },
       });
       setSelection(null);
       setFrameKey((value) => value + 1);
@@ -338,12 +353,12 @@ function WebsiteCanvas() {
     if (!selection || selection.tag !== "a") return;
     if (kind === "text") {
       const element = frameRef.current?.contentDocument?.querySelector(selection.selector);
-      const text = element instanceof HTMLAnchorElement ? element.innerText.trim() : selection.value;
+      const text = isAnchor(element) ? element.innerText.trim() : selection.value;
       preview({ ...selection, kind, value: text });
       return;
     }
     const element = frameRef.current?.contentDocument?.querySelector(selection.selector);
-    const href = element instanceof HTMLAnchorElement ? element.getAttribute("href") ?? "/" : "/";
+    const href = isAnchor(element) ? element.getAttribute("href") ?? "/" : "/";
     preview({ ...selection, kind, value: href });
   }
 
@@ -388,6 +403,7 @@ function WebsiteCanvas() {
 
         <div className="grid min-h-[760px] xl:grid-cols-[210px_minmax(0,1fr)_330px]">
           <aside className="border-b border-white/10 p-3 xl:border-b-0 xl:border-r">
+            <label className="mb-4 block text-xs text-white/70">Language to edit<select value={locale} className="mt-2 w-full rounded-lg bg-[#15291f] p-2" onChange={(event) => { if (isLocale(event.target.value)) { setLocale(event.target.value); setSelection(null); } }}>{LOCALES.map((item) => <option key={item.id} value={item.id}>{item.native}</option>)}</select></label>
             <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35">Pages</p>
             <nav className="grid grid-cols-2 gap-1 sm:grid-cols-3 xl:grid-cols-1">
               {PAGES.map((item) => (
@@ -414,10 +430,10 @@ function WebsiteCanvas() {
               style={{ width: viewport === "mobile" ? "390px" : "100%", maxWidth: viewport === "mobile" ? "390px" : "1440px" }}
             >
               <iframe
-                key={`${page}-${frameKey}`}
+                key={`${page}-${locale}-${frameKey}`}
                 ref={frameRef}
                 title={`Live preview of ${page}`}
-                src={`${page}?hfm_visual_editor=1`}
+                src={`${page}?hfm_visual_editor=1&hfm_locale=${locale}`}
                 className="h-full w-full border-0 bg-white"
                 onLoad={wireFrame}
               />

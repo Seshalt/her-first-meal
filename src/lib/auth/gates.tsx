@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useState, type ReactNode } from "react";
 import { Navigate } from "@tanstack/react-router";
 import { authEnabled, signOut } from "./client";
@@ -19,8 +20,9 @@ export const STAFF_SIGN_IN_PATH = "/hearth";
 
 /** Render children only when a user is present (real session, or the disabled-auth dev user). */
 export function SignedIn({ children }: { children: ReactNode }) {
+  const localizeContent = useContentText();
   const { user } = useCurrentUserState();
-  return user ? <>{children}</> : null;
+  return user ? <>{localizeContent(children)}</> : null;
 }
 
 /**
@@ -28,9 +30,10 @@ export function SignedIn({ children }: { children: ReactNode }) {
  * cleared and there is no user). Hidden while the session is still loading.
  */
 export function SignedOut({ children }: { children: ReactNode }) {
+  const localizeContent = useContentText();
   const { user, isPending } = useCurrentUserState();
   if (isPending || user) return null;
-  return <>{children}</>;
+  return <>{localizeContent(children)}</>;
 }
 
 /**
@@ -51,6 +54,7 @@ export function RedirectToSignIn({ to = SIGN_IN_PATH }: { to?: string }) {
  * disabled-auth dev user has nothing to sign out of).
  */
 export function UserButton() {
+  const localizeContent = useContentText();
   const user = useCurrentUser();
   // Sign-out can take a moment (and can fail when deployed), so the control
   // shows it is working and cannot be fired twice.
@@ -59,19 +63,19 @@ export function UserButton() {
   const label = user.displayName ?? user.primaryEmail ?? "Account";
   return (
     <div className="flex items-center gap-2">
-      {user.profileImageUrl ? (
+      {localizeContent(user.profileImageUrl ? (
         <img
           src={user.profileImageUrl}
-          alt={label}
+          alt={localizeContent(label)}
           className="h-8 w-8 rounded-full object-cover"
         />
       ) : (
         <span className="grid h-8 w-8 place-items-center rounded-full bg-black/10 text-sm font-medium dark:bg-white/20">
-          {label.charAt(0).toUpperCase()}
+          {localizeContent(label.charAt(0).toUpperCase())}
         </span>
-      )}
-      <span className="text-sm font-medium">{label}</span>
-      {authEnabled && (
+      ))}
+      <span className="text-sm font-medium">{localizeContent(label)}</span>
+      {localizeContent(authEnabled && (
         <button
           type="button"
           disabled={signingOut}
@@ -82,9 +86,9 @@ export function UserButton() {
           }}
           className="cursor-pointer text-sm underline-offset-4 opacity-70 hover:underline disabled:cursor-wait disabled:no-underline"
         >
-          {signingOut ? "Signing out…" : "Sign out"}
+          {localizeContent(signingOut ? "Signing out…" : "Sign out")}
         </button>
-      )}
+      ))}
     </div>
   );
 }

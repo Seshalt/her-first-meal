@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -34,21 +35,23 @@ export function RoomHero({
   alt: string;
   tone?: RoomTone;
 }) {
+  const localizeContent = useContentText();
   return (
     <section className="relative min-h-[44vh] overflow-hidden text-paper md:min-h-[52vh]">
-      <img src={src} alt={alt} className="media absolute inset-0 h-full w-full object-cover" />
+      <img src={src} alt={localizeContent(alt)} className="media absolute inset-0 h-full w-full object-cover" />
       <div className={cn("pointer-events-none absolute inset-0", VEIL[tone])} />
       <div className="relative mx-auto flex min-h-[44vh] max-w-5xl flex-col justify-end px-5 pb-12 pt-20 md:min-h-[52vh] md:px-10 md:pb-16">
-        {kicker ? <p className={cn("text-xs uppercase tracking-[0.32em]", KICKER[tone])}>{kicker}</p> : null}
-        <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.4rem)] leading-[0.95]">{title}</h1>
-        {body ? <p className="mt-5 max-w-xl text-lg leading-relaxed text-paper/88 md:text-xl">{body}</p> : null}
+        {localizeContent(kicker ? <p className={cn("text-xs uppercase tracking-[0.32em]", KICKER[tone])}>{localizeContent(kicker)}</p> : null)}
+        <h1 className="mt-4 font-display text-[clamp(2.6rem,7vw,5.4rem)] leading-[0.95]">{localizeContent(title)}</h1>
+        {localizeContent(body ? <p className="mt-5 max-w-xl text-lg leading-relaxed text-paper/88 md:text-xl">{localizeContent(body)}</p> : null)}
       </div>
     </section>
   );
 }
 
 export function RoomBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("mx-auto max-w-5xl px-5 py-14 md:px-10 md:py-20", className)}>{children}</div>;
+  const localizeContent = useContentText();
+  return <div className={cn("mx-auto max-w-5xl px-5 py-14 md:px-10 md:py-20", className)}>{localizeContent(children)}</div>;
 }
 
 export function Pill({
@@ -62,6 +65,7 @@ export function Pill({
   onClick: () => void;
   tone?: RoomTone;
 }) {
+  const localizeContent = useContentText();
   const activeClass =
     tone === "clay"
       ? "bg-clay text-paper"
@@ -81,7 +85,7 @@ export function Pill({
         active ? activeClass : "bg-secondary text-foreground hover:bg-mist",
       )}
     >
-      {children}
+      {localizeContent(children)}
     </button>
   );
 }
@@ -95,6 +99,7 @@ export function Kicker({
   tone?: "earth" | "clay" | "blush" | "plum" | "sea" | "gold";
   className?: string;
 }) {
+  const localizeContent = useContentText();
   const color =
     tone === "clay"
       ? "text-clay"
@@ -107,5 +112,5 @@ export function Kicker({
             : tone === "gold"
               ? "text-gold"
               : "text-earth";
-  return <p className={cn("text-xs uppercase tracking-[0.32em]", color, className)}>{children}</p>;
+  return <p className={cn("text-xs uppercase tracking-[0.32em]", color, className)}>{localizeContent(children)}</p>;
 }

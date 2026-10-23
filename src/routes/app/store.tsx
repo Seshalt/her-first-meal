@@ -1,3 +1,5 @@
+import { useI18n } from "@/lib/i18n/provider";
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,27 +12,29 @@ import { altFor } from "@/lib/landing";
 export const Route = createFileRoute("/app/store")({ component: Store });
 
 function Store() {
+  const localizeContent = useContentText();
+  const { locale } = useI18n();
   const [data, setData] = useState<Awaited<ReturnType<typeof listStore>> | null>(null);
   const [paying, setPaying] = useState<number | null>(null);
   useEffect(() => {
     void listStore().then(setData);
   }, []);
-  if (!data) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">Opening the shop…</p>;
+  if (!data) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">{localizeContent("Opening the shop…")}</p>;
   const meetings = data.products.filter((p) => p.kind === "consultation" || p.slug === "consultation");
   return (
     <div>
       <RoomHero
-        kicker="The only extra"
-        title="A meeting with Maat"
-        body="Membership already includes the table, the studio, personal support, and the pantry. A private live session with Maat is the only optional service billed separately."
+        kicker={localizeContent("The only extra")}
+        title={localizeContent("A meeting with Maat")}
+        body={localizeContent("Membership already includes the table, the studio, personal support, and the pantry. A private live session with Maat is the only optional service billed separately.")}
         src="/images/binding-hands.jpg"
-        alt={altFor("/images/binding-hands.jpg")}
+        alt={localizeContent(altFor("/images/binding-hands.jpg"))}
         tone="gold"
       />
       <div>
-        {meetings.length === 0 ? (
+        {localizeContent(meetings.length === 0 ? (
           <RoomBody>
-            <p className="font-display text-3xl text-ink-soft">No meeting times are priced yet.</p>
+            <p className="font-display text-3xl text-ink-soft">{localizeContent("No meeting times are priced yet.")}</p>
           </RoomBody>
         ) : (
           meetings.map((p, i) => (
@@ -38,16 +42,16 @@ function Store() {
               <div className={i % 2 === 1 ? "relative min-h-[42vh] lg:order-2" : "relative min-h-[42vh]"}>
                 <img
                   src={p.image || "/images/binding-hands.jpg"}
-                  alt={altFor(p.image || "/images/binding-hands.jpg", p.name)}
+                  alt={localizeContent(altFor(p.image || "/images/binding-hands.jpg", p.name))}
                   className="media absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <div className="flex flex-col justify-center bg-wash-blush px-5 py-16 md:px-16">
-                <p className="text-xs uppercase tracking-[0.32em] text-blush">Private session</p>
-                <h2 className="mt-4 font-display text-[clamp(2.2rem,4vw,3.8rem)]">{p.name}</h2>
-                <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{p.description}</p>
-                <p className="mt-6 font-display text-4xl tabular-nums">{formatCurrency(p.price_cents)}</p>
-                <p className="mt-2 text-sm text-ink-soft">Per session. Not included in membership. Payment is handled securely through Stripe.</p>
+                <p className="text-xs uppercase tracking-[0.32em] text-blush">{localizeContent("Private session")}</p>
+                <h2 className="mt-4 font-display text-[clamp(2.2rem,4vw,3.8rem)]">{localizeContent(p.name)}</h2>
+                <p className="mt-5 max-w-md text-lg leading-relaxed text-ink-soft">{localizeContent(p.description)}</p>
+                <p className="mt-6 font-display text-4xl tabular-nums">{localizeContent(formatCurrency(p.price_cents))}</p>
+                <p className="mt-2 text-sm text-ink-soft">{localizeContent("Per session. Not included in membership. Payment is handled securely through Stripe.")}</p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button
                     variant="blush"
@@ -60,40 +64,39 @@ function Store() {
                             window.location.assign(r.url);
                             return;
                           }
-                          toast.error("error" in r ? r.error : "Stripe could not open checkout.");
+                          toast.error(localizeContent("error" in r ? r.error : "Stripe could not open checkout."));
                         })
                         .finally(() => setPaying(null));
                     }}
                   >
-                    {paying === p.id ? "Opening Stripe…" : "Pay on Stripe"}
+                    {localizeContent(paying === p.id ? "Opening Stripe…" : "Pay on Stripe")}
                   </Button>
                   <Button asChild variant="outline">
-                    <Link to="/app/appointments">Pick a time</Link>
+                    <Link to="/app/appointments">{localizeContent("Pick a time")}</Link>
                   </Button>
                 </div>
-                {!data.stripeReady ? (
+                {localizeContent(!data.stripeReady ? (
                   <p className="mt-4 max-w-md text-sm text-ink-soft">
-                    Live-session checkout is temporarily unavailable. Your membership features are unaffected.
-                  </p>
-                ) : null}
+                    {localizeContent("Live-session checkout is temporarily unavailable. Your membership features are unaffected.")}</p>
+                ) : null)}
               </div>
             </article>
           ))
-        )}
+        ))}
       </div>
       <RoomBody>
-        <h2 className="font-display text-4xl">History</h2>
+        <h2 className="font-display text-4xl">{localizeContent("History")}</h2>
         <div className="editorial-rule editorial-rule-blush mt-6" />
         <ul>
-          {data.history.length === 0 ? (
-            <li className="py-8 text-lg text-ink-soft">No meetings purchased yet.</li>
+          {localizeContent(data.history.length === 0 ? (
+            <li className="py-8 text-lg text-ink-soft">{localizeContent("No meetings purchased yet.")}</li>
           ) : (
             data.history.map((h) => (
               <li key={h.id} className="border-b border-border py-6 text-lg">
-                {formatCurrency(h.amount_cents)} · {h.status} · {new Date(h.created_at).toLocaleDateString()}
+                {localizeContent(formatCurrency(h.amount_cents))} · {localizeContent(h.status)} · {localizeContent(new Date(h.created_at).toLocaleDateString(locale === "yue" ? "zh-HK" : locale))}
               </li>
             ))
-          )}
+          ))}
         </ul>
       </RoomBody>
     </div>
