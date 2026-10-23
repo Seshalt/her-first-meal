@@ -1907,5 +1907,12 @@
   "· Week": "· Неделя",
   "· estimated": "· ориентировочно",
   "· running low": "· запас заканчивается",
-  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() will reject every request (fail closed) rather than"
+  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() will reject every request (fail closed) rather than",
+  ". For privacy or account questions, use the Contact page.": ". По вопросам конфиденциальности или учетной записи воспользуйтесь страницей Контакты.",
+  ". Tap to undo": ". Нажмите, чтобы отменить",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". Вы можете использовать свое текущее местоположение для однократного поиска поблизости или сразу открыть один из сохраненных магазинов.",
+  "/ month": "/ месяц",
+  "/ session": "/ сеанс",
+  "/ year": "/ год",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Сервис использует информацию, которую вы решили сохранить, — например, этап беременности или послеродового периода, предпочтения в питании, продукты, которых вы избегаете или которые вам нравятся, размер домохозяйства, сведения о продуктах в кладовой, город или ZIP-код, предпочитаемые магазины и отметки о вашем состоянии, — чтобы подбирать материалы из встроенной библиотеки Her First Meal и организовывать ваш опыт участия."
 }

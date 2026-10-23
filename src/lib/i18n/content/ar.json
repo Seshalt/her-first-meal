@@ -1907,5 +1907,12 @@
   "· Week": "· أسبوع",
   "· estimated": "· تقديري",
   "· running low": "· أوشك على النفاد",
-  "— requireUserId() will reject every request (fail closed) rather than": "— سترفض requireUserId() كل طلب (مع الإخفاق الآمن) بدلًا من"
+  "— requireUserId() will reject every request (fail closed) rather than": "— سترفض requireUserId() كل طلب (مع الإخفاق الآمن) بدلًا من",
+  ". For privacy or account questions, use the Contact page.": ". للأسئلة المتعلقة بالخصوصية أو الحساب، يُرجى استخدام صفحة التواصل.",
+  ". Tap to undo": ". اضغط للتراجع",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". يمكنك استخدام موقعك الحالي لإجراء بحث لمرة واحدة عن الأماكن القريبة، أو فتح أحد متاجرك المحفوظة مباشرةً.",
+  "/ month": "/ شهر",
+  "/ session": "/ جلسة",
+  "/ year": "/ سنة",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "تستخدم الخدمة المعلومات التي تختار حفظها — مثل مرحلة الحمل أو ما بعد الولادة، والتفضيلات الغذائية، والأطعمة التي تتجنبها أو تستمتع بها، وحجم الأسرة، ومعلومات مخزون المؤن، والمدينة أو الرمز البريدي (ZIP code)، والمتاجر المفضلة، وتسجيلات المتابعة — لاختيار محتوى من المكتبة المدمجة في Her First Meal وتنظيم تجربتك كعضو."
 }

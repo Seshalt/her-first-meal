@@ -1907,5 +1907,12 @@
   "· Week": "· Tuần",
   "· estimated": "· ước tính",
   "· running low": "· sắp hết",
-  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() sẽ từ chối mọi yêu cầu (mặc định từ chối khi có lỗi) thay vì"
+  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() sẽ từ chối mọi yêu cầu (mặc định từ chối khi có lỗi) thay vì",
+  ". For privacy or account questions, use the Contact page.": ". Nếu có thắc mắc về quyền riêng tư hoặc tài khoản, hãy sử dụng trang Liên hệ.",
+  ". Tap to undo": ". Nhấn để hoàn tác",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". Bạn có thể sử dụng vị trí hiện tại để tìm kiếm các địa điểm gần đó một lần, hoặc mở trực tiếp một trong các cửa hàng đã lưu.",
+  "/ month": "/ tháng",
+  "/ session": "/ buổi",
+  "/ year": "/ năm",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Dịch vụ sử dụng thông tin bạn chọn lưu — chẳng hạn như giai đoạn mang thai hoặc sau sinh, sở thích ăn uống, thực phẩm bạn tránh hoặc yêu thích, số người trong hộ gia đình, thông tin về thực phẩm dự trữ, thành phố hoặc mã ZIP, cửa hàng ưu tiên và thông tin cập nhật — để chọn nội dung từ thư viện tích hợp sẵn của Her First Meal và sắp xếp trải nghiệm thành viên của bạn."
 }

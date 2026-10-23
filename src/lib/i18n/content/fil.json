@@ -1907,5 +1907,12 @@
   "· Week": "· Linggo",
   "· estimated": "· tinatayang",
   "· running low": "· paubos na",
-  "— requireUserId() will reject every request (fail closed) rather than": "— tatanggihan ng requireUserId() ang bawat kahilingan (fail closed) sa halip na"
+  "— requireUserId() will reject every request (fail closed) rather than": "— tatanggihan ng requireUserId() ang bawat kahilingan (fail closed) sa halip na",
+  ". For privacy or account questions, use the Contact page.": ". Para sa mga tanong tungkol sa privacy o account, gamitin ang pahina ng Makipag-ugnayan.",
+  ". Tap to undo": ". I-tap upang ibalik",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". Maaari mong gamitin ang kasalukuyan mong lokasyon para sa isang beses na paghahanap ng mga kalapit na lugar, o direktang buksan ang isa sa mga tindahang na-save mo.",
+  "/ month": "/ buwan",
+  "/ session": "/ sesyon",
+  "/ year": "/ taon",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Ginagamit ng serbisyo ang impormasyong pinili mong i-save — gaya ng yugto ng pagbubuntis o postpartum, mga kagustuhan sa pagkain, mga pagkaing iniiwasan o gustong kainin, laki ng sambahayan, impormasyon tungkol sa mga pagkaing nakaimbak sa bahay, lungsod o ZIP code, mga gustong tindahan, at mga check-in — upang pumili ng content mula sa built-in na library ng Her First Meal at ayusin ang iyong karanasan bilang miyembro."
 }

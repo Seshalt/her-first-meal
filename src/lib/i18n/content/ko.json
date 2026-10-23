@@ -1907,5 +1907,12 @@
   "· Week": "· 주",
   "· estimated": "· 예상",
   "· running low": "· 얼마 남지 않음",
-  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId()는 모든 요청을 거부합니다(안전하게 실패). …하는 대신"
+  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId()는 모든 요청을 거부합니다(안전하게 실패). …하는 대신",
+  ". For privacy or account questions, use the Contact page.": ". 개인정보 보호 또는 계정 관련 문의는 문의 페이지를 이용하세요.",
+  ". Tap to undo": ". 탭하여 실행 취소",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". 현재 위치를 사용해 한 번 주변을 검색하거나, 저장해 둔 매장 중 하나를 바로 열 수 있습니다.",
+  "/ month": "/ 월",
+  "/ session": "/ 세션",
+  "/ year": "/ 년",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "이 서비스는 회원님이 저장하기로 선택한 정보(예: 임신 또는 산후 단계, 식단 선호도, 피하거나 즐겨 먹는 음식, 가구원 수, 식료품 저장 공간 정보, 도시 또는 ZIP 코드, 선호하는 매장, 체크인 기록)를 사용하여 Her First Meal에 내장된 라이브러리에서 콘텐츠를 선택하고 회원 경험을 구성합니다."
 }

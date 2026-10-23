@@ -1907,5 +1907,12 @@
   "· Week": "· Semana",
   "· estimated": "· estimado",
   "· running low": "· estoque baixo",
-  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() will reject every request (fail closed) rather than"
+  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() will reject every request (fail closed) rather than",
+  ". For privacy or account questions, use the Contact page.": ". Para questões sobre privacidade ou sua conta, use a página de contato.",
+  ". Tap to undo": ". Toque para desfazer",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": ". Você pode usar sua localização atual para uma única busca nas proximidades ou abrir diretamente uma das lojas salvas.",
+  "/ month": "/ mês",
+  "/ session": "/ sessão",
+  "/ year": "/ ano",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "O serviço usa as informações que você escolhe salvar — como a fase da gestação ou do pós-parto, preferências alimentares, alimentos que evita ou aprecia, número de pessoas na família, informações sobre a despensa, cidade ou CEP, lojas preferidas e registros de acompanhamento — para selecionar conteúdo da biblioteca integrada da Her First Meal e organizar sua experiência como membro."
 }

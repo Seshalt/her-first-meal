@@ -78,8 +78,11 @@ Working audit, 2026-10-23. Stripe deliberately deferred by owner.
 
 - All 17 non-English shared interface packs explicitly contain every one of the 157 English message keys with matching placeholders.
 - Customer route/component copy now uses static editorial dictionaries, loaded once per selected locale. No translation API is called by the customer application.
-- Inventory covers 1,909 editorial strings, template strings, dynamic category/status labels and public authentication errors.
+- Inventory covers 1,916 editorial strings, template strings, dynamic category/status labels and public authentication errors.
 - Dates in member pages and receipts use the selected app language, including Cantonese zh-HK.
 - Fixed cross-frame element checks in the visual editor: parent-window instanceof checks rejected valid elements from the iframe. Tag/node checks now work across frames.
 - Added an admin language selector and separate saved visual overrides per locale. English edits remain the base; language-specific edits override them.
-- Production language deployment and browser verification are pending.
+- Production language deployment 0985dca is READY and assigned to www.herfirstmeal.app. All 18 doula language selections verified in cloud browser, including Arabic RTL and Cantonese zh-HK. Spanish/French/Arabic audits covered all 11 public pages; found and fixed pricing cadence, privacy prose and a terms paragraph missed by inventory heuristics. Remaining authenticated and mobile checks still require owner sign-in.
+
+- Final source gates for localization: typecheck and lint passed, 48 tests passed, build passed, full npm audit zero vulnerabilities.
+- The locale inventories are static. Every language contains all 157 shared keys and all 1,916 inventoried editorial strings with matching placeholders.

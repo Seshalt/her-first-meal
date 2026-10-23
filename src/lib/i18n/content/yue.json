@@ -1907,5 +1907,12 @@
   "· Week": "· 週",
   "· estimated": "· 預計",
   "· running low": "· 存量偏低",
-  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() 會拒絕每個請求（採取封閉失敗方式），而不是"
+  "— requireUserId() will reject every request (fail closed) rather than": "— requireUserId() 會拒絕每個請求（採取封閉失敗方式），而不是",
+  ". For privacy or account questions, use the Contact page.": "。如有私隱或帳戶方面的問題，請使用「聯絡」頁面。",
+  ". Tap to undo": "。點按以復原",
+  ". You can use your current location for a one-time nearby search, or open one of your saved stores directly.": "。你可以使用目前的位置進行一次附近搜尋，或直接開啟已儲存的商店之一。",
+  "/ month": "/ 月",
+  "/ session": "/ 節",
+  "/ year": "/ 年",
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "此服務會使用你選擇儲存的資料——例如懷孕或產後階段、飲食偏好、避免或喜愛的食物、家庭人數、食品儲備資料、城市或郵遞區號、偏好的商店，以及簽到紀錄——從 Her First Meal 的內置資料庫中挑選內容，並安排你的會員體驗。"
 }

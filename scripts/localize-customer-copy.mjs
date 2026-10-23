@@ -10,8 +10,7 @@ function human(value) {
   const s = value.trim();
   if (new Set("any low medium steady walking stretching mobility yoga breathing pelvic strength recovery confirmed cancelled completed pending paid unpaid refunded front side back left right cup cups tbsp tsp oz lb g kg ml l can cans clove cloves bunch pinch piece pieces slice slices serving servings energy min vegan vegetarian pescatarian halal kosher gluten-free dairy-free nut-free soy-free".split(" ")).has(s)) return true;
   if (!s || s.length > 2400 || ignoredNames.has(s) || !/[A-Za-z]/.test(s)) return false;
-  if (/^(?:https?:|mailto:|tel:|[/@.#])/.test(s) || /\S+@\S+\.\S+/.test(s)) return false;
-  if (/\b(?:select|insert|update|delete|create table|alter table)\b/i.test(s) && /\b(?:from|where|into|set|table)\b/i.test(s)) return false;
+  if (/^(?:https?:|mailto:|tel:|@|[/\.#]\S)/.test(s) || /\S+@\S+\.\S+/.test(s)) return false;
   if (/(?:\b(?:bg|text|font|border|rounded|shadow|size|gap|px|py|mt|mb|max-w|min-h|grid-cols|items|justify)-|(?:sm|md|lg|xl):|^\w+\/\w+)/.test(s)) return false;
   if (/^[\w./:$#{}()[\]<>+=,;?-]+$/.test(s) && !/^[A-Z][a-z]+(?:[-'][a-z]+)?$/.test(s) && !/^[A-Z]{2,15}$/.test(s)) return false;
   return /[A-Za-z]{2}/.test(s);
