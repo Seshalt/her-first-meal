@@ -1,7 +1,9 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useRef, type HTMLAttributes, type MouseEvent } from "react";
 import { cn } from "@/lib/utils";
 
 export function TiltCard({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const localizeContent = useContentText();
   const ref = useRef<HTMLDivElement>(null);
 
   const onMove = (e: MouseEvent) => {
@@ -30,7 +32,7 @@ export function TiltCard({ className, children, ...props }: HTMLAttributes<HTMLD
       )}
       {...props}
     >
-      {children}
+      {localizeContent(children)}
     </div>
   );
 }

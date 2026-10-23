@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
@@ -11,6 +12,7 @@ import { useT } from "@/lib/i18n/provider";
 import { LOCALES } from "@/lib/i18n/locales";
 
 export function PublicNav({ overlay = false, cinematic = false }: { overlay?: boolean; cinematic?: boolean }) {
+  const localizeContent = useContentText();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const t = useT();
   const { site } = usePublicSite();
@@ -83,8 +85,8 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
     >
       <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-3 px-4 md:h-[5.25rem] md:px-6">
         <Wordmark mark className={cn("min-w-0", ink)} />
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
-          {links.map((l) => (
+        <nav className="hidden items-center gap-7 lg:flex" aria-label={localizeContent("Primary")}>
+          {localizeContent(links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
@@ -94,9 +96,9 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
                 pathname === l.to && (darkNav ? "text-paper" : "text-foreground"),
               )}
             >
-              {l.label}
+              {localizeContent(l.label)}
             </Link>
-          ))}
+          )))}
         </nav>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">
           <LocaleSwitch tone={darkNav ? "paper" : "ink"} className="hidden md:inline-flex" />
@@ -109,7 +111,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
                 ink,
               )}
             >
-              {t("nav.signIn")}
+              {localizeContent(t("nav.signIn"))}
             </Link>
           </SignedOut>
           <SignedIn>
@@ -120,7 +122,7 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
                 ink,
               )}
             >
-              {t("nav.home")}
+              {localizeContent(t("nav.home"))}
             </Link>
           </SignedIn>
           <Link
@@ -130,55 +132,56 @@ export function PublicNav({ overlay = false, cinematic = false }: { overlay?: bo
               darkNav ? "bg-gold text-ink hover:bg-paper" : "bg-primary text-primary-foreground hover:bg-sea-deep",
             )}
           >
-            {t("cta")}
+            {localizeContent(t("cta"))}
           </Link>
           <button
             type="button"
             className={cn("relative z-[90] grid size-12 place-items-center rounded-full lg:hidden", ink)}
             aria-expanded={open}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={localizeContent(open ? "Close menu" : "Open menu")}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="size-6" /> : <Menu className="size-6" />}
+            {localizeContent(open ? <X className="size-6" /> : <Menu className="size-6" />)}
           </button>
         </div>
       </div>
 
-      {open ? (
+      {localizeContent(open ? (
         <div className={cn("fixed inset-0 z-[100] flex flex-col", stayDark ? "bg-ink text-paper" : "bg-background text-foreground")}>
           <div className="flex h-16 items-center justify-between px-4">
             <Wordmark mark className={stayDark ? "text-paper" : undefined} />
-            <button type="button" className="grid size-12 place-items-center rounded-full" aria-label="Close menu" onClick={() => setOpen(false)}>
+            <button type="button" className="grid size-12 place-items-center rounded-full" aria-label={localizeContent("Close menu")} onClick={() => setOpen(false)}>
               <X className="size-6" />
             </button>
           </div>
-          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-10 pt-6" aria-label="Mobile">
-            {links.map((l) => (
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-10 pt-6" aria-label={localizeContent("Mobile")}>
+            {localizeContent(links.map((l) => (
               <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-2xl px-3 py-4 font-display text-3xl">
-                {l.label}
+                {localizeContent(l.label)}
               </Link>
-            ))}
+            )))}
             <Link to="/pricing" onClick={() => setOpen(false)} className="mt-6 rounded-full bg-primary px-5 py-4 text-center text-base font-medium text-primary-foreground">
-              {t("cta")}
+              {localizeContent(t("cta"))}
             </Link>
             <SignedOut>
               <Link to="/login" search={{}} onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
-                {t("nav.signIn")}
+                {localizeContent(t("nav.signIn"))}
               </Link>
             </SignedOut>
             <SignedIn>
               <Link to="/app" onClick={() => setOpen(false)} className="mt-2 rounded-2xl px-3 py-4 text-lg">
-                {t("nav.home")}
+                {localizeContent(t("nav.home"))}
               </Link>
             </SignedIn>
           </nav>
         </div>
-      ) : null}
+      ) : null)}
     </header>
   );
 }
 
 export function PublicFooter() {
+  const localizeContent = useContentText();
   const { site, content } = usePublicSite();
   const t = useT();
   const instagram = publicHttpUrl(site.instagramUrl);
@@ -187,18 +190,18 @@ export function PublicFooter() {
     <footer className="relative overflow-hidden bg-ink text-paper">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_280px_at_10%_0%,rgba(212,162,74,0.12),transparent_60%),radial-gradient(640px_240px_at_90%_100%,rgba(42,117,108,0.16),transparent_55%)]" />
 
-      <section className="relative border-b border-white/10 px-4 py-12 md:px-6" aria-label="Languages">
+      <section className="relative border-b border-white/10 px-4 py-12 md:px-6" aria-label={localizeContent("Languages")}>
         <div className="mx-auto max-w-6xl">
-          <p className="text-xs uppercase tracking-[0.24em] text-gold">18 languages · one home</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-gold">{localizeContent("18 languages · one home")}</p>
           <p className="mt-4 max-w-3xl font-display text-3xl leading-tight text-paper md:text-4xl">
-            {t("footer.languages")}
+            {localizeContent(t("footer.languages"))}
           </p>
-          <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-xs text-paper/55" aria-label="Available languages">
-            {LOCALES.map((language) => (
+          <div className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-xs text-paper/55" aria-label={localizeContent("Available languages")}>
+            {localizeContent(LOCALES.map((language) => (
               <span key={language.id} lang={language.id === "yue" ? "zh-HK" : language.id}>
-                {language.native}
+                {localizeContent(language.native)}
               </span>
-            ))}
+            )))}
           </div>
         </div>
       </section>
@@ -207,37 +210,37 @@ export function PublicFooter() {
         <div className="md:col-span-2">
           <Wordmark stacked className="text-paper" />
           <p className="mt-5 max-w-md text-sm leading-relaxed text-paper/70">
-            {content.headlineAccent} {t("footer.blurb")}
+            {localizeContent(content.headlineAccent)} {localizeContent(t("footer.blurb"))}
           </p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerVisit}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">{localizeContent(site.footerVisit)}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
-            <li><Link to="/about">{t("footer.story")}</Link></li>
-            <li><Link to="/belly-binding">{site.footerStudio}</Link></li>
-            <li><Link to="/doula">{site.footerDoula}</Link></li>
-            <li><Link to="/nouri">{t("footer.write")}</Link></li>
-            <li><Link to="/pricing">{t("footer.membership")}</Link></li>
-            <li><Link to="/contact">{t("footer.contact")}</Link></li>
+            <li><Link to="/about">{localizeContent(t("footer.story"))}</Link></li>
+            <li><Link to="/belly-binding">{localizeContent(site.footerStudio)}</Link></li>
+            <li><Link to="/doula">{localizeContent(site.footerDoula)}</Link></li>
+            <li><Link to="/nouri">{localizeContent(t("footer.write"))}</Link></li>
+            <li><Link to="/pricing">{localizeContent(t("footer.membership"))}</Link></li>
+            <li><Link to="/contact">{localizeContent(t("footer.contact"))}</Link></li>
           </ul>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gold">{site.footerConnect}</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold">{localizeContent(site.footerConnect)}</p>
           <ul className="mt-4 space-y-3 text-sm text-paper/80">
-            {instagram ? <li><a href={instagram} target="_blank" rel="noreferrer">{site.instagramLabel}</a></li> : null}
-            {tiktok ? <li><a href={tiktok} target="_blank" rel="noreferrer">{site.tiktokLabel}</a></li> : null}
-            <li><Link to="/contact">{t("footer.contact")}</Link></li>
-            <li><Link to="/login" search={{}}>{site.footerSignIn}</Link></li>
-            <li><Link to="/privacy">{t("footer.privacy")}</Link></li>
-            <li><Link to="/terms">Terms</Link></li>
-            <li><Link to="/cookies">Cookies</Link></li>
-            <li><Link to="/accessibility">Accessibility</Link></li>
+            {localizeContent(instagram ? <li><a href={instagram} target="_blank" rel="noreferrer">{localizeContent(site.instagramLabel)}</a></li> : null)}
+            {localizeContent(tiktok ? <li><a href={tiktok} target="_blank" rel="noreferrer">{localizeContent(site.tiktokLabel)}</a></li> : null)}
+            <li><Link to="/contact">{localizeContent(t("footer.contact"))}</Link></li>
+            <li><Link to="/login" search={{}}>{localizeContent(site.footerSignIn)}</Link></li>
+            <li><Link to="/privacy">{localizeContent(t("footer.privacy"))}</Link></li>
+            <li><Link to="/terms">{localizeContent("Terms")}</Link></li>
+            <li><Link to="/cookies">{localizeContent("Cookies")}</Link></li>
+            <li><Link to="/accessibility">{localizeContent("Accessibility")}</Link></li>
           </ul>
         </div>
       </div>
       <div className="relative border-t border-white/10 px-4 py-6 text-center text-xs text-paper/50">
-        <p>{site.footerCopyright}</p>
-        <p className="mt-2">{site.footerLegal}</p>
+        <p>{localizeContent(site.footerCopyright)}</p>
+        <p className="mt-2">{localizeContent(site.footerLegal)}</p>
       </div>
     </footer>
   );

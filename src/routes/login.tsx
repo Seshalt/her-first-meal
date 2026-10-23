@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const localizeContent = useContentText();
   const { user, isPending } = useCurrentUserState();
   const { site, content } = usePublicSite();
   const navigate = useNavigate();
@@ -65,7 +67,7 @@ function Login() {
     e.preventDefault();
     if (guard.honey.trim()) return;
     if (!guard.human) {
-      toast.error("Please confirm you are a person.");
+      toast.error(localizeContent("Please confirm you are a person."));
       return;
     }
     setBusy(true);
@@ -81,14 +83,14 @@ function Login() {
       const status = await requestEmailFactor();
       if (status.needed) {
         setFactor(status);
-        toast.success(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in.");
+        toast.success(localizeContent(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in."));
         return;
       }
       window.location.replace("/app");
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);
-      toast.error(message);
+      toast.error(localizeContent(message));
     } finally {
       setBusy(false);
     }
@@ -101,23 +103,23 @@ function Login() {
         <div className="relative hidden min-h-dvh overflow-hidden text-paper lg:block">
           <img
             src={content.images.login}
-            alt={content.alts.login}
+            alt={localizeContent(content.alts.login)}
             className="media absolute inset-0 h-full w-full object-cover"
           />
           <div className="hero-veil pointer-events-none absolute inset-0" />
           <div className="relative flex min-h-dvh flex-col justify-end px-12 pb-16 pt-32">
-            <p className="text-xs uppercase tracking-[0.32em] text-aqua">{site.loginKicker}</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-aqua">{localizeContent(site.loginKicker)}</p>
             <p className="mt-6 max-w-md font-display text-5xl leading-[1.05]">
-              {site.loginPhotoLine}
+              {localizeContent(site.loginPhotoLine)}
             </p>
           </div>
         </div>
         <div className="flex min-h-dvh flex-col justify-center bg-wash-linen px-5 py-28 md:px-16">
-          <p className="text-xs uppercase tracking-[0.32em] text-clay">{site.loginEyebrow}</p>
-          <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{site.loginTitle}</h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{site.loginBody}</p>
+          <p className="text-xs uppercase tracking-[0.32em] text-clay">{localizeContent(site.loginEyebrow)}</p>
+          <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{localizeContent(site.loginTitle)}</h1>
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{localizeContent(site.loginBody)}</p>
           <div className="editorial-rule mt-8" />
-          {factor?.needed ? (
+          {localizeContent(factor?.needed ? (
             <EmailFactorForm
               emailMasked={factor.emailMasked}
               sent={factor.sent}
@@ -129,9 +131,9 @@ function Login() {
             />
           ) : (
             <>
-          {authEnabled ? (
+          {localizeContent(authEnabled ? (
             <div className="mt-10 space-y-3">
-              {GROK_PROVIDERS.map((p) => (
+              {localizeContent(GROK_PROVIDERS.map((p) => (
                 <Button
                   key={p.providerId}
                   type="button"
@@ -139,16 +141,16 @@ function Login() {
                   className="w-full max-w-md"
                   onClick={() => void signIn(p.providerId, { callbackURL: "/login" })}
                 >
-                  Continue with {p.label}
+                  {localizeContent("Continue with ")}{localizeContent(p.label)}
                 </Button>
-              ))}
+              )))}
             </div>
           ) : (
-            <p className="mt-6 text-sm text-muted-foreground">Sign-in is disabled.</p>
-          )}
+            <p className="mt-6 text-sm text-muted-foreground">{localizeContent("Sign-in is disabled.")}</p>
+          ))}
           <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{localizeContent("Email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -159,7 +161,7 @@ function Login() {
               />
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{localizeContent("Password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -172,8 +174,7 @@ function Login() {
             </div>
             <div className="-mt-1 text-right">
               <Link to="/forgot-password" className="text-xs text-primary underline-offset-4 hover:underline">
-                Forgot password?
-              </Link>
+                {localizeContent("Forgot password?")}</Link>
             </div>
             <HumanCheck
               checked={guard.human}
@@ -181,23 +182,22 @@ function Login() {
               honey={guard.honey}
               onHoney={guard.setHoney}
             />
-            {formError ? (
+            {localizeContent(formError ? (
               <p className="rounded-xl bg-clay px-4 py-3 text-sm text-paper" role="alert">
-                {formError}
+                {localizeContent(formError)}
               </p>
-            ) : null}
+            ) : null)}
             <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
-              {busy ? "Entering…" : "Enter the house"}
+              {localizeContent(busy ? "Entering…" : "Enter the house")}
             </Button>
           </form>
           <p className="mt-8 max-w-md text-sm text-muted-foreground">
-            New here?{" "}
+            {localizeContent("New here?")}{localizeContent(" ")}
             <Link to="/pricing" className="text-primary">
-              Start your journey today
-            </Link>
+              {localizeContent("Start your journey today")}</Link>
           </p>
             </>
-          )}
+          ))}
         </div>
       </section>
       <PublicFooter />

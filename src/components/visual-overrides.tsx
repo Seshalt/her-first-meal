@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { getVisualOverrides, type VisualOverride } from "@/lib/server/visual-overrides";
+import { useI18n } from "@/lib/i18n/provider";
+import { useText } from "@/lib/i18n/use-text";
 
 function applyOne(edit: VisualOverride) {
   let element: Element | null = null;
@@ -28,6 +30,8 @@ function applyOne(edit: VisualOverride) {
 }
 
 export function VisualOverrides() {
+  const { locale } = useI18n();
+  const translate = useText();
   const pathname = useLocation({ select: (location) => location.pathname });
 
   useEffect(() => {
@@ -37,12 +41,12 @@ export function VisualOverrides() {
     let observer: MutationObserver | null = null;
     let queued = 0;
 
-    void getVisualOverrides({ data: { page: pathname } })
+    void getVisualOverrides({ data: { page: pathname, locale } })
       .then((overrides) => {
         if (cancelled) return;
         const edits = Object.values(overrides);
         const applyAll = () => {
-          for (const edit of edits) applyOne(edit);
+          for (const edit of edits) applyOne({ ...edit, value: edit.kind === "text" ? translate(edit.value) : edit.value, alt: edit.alt ? translate(edit.alt) : edit.alt });
         };
         applyAll();
         observer = new MutationObserver(() => {
@@ -60,7 +64,7 @@ export function VisualOverrides() {
       window.clearTimeout(queued);
       observer?.disconnect();
     };
-  }, [pathname]);
+  }, [pathname, locale, translate]);
 
   return null;
 }

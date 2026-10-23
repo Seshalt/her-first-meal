@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { RoomBody, RoomHero } from "@/components/layout/room-hero";
@@ -9,6 +10,7 @@ import { Input, Label } from "@/components/ui/input";
 export const Route = createFileRoute("/app/pantry")({ component: Pantry });
 
 function Pantry() {
+  const localizeContent = useContentText();
   const [items, setItems] = useState<Awaited<ReturnType<typeof listPantry>>>([]);
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -24,11 +26,11 @@ function Pantry() {
   return (
     <div>
       <RoomHero
-        kicker="The cupboard"
-        title="Virtual pantry"
-        body="Estimated quantities, never confirmed inventory. Edit anything. Data stays on your signed-in account."
+        kicker={localizeContent("The cupboard")}
+        title={localizeContent("Virtual pantry")}
+        body={localizeContent("Estimated quantities, never confirmed inventory. Edit anything. Data stays on your signed-in account.")}
         src="/images/family-table.jpg"
-        alt={altFor("/images/family-table.jpg")}
+        alt={localizeContent(altFor("/images/family-table.jpg"))}
         tone="clay"
       />
       <RoomBody>
@@ -43,20 +45,19 @@ function Pantry() {
           }}
         >
           <div>
-            <Label htmlFor="pname">Ingredient</Label>
+            <Label htmlFor="pname">{localizeContent("Ingredient")}</Label>
             <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div>
-            <Label htmlFor="pqty">Qty</Label>
+            <Label htmlFor="pqty">{localizeContent("Qty")}</Label>
             <Input id="pqty" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="punit">Unit</Label>
+            <Label htmlFor="punit">{localizeContent("Unit")}</Label>
             <Input id="punit" value={unit} onChange={(e) => setUnit(e.target.value)} />
           </div>
           <Button type="submit" className="self-end">
-            Add
-          </Button>
+            {localizeContent("Add")}</Button>
         </form>
         <Button
           type="button"
@@ -64,30 +65,27 @@ function Pantry() {
           className="mt-6"
           onClick={() => void stockPantryStaples().then(reload)}
         >
-          Stock kitchen staples
-        </Button>
+          {localizeContent("Stock kitchen staples")}</Button>
         <ul className="mt-12 divide-y divide-border">
-          {items.length === 0 ? (
+          {localizeContent(items.length === 0 ? (
             <li className="py-10 font-display text-2xl text-ink-soft">
-              Your pantry is empty. Add staples you already keep.
-            </li>
+              {localizeContent("Your pantry is empty. Add staples you already keep.")}</li>
           ) : (
             items.map((item) => (
               <li key={item.id} className="flex min-h-16 items-center justify-between gap-4 py-5">
                 <span>
-                  <span className="font-display text-2xl">{item.name}</span>
+                  <span className="font-display text-2xl">{localizeContent(item.name)}</span>
                   <span className="ml-3 text-sm text-muted-foreground">
-                    {item.quantity} {item.unit}
-                    {item.estimated ? " · estimated" : ""}
-                    {item.low ? " · running low" : ""}
+                    {localizeContent(item.quantity)} {localizeContent(item.unit)}
+                    {localizeContent(item.estimated ? " · estimated" : "")}
+                    {localizeContent(item.low ? " · running low" : "")}
                   </span>
                 </span>
                 <button type="button" className="text-sm text-muted-foreground" onClick={() => void removePantry({ data: { id: item.id } }).then(reload)}>
-                  Remove
-                </button>
+                  {localizeContent("Remove")}</button>
               </li>
             ))
-          )}
+          ))}
         </ul>
       </RoomBody>
     </div>

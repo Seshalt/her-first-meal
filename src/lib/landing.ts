@@ -66,7 +66,7 @@ export const LANDING_IMAGE_SLOTS = [
     id: "about",
     label: "About · Maat",
     fallback: "/images/about-portrait.jpg",
-    alt: "Indian woman cooking at a stove",
+    alt: "Portrait of a smiling woman outdoors",
   },
   {
     id: "doulaHero",

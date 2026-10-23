@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Check, LockKeyhole } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
@@ -53,6 +54,7 @@ export const Route = createFileRoute("/checkout")({
 });
 
 function Checkout() {
+  const localizeContent = useContentText();
   const { plan, preview, paid, session_id } = Route.useSearch();
   const mock = preview || isMemberWalk();
   const [printed, setPrinted] = useState(false);
@@ -79,8 +81,8 @@ function Checkout() {
         if (row.email) setEmail(row.email);
         setPrinted(true);
       })
-      .catch(() => toast.error("We could not confirm that Stripe payment yet."));
-  }, [paid, session_id]);
+      .catch(() => toast.error(localizeContent("We could not confirm that Stripe payment yet.")));
+  }, [paid, session_id, localizeContent]);
 
   useEffect(() => {
     void getPublicPricing()
@@ -107,12 +109,12 @@ function Checkout() {
         checkout = instance;
         instance.mount("#stripe-embedded-checkout");
       })
-      .catch((err) => toast.error(err instanceof Error ? err.message : "Secure payment form could not load."));
+      .catch((err) => toast.error(localizeContent(err instanceof Error ? err.message : "Secure payment form could not load.")));
     return () => {
       cancelled = true;
       checkout?.destroy();
     };
-  }, [embedded]);
+  }, [embedded, localizeContent]);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -136,17 +138,17 @@ function Checkout() {
       setJoinToken(res.token);
       if (res.stripeClientSecret && res.stripePublishableKey) {
         setEmbedded({ clientSecret: res.stripeClientSecret, publishableKey: res.stripePublishableKey });
-        toast.success("Secure Stripe checkout is ready below.");
+        toast.success(localizeContent("Secure Stripe checkout is ready below."));
         return;
       }
       if (res.stripeUrl) {
-        toast.success("Opening secure Stripe checkout…");
+        toast.success(localizeContent("Opening secure Stripe checkout…"));
         window.location.assign(res.stripeUrl);
         return;
       }
       setPrinted(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Checkout could not finish.");
+      toast.error(localizeContent(err instanceof Error ? err.message : "Checkout could not finish."));
     } finally {
       setBusy(false);
     }
@@ -155,7 +157,7 @@ function Checkout() {
   return (
     <div>
       <PublicNav />
-      {printed ? (
+      {localizeContent(printed ? (
         <div className="px-4 py-16">
           <ReceiptPrinter
             plan={plan}
@@ -180,34 +182,31 @@ function Checkout() {
               plan={plan}
               processing={busy}
             />
-            <p className="mt-10 text-xs uppercase tracking-[0.2em] text-earth">{site.checkoutKicker}</p>
-            <h1 className="mt-3 font-display text-4xl">{site.checkoutTitle}</h1>
+            <p className="mt-10 text-xs uppercase tracking-[0.2em] text-earth">{localizeContent(site.checkoutKicker)}</p>
+            <h1 className="mt-3 font-display text-4xl">{localizeContent(site.checkoutTitle)}</h1>
             <p className="mt-3 text-muted-foreground">
-              {plan === "yearly" ? "Yearly membership" : "Monthly membership"} — {formatCurrency(price)}
-              {plan === "yearly"
+              {localizeContent(plan === "yearly" ? "Yearly membership" : "Monthly membership")} — {localizeContent(formatCurrency(price))}
+              {localizeContent(plan === "yearly"
                 ? ` (${formatCurrency(yearlySavings(monthly, yearly).perMonthCents)}/month, save ${yearlySavings(monthly, yearly).percent}%).`
-                : "."}{" "}
-              Payment is securely processed by Stripe. After it clears, a receipt prints and you create your account.
-            </p>
+                : ".")}{localizeContent(" ")}
+              {localizeContent("Payment is securely processed by Stripe. After it clears, a receipt prints and you create your account.")}</p>
 
-            {embedded ? (
+            {localizeContent(embedded ? (
               <section className="mt-8 overflow-hidden rounded-[28px] border border-border bg-card p-3 shadow-[0_28px_80px_-35px_rgba(20,30,28,.45)]">
                 <div className="flex items-center gap-2 px-3 py-3 text-sm text-muted-foreground">
-                  <LockKeyhole className="size-4 text-primary" /> Secure embedded Stripe checkout
-                </div>
+                  <LockKeyhole className="size-4 text-primary" /> {localizeContent(" Secure embedded Stripe checkout")}</div>
                 <div id="stripe-embedded-checkout" className="min-h-[520px]" />
                 <Button type="button" variant="ghost" className="mt-2" onClick={() => setEmbedded(null)}>
-                  Change membership details
-                </Button>
+                  {localizeContent("Change membership details")}</Button>
               </section>
             ) : (
               <form onSubmit={submit} className="mt-8 space-y-4">
                 <div>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{localizeContent("Name")}</Label>
                   <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{localizeContent("Email")}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -218,8 +217,8 @@ function Checkout() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="code">Discount or gift code</Label>
-                  <Input id="code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Optional" />
+                  <Label htmlFor="code">{localizeContent("Discount or gift code")}</Label>
+                  <Input id="code" value={code} onChange={(e) => setCode(e.target.value)} placeholder={localizeContent("Optional")} />
                 </div>
                 <HumanCheck
                   checked={guard.human}
@@ -228,40 +227,37 @@ function Checkout() {
                   onHoney={guard.setHoney}
                 />
                 <Button type="submit" className="w-full" disabled={busy || !guard.human}>
-                  {busy ? "Preparing secure checkout…" : `Continue to payment · ${formatCurrency(price)}`}
+                  {localizeContent(busy ? "Preparing secure checkout…" : `Continue to payment · ${formatCurrency(price)}`)}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  Payment is processed by Stripe. Completing checkout means you agree to the{" "}
-                  <Link to="/terms" className="underline">terms</Link>{" "}
-                  and{" "}
-                  <Link to="/privacy" className="underline">privacy</Link>{" "}
-                  pages. Her First Meal personalizes your experience using the preferences you save. It is not medical care.
-                </p>
+                  {localizeContent("Payment is processed by Stripe. Completing checkout means you agree to the")}{localizeContent(" ")}
+                  <Link to="/terms" className="underline">{localizeContent("terms")}</Link>{localizeContent(" ")}
+                  {localizeContent("and")}{localizeContent(" ")}
+                  <Link to="/privacy" className="underline">{localizeContent("privacy")}</Link>{localizeContent(" ")}
+                  {localizeContent("pages. Her First Meal personalizes your experience using the preferences you save. It is not medical care.")}</p>
               </form>
-            )}
+            ))}
           </div>
           <aside className="rounded-[28px] bg-card p-6 shadow-[var(--shadow-border)]">
-            <h2 className="font-display text-2xl">{site.checkoutAside}</h2>
+            <h2 className="font-display text-2xl">{localizeContent(site.checkoutAside)}</h2>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              {(lines(site.pricingIncludes).length ? lines(site.pricingIncludes) : MEMBERSHIP_INCLUDES).map((item) => (
+              {localizeContent((lines(site.pricingIncludes).length ? lines(site.pricingIncludes) : MEMBERSHIP_INCLUDES).map((item) => (
                 <li key={item} className="flex gap-2">
                   <Check className="mt-0.5 size-4 shrink-0 text-clay" />
-                  <span>{item}</span>
+                  <span>{localizeContent(item)}</span>
                 </li>
-              ))}
+              )))}
             </ul>
             <p className="mt-6 rounded-2xl bg-wash-blush px-4 py-3 text-sm text-blush-deep">
-              The only extra after this is a private meeting with Maat — {formatCurrency(meeting)} per session,
-              booked inside the house. Nothing else is billed on top of membership.
-            </p>
+              {localizeContent("The only extra after this is a private meeting with Maat — ")}{localizeContent(formatCurrency(meeting))} {localizeContent(" per session, booked inside the house. Nothing else is billed on top of membership.")}</p>
             <p className="mt-4 text-sm text-muted-foreground">
-              Want the other cadence?{" "}
-              <Link to="/pricing" className="text-primary">Compare monthly and yearly</Link>
+              {localizeContent("Want the other cadence?")}{localizeContent(" ")}
+              <Link to="/pricing" className="text-primary">{localizeContent("Compare monthly and yearly")}</Link>
             </p>
-            <img src={content.images.checkout} alt={content.alts.checkout} className="media mt-6 h-48 w-full rounded-2xl object-cover" />
+            <img src={content.images.checkout} alt={localizeContent(content.alts.checkout)} className="media mt-6 h-48 w-full rounded-2xl object-cover" />
           </aside>
         </div>
-      )}
+      ))}
       <PublicFooter />
     </div>
   );

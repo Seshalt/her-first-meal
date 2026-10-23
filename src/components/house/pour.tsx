@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ export function Pour({
   count: number;
   onChange: (next: number) => void;
 }) {
+  const localizeContent = useContentText();
   const [stream, setStream] = useState(false);
   const filled = Math.min(GLASS_GOAL, Math.max(0, count));
   const full = filled >= GLASS_GOAL;
@@ -30,16 +32,15 @@ export function Pour({
   }
 
   return (
-    <section className="pour-hearth" aria-label="Hydration">
+    <section className="pour-hearth" aria-label={localizeContent("Hydration")}>
       <div className="pour-copy">
-        <p className="text-xs uppercase tracking-[0.32em] text-aqua">Hydration</p>
+        <p className="text-xs uppercase tracking-[0.32em] text-aqua">{localizeContent("Hydration")}</p>
         <h2 className="mt-3 font-display text-[clamp(2rem,5vw,3.4rem)] leading-[1.05] text-paper">
-          <span className="tabular-nums">{filled}</span>
-          <span className="text-paper/55"> of {GLASS_GOAL}</span>
+          <span className="tabular-nums">{localizeContent(filled)}</span>
+          <span className="text-paper/55"> {localizeContent(" of ")}{localizeContent(GLASS_GOAL)}</span>
         </h2>
         <p className="mt-3 max-w-sm text-sm leading-relaxed text-paper/75">
-          Pour a glass. Tap the last one to undo. No streak. No shame.
-        </p>
+          {localizeContent("Pour a glass. Tap the last one to undo. No streak. No shame.")}</p>
       </div>
 
       <div className="pour-stage">
@@ -48,14 +49,14 @@ export function Pour({
           className={cn("carafe", stream && "is-pouring", full && "is-resting")}
           onClick={pour}
           disabled={full}
-          aria-label={full ? "Eight glasses already poured" : "Pour a glass"}
+          aria-label={localizeContent(full ? "Eight glasses already poured" : "Pour a glass")}
         >
           <Carafe pouring={stream} />
-          <span className="carafe-label">{full ? "The pitcher is enough" : "Pour a glass"}</span>
+          <span className="carafe-label">{localizeContent(full ? "The pitcher is enough" : "Pour a glass")}</span>
         </button>
-        {stream ? <span className="pour-stream" aria-hidden /> : null}
+        {localizeContent(stream ? <span className="pour-stream" aria-hidden /> : null)}
         <ol className="pour-row">
-          {Array.from({ length: GLASS_GOAL }, (_, i) => {
+          {localizeContent(Array.from({ length: GLASS_GOAL }, (_, i) => {
             const isFull = i < filled;
             const isNext = i === filled;
             return (
@@ -65,11 +66,11 @@ export function Pour({
                   className={cn("tumbler", isFull && "is-full", isNext && stream && "is-filling")}
                   onClick={() => onGlass(i)}
                   aria-label={
-                    isFull
+                    localizeContent(isFull
                       ? `Glass ${i + 1}, poured${i === filled - 1 ? ". Tap to undo" : ""}`
                       : isNext
                         ? `Pour glass ${i + 1}`
-                        : `Glass ${i + 1}, waiting`
+                        : `Glass ${i + 1}, waiting`)
                   }
                   aria-pressed={isFull}
                 >
@@ -80,7 +81,7 @@ export function Pour({
                 </button>
               </li>
             );
-          })}
+          }))}
         </ol>
       </div>
     </section>

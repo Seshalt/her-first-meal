@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { PageCanvas } from "@/components/layout/page-canvas";
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/belly-binding")({
 });
 
 function BindingPage() {
+  const localizeContent = useContentText();
   const { site, content, bindingSteps } = usePublicSite();
   const steps =
     bindingSteps?.length > 0
@@ -41,36 +43,36 @@ function BindingPage() {
       <section>
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 md:grid-cols-2 md:pt-16">
           <div>
-            <Badge tone="blush">{site.bindPageKicker}</Badge>
-            <h1 className="mt-4 font-display text-5xl">{site.bindPageTitle}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{site.bindPageBody}</p>
+            <Badge tone="blush">{localizeContent(site.bindPageKicker)}</Badge>
+            <h1 className="mt-4 font-display text-5xl">{localizeContent(site.bindPageTitle)}</h1>
+            <p className="mt-4 text-lg text-muted-foreground">{localizeContent(site.bindPageBody)}</p>
             <Button asChild className="mt-8" variant="blush">
-              <Link to="/pricing">{site.bindPageCta}</Link>
+              <Link to="/pricing">{localizeContent(site.bindPageCta)}</Link>
             </Button>
           </div>
-          <img src={content.images.bindHero} alt={content.alts.bindHero} className="media h-80 w-full rounded-[32px] object-cover" />
+          <img src={content.images.bindHero} alt={localizeContent(content.alts.bindHero)} className="media h-80 w-full rounded-[32px] object-cover" />
         </div>
       </section>
       <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 md:grid-cols-2">
-        {steps.map((s, i) => (
+        {localizeContent(steps.map((s, i) => (
           <article key={s.title + String(i)} className="glass-panel overflow-hidden">
-            <img src={s.image} alt={s.alt} className="media h-44 w-full object-cover" loading="lazy" decoding="async" />
+            <img src={s.image} alt={localizeContent(s.alt)} className="media h-44 w-full object-cover" loading="lazy" decoding="async" />
             <div className="p-6">
-              <h2 className="font-display text-2xl">{s.title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
+              <h2 className="font-display text-2xl">{localizeContent(s.title)}</h2>
+              <p className="mt-2 text-sm text-muted-foreground">{localizeContent(s.body)}</p>
             </div>
           </article>
-        ))}
+        )))}
       </section>
       <section className="mx-auto max-w-3xl px-4 pb-16">
-        <h2 className="font-display text-3xl">{site.bindQuestions}</h2>
+        <h2 className="font-display text-3xl">{localizeContent(site.bindQuestions)}</h2>
         <dl className="mt-6 space-y-5">
-          {faqs.map((f) => (
+          {localizeContent(faqs.map((f) => (
             <div key={f.q} className="glass-panel p-5">
-              <dt className="font-medium">{f.q}</dt>
-              <dd className="mt-2 text-sm text-muted-foreground">{f.a}</dd>
+              <dt className="font-medium">{localizeContent(f.q)}</dt>
+              <dd className="mt-2 text-sm text-muted-foreground">{localizeContent(f.a)}</dd>
             </div>
-          ))}
+          )))}
         </dl>
       </section>
       </PageCanvas>

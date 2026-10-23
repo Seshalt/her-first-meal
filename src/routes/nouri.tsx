@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeartHandshake, ListChecks, MessageCircle, ShoppingBasket, Video, UtensilsCrossed } from "lucide-react";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
@@ -27,6 +28,7 @@ const SUPPORT = [
 ];
 
 function SupportMarketing() {
+  const localizeContent = useContentText();
   const { content } = usePublicSite();
   return (
     <div>
@@ -35,28 +37,27 @@ function SupportMarketing() {
         <section>
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 md:grid-cols-2 md:pt-16">
             <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-plum">Personal support</p>
-              <h1 className="mt-3 font-display text-5xl">Personalized support for the season you’re in.</h1>
+              <p className="text-xs uppercase tracking-[0.28em] text-plum">{localizeContent("Personal support")}</p>
+              <h1 className="mt-3 font-display text-5xl">{localizeContent("Personalized support for the season you’re in.")}</h1>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                Her First Meal brings together a deep recipe and wellness library, your dietary choices, your pregnancy or postpartum stage, and the stores you prefer. When you want a human, Maat is still here.
-              </p>
+                {localizeContent("Her First Meal brings together a deep recipe and wellness library, your dietary choices, your pregnancy or postpartum stage, and the stores you prefer. When you want a human, Maat is still here.")}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild variant="plum"><Link to="/pricing">Start your journey</Link></Button>
-                <Button asChild variant="outline"><Link to="/contact">Write Maat</Link></Button>
+                <Button asChild variant="plum"><Link to="/pricing">{localizeContent("Start your journey")}</Link></Button>
+                <Button asChild variant="outline"><Link to="/contact">{localizeContent("Write Maat")}</Link></Button>
               </div>
             </div>
-            <img src={content.images.nouriHero} alt={content.alts.nouriHero} className="media h-80 w-full rounded-[32px] object-cover" />
+            <img src={content.images.nouriHero} alt={localizeContent(content.alts.nouriHero)} className="media h-80 w-full rounded-[32px] object-cover" />
           </div>
         </section>
         <section className="pb-16">
           <div className="mx-auto grid max-w-6xl gap-4 px-4 sm:grid-cols-2 lg:grid-cols-3">
-            {SUPPORT.map(({ icon: Icon, title, body }) => (
+            {localizeContent(SUPPORT.map(({ icon: Icon, title, body }) => (
               <article key={title} className="glass-panel p-6 transition hover:-translate-y-1">
                 <Icon className="size-5 text-plum" />
-                <h2 className="mt-4 font-display text-2xl">{title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+                <h2 className="mt-4 font-display text-2xl">{localizeContent(title)}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{localizeContent(body)}</p>
               </article>
-            ))}
+            )))}
           </div>
         </section>
       </PageCanvas>

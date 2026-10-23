@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/pricing")({
 });
 
 function Pricing() {
+  const localizeContent = useContentText();
   const priced = Route.useLoaderData();
   const { site, content } = usePublicSite();
   const monthly = priced?.settings.monthlyPriceCents ?? 4900;
@@ -45,22 +47,22 @@ function Pricing() {
           <span />
         </div>
         <div className="pricing-photo">
-          <img src={content.images.pricing} alt={content.alts.pricing} />
+          <img src={content.images.pricing} alt={localizeContent(content.alts.pricing)} />
         </div>
         <div className="pricing-veil" />
 
         <div className="relative z-10 mx-auto w-full max-w-[74rem] text-center">
-          <p className="text-xs uppercase tracking-[0.32em] text-gold">{site.pricingKicker}</p>
+          <p className="text-xs uppercase tracking-[0.32em] text-gold">{localizeContent(site.pricingKicker)}</p>
           <h1 className="mx-auto mt-4 max-w-4xl font-display text-[clamp(2.35rem,4.8vw,4.6rem)] leading-[0.96] text-paper">
-            {site.pricingTitle}
+            {localizeContent(site.pricingTitle)}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-paper/75 md:text-base">
-            {site.pricingBody}
+            {localizeContent(site.pricingBody)}
           </p>
 
           <div className="mt-7 flex flex-col items-center gap-2">
             <label className="inline-flex cursor-pointer flex-wrap items-center justify-center gap-3 text-sm text-paper/80">
-              <span className={cn(!yearlyOn && "text-paper")}>Monthly</span>
+              <span className={cn(!yearlyOn && "text-paper")}>{localizeContent("Monthly")}</span>
               <span className="relative inline-flex h-8 w-14 shrink-0 items-center rounded-full bg-white/15 p-1">
                 <input
                   type="checkbox"
@@ -75,15 +77,14 @@ function Pricing() {
                   )}
                 />
               </span>
-              <span className={cn(yearlyOn && "text-paper")}>{site.pricingToggleOn}</span>
+              <span className={cn(yearlyOn && "text-paper")}>{localizeContent(site.pricingToggleOn)}</span>
             </label>
-            {yearlyOn ? (
+            {localizeContent(yearlyOn ? (
               <p className="max-w-xl px-2 text-sm text-gold">
-                Yearly keeps {formatCurrency(save.savedCents)} in her pocket — {save.percent}% less than twelve months.
-              </p>
+                {localizeContent("Yearly keeps ")}{localizeContent(formatCurrency(save.savedCents))} {localizeContent(" in her pocket — ")}{localizeContent(save.percent)}{localizeContent("% less than twelve months.")}</p>
             ) : (
-              <p className="max-w-xl px-2 text-sm text-paper/55">Same rooms either way. Yearly is only how you pay.</p>
-            )}
+              <p className="max-w-xl px-2 text-sm text-paper/55">{localizeContent("Same rooms either way. Yearly is only how you pay.")}</p>
+            ))}
           </div>
 
           <div className="mt-10 grid min-w-0 gap-5 text-left md:grid-cols-2 xl:grid-cols-3">
@@ -124,19 +125,19 @@ function Pricing() {
 
           <section className="mx-auto mt-10 grid max-w-5xl items-center gap-6 rounded-[30px] border border-gold/35 bg-ink/75 p-6 text-left backdrop-blur md:grid-cols-[1fr_auto] md:p-9" aria-labelledby="doula-price-title">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-gold">{site.doulaKicker}</p>
-              <h2 id="doula-price-title" className="mt-3 font-display text-3xl text-paper md:text-4xl">{site.doulaPriceLabel}</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-paper/70">{site.doulaPriceNote}</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-gold">{localizeContent(site.doulaKicker)}</p>
+              <h2 id="doula-price-title" className="mt-3 font-display text-3xl text-paper md:text-4xl">{localizeContent(site.doulaPriceLabel)}</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-paper/70">{localizeContent(site.doulaPriceNote)}</p>
             </div>
             <div className="md:text-right">
-              <p className="font-display text-5xl text-paper">{site.doulaPrice}</p>
+              <p className="font-display text-5xl text-paper">{localizeContent(site.doulaPrice)}</p>
               <Button asChild variant="gold" className="mt-4">
-                <Link to="/doula">{site.doulaCta}</Link>
+                <Link to="/doula">{localizeContent(site.doulaCta)}</Link>
               </Button>
             </div>
           </section>
 
-          <p className="mx-auto mt-12 max-w-xl px-2 text-sm text-paper/55">{site.pricingFoot}</p>
+          <p className="mx-auto mt-12 max-w-xl px-2 text-sm text-paper/55">{localizeContent(site.pricingFoot)}</p>
         </div>
       </section>
       <PublicFooter />
@@ -171,6 +172,7 @@ function PlanCard({
   toPlan?: "monthly" | "yearly";
   href?: "/login";
 }) {
+  const localizeContent = useContentText();
   return (
     <article
       className={cn(
@@ -181,25 +183,25 @@ function PlanCard({
       )}
     >
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-        <h2 className="min-w-0 font-display text-2xl text-paper">{name}</h2>
-        {badge ? <span className="pricing-save shrink-0">{badge}</span> : null}
+        <h2 className="min-w-0 font-display text-2xl text-paper">{localizeContent(name)}</h2>
+        {localizeContent(badge ? <span className="pricing-save shrink-0">{localizeContent(badge)}</span> : null)}
       </div>
       <div className="mt-6 flex min-w-0 flex-wrap items-end gap-x-2 gap-y-1">
         <span className="min-w-0 font-display text-[clamp(2.7rem,4.4vw,4.75rem)] tabular-nums leading-none text-paper">
-          {headline}
+          {localizeContent(headline)}
         </span>
-        <span className="pb-1 text-base text-paper/55 sm:text-lg">{cadence}</span>
+        <span className="pb-1 text-base text-paper/55 sm:text-lg">{localizeContent(cadence)}</span>
       </div>
-      <p className="mt-3 break-words text-sm text-paper/60">{sub}</p>
+      <p className="mt-3 break-words text-sm text-paper/60">{localizeContent(sub)}</p>
       <ul className="mt-8 flex-1 space-y-3 text-sm text-paper/80">
-        {points.map((p) => (
+        {localizeContent(points.map((p) => (
           <li key={p} className="flex gap-2.5">
             <Check className="mt-0.5 size-4 shrink-0 text-gold" />
-            <span className="min-w-0 break-words">{p}</span>
+            <span className="min-w-0 break-words">{localizeContent(p)}</span>
           </li>
-        ))}
+        )))}
       </ul>
-      {toPlan ? (
+      {localizeContent(toPlan ? (
         <Button
           asChild
           variant={featured ? "paper" : "ghost"}
@@ -210,14 +212,14 @@ function PlanCard({
           }
         >
           <Link to="/checkout" search={{ plan: toPlan, preview: undefined, paid: undefined, session_id: undefined }}>
-            {cta}
+            {localizeContent(cta)}
           </Link>
         </Button>
       ) : (
         <Button asChild variant="gold" className="mt-8 h-12 w-full">
-          <Link to={href ?? "/login"} search={{}}>{cta}</Link>
+          <Link to={href ?? "/login"} search={{}}>{localizeContent(cta)}</Link>
         </Button>
-      )}
+      ))}
     </article>
   );
 }

@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { LockKeyhole } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
@@ -43,6 +44,7 @@ async function waitForSession() {
 }
 
 function Join() {
+  const localizeContent = useContentText();
   const { token } = Route.useSearch();
   const navigate = useNavigate();
   const { user, isPending } = useCurrentUserState();
@@ -100,22 +102,22 @@ function Join() {
         if (live) void navigate({ to: "/app/onboarding" });
       })
       .catch((err) => {
-        if (live) toast.error(err instanceof Error ? err.message : "Could not open your membership yet.");
+        if (live) toast.error(localizeContent(err instanceof Error ? err.message : "Could not open your membership yet."));
       });
     return () => {
       live = false;
     };
-  }, [busy, checkoutState, factor?.needed, isPending, manualSignup, navigate, token, user]);
+  }, [busy, checkoutState, factor?.needed, isPending, manualSignup, navigate, token, user, localizeContent]);
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
     if (checkoutState !== "paid" || !token) {
-      toast.error("Complete Stripe payment before creating your member account.");
+      toast.error(localizeContent("Complete Stripe payment before creating your member account."));
       return;
     }
     if (guard.honey.trim()) return;
     if (!guard.human) {
-      toast.error("Please confirm you are a person.");
+      toast.error(localizeContent("Please confirm you are a person."));
       return;
     }
     setBusy(true);
@@ -145,7 +147,7 @@ function Join() {
 
       await claimMembership({ data: { token } });
       await saveJoinDiets({ data: { diets, language: locale } }).catch(() => undefined);
-      toast.success("Payment confirmed. Your account is ready.");
+      toast.success(localizeContent("Payment confirmed. Your account is ready."));
 
       const status = await requestEmailFactor();
       if (status.needed) {
@@ -154,7 +156,7 @@ function Join() {
       }
       void navigate({ to: "/app/onboarding" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not create the account.");
+      toast.error(localizeContent(err instanceof Error ? err.message : "Could not create the account."));
     } finally {
       setBusy(false);
     }
@@ -169,66 +171,64 @@ function Join() {
         <div className="relative hidden min-h-dvh overflow-hidden text-paper lg:block">
           <img
             src={content.images.join}
-            alt={content.alts.join}
+            alt={localizeContent(content.alts.join)}
             className="media absolute inset-0 h-full w-full object-cover"
           />
           <div className="hero-veil pointer-events-none absolute inset-0" />
           <div className="relative flex min-h-dvh flex-col justify-end px-12 pb-16 pt-32">
-            <p className="text-xs uppercase tracking-[0.32em] text-gold">{site.joinKicker}</p>
-            <p className="mt-6 max-w-md font-display text-5xl leading-[1.05]">{site.joinPhotoLine}</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-gold">{localizeContent(site.joinKicker)}</p>
+            <p className="mt-6 max-w-md font-display text-5xl leading-[1.05]">{localizeContent(site.joinPhotoLine)}</p>
           </div>
         </div>
 
         <div className="flex min-h-dvh flex-col justify-center bg-wash-clay px-5 py-28 md:px-16">
-          {checkoutState === "checking" ? (
+          {localizeContent(checkoutState === "checking" ? (
             <div className="max-w-md rounded-[28px] border border-border bg-card p-7 shadow-[var(--shadow-border)]">
-              <p className="text-xs uppercase tracking-[0.22em] text-earth">Secure checkout</p>
-              <h1 className="mt-3 font-display text-4xl">Confirming your payment…</h1>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">We are checking the Stripe payment before account creation opens.</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-earth">{localizeContent("Secure checkout")}</p>
+              <h1 className="mt-3 font-display text-4xl">{localizeContent("Confirming your payment…")}</h1>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{localizeContent("We are checking the Stripe payment before account creation opens.")}</p>
             </div>
-          ) : null}
+          ) : null)}
 
-          {checkoutState === "invalid" ? (
+          {localizeContent(checkoutState === "invalid" ? (
             <div className="max-w-md rounded-[28px] border border-border bg-card p-7 shadow-[var(--shadow-border)]">
               <div className="grid size-12 place-items-center rounded-full bg-primary/10 text-primary">
                 <LockKeyhole className="size-5" />
               </div>
-              <p className="mt-5 text-xs uppercase tracking-[0.22em] text-earth">Payment required</p>
-              <h1 className="mt-3 font-display text-4xl leading-tight">Create your member account after checkout.</h1>
+              <p className="mt-5 text-xs uppercase tracking-[0.22em] text-earth">{localizeContent("Payment required")}</p>
+              <h1 className="mt-3 font-display text-4xl leading-tight">{localizeContent("Create your member account after checkout.")}</h1>
               <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                This page only opens account creation from a Stripe-confirmed membership. If you canceled checkout or opened this page directly, choose a membership and complete payment first.
-              </p>
+                {localizeContent("This page only opens account creation from a Stripe-confirmed membership. If you canceled checkout or opened this page directly, choose a membership and complete payment first.")}</p>
               <Link
                 to="/pricing"
                 className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 active:scale-95"
               >
-                Choose membership
-              </Link>
+                {localizeContent("Choose membership")}</Link>
             </div>
-          ) : null}
+          ) : null)}
 
-          {!checkoutGate ? (
+          {localizeContent(!checkoutGate ? (
             <>
-              <p className="text-xs uppercase tracking-[0.32em] text-clay">{site.joinEyebrow}</p>
-              <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{site.joinTitle}</h1>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{site.joinBody}</p>
+              <p className="text-xs uppercase tracking-[0.32em] text-clay">{localizeContent(site.joinEyebrow)}</p>
+              <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{localizeContent(site.joinTitle)}</h1>
+              <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{localizeContent(site.joinBody)}</p>
 
               <div className="mt-8 space-y-3">
-                <p className="text-xs uppercase tracking-[0.22em] text-earth">{t("join.language")}</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-earth">{localizeContent(t("join.language"))}</p>
                 <LocaleSwitch tone="gold" />
               </div>
 
               <div className="mt-8 space-y-3">
-                <p className="text-xs uppercase tracking-[0.22em] text-earth">{t("join.howSheEats")}</p>
-                <p className="max-w-md text-sm leading-relaxed text-ink-soft">{t("join.eatsHint")}</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-earth">{localizeContent(t("join.howSheEats"))}</p>
+                <p className="max-w-md text-sm leading-relaxed text-ink-soft">{localizeContent(t("join.eatsHint"))}</p>
                 <DietPicks value={diets} onChange={setDiets} />
               </div>
 
               <div className="editorial-rule mt-8" />
 
-              {authEnabled ? (
+              {localizeContent(authEnabled ? (
                 <div className="mt-10 space-y-3">
-                  {GROK_PROVIDERS.map((p) => (
+                  {localizeContent(GROK_PROVIDERS.map((p) => (
                     <Button
                       key={p.providerId}
                       type="button"
@@ -245,13 +245,13 @@ function Join() {
                         });
                       }}
                     >
-                      Continue with {p.label}
+                      {localizeContent("Continue with ")}{localizeContent(p.label)}
                     </Button>
-                  ))}
+                  )))}
                 </div>
-              ) : null}
+              ) : null)}
 
-              {factor?.needed ? (
+              {localizeContent(factor?.needed ? (
                 <EmailFactorForm
                   emailMasked={factor.emailMasked}
                   sent={factor.sent}
@@ -264,16 +264,16 @@ function Join() {
               ) : (
                 <form onSubmit={onEmail} className="glass-panel mt-8 max-w-md space-y-4 p-6">
                   <div>
-                    <Label htmlFor="name">{t("join.name")}</Label>
+                    <Label htmlFor="name">{localizeContent(t("join.name"))}</Label>
                     <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
                   </div>
                   <div>
-                    <Label htmlFor="email">{t("join.email")}</Label>
+                    <Label htmlFor="email">{localizeContent(t("join.email"))}</Label>
                     <Input id="email" type="email" required readOnly value={email} autoComplete="email" />
-                    <p className="mt-1 text-xs text-muted-foreground">Use the same email that completed Stripe checkout.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{localizeContent("Use the same email that completed Stripe checkout.")}</p>
                   </div>
                   <div>
-                    <Label htmlFor="password">{t("join.password")}</Label>
+                    <Label htmlFor="password">{localizeContent(t("join.password"))}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -291,12 +291,12 @@ function Join() {
                     onHoney={guard.setHoney}
                   />
                   <Button type="submit" className="w-full" size="lg" disabled={busy || !guard.human}>
-                    {busy ? "Securing your account…" : t("join.submit")}
+                    {localizeContent(busy ? "Securing your account…" : t("join.submit"))}
                   </Button>
                 </form>
-              )}
+              ))}
             </>
-          ) : null}
+          ) : null)}
         </div>
       </section>
       <PublicFooter />
