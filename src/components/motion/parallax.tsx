@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ export function ParallaxFrame({
   className?: string;
   imgClassName?: string;
 }) {
+  const localizeContent = useContentText();
   const wrapRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -50,12 +52,13 @@ export function ParallaxFrame({
 
   return (
     <div ref={wrapRef} className={cn("parallax-frame", className)}>
-      <img ref={imgRef} src={src} alt={alt} className={cn("parallax-frame-img", imgClassName)} />
+      <img ref={imgRef} src={src} alt={localizeContent(alt)} className={cn("parallax-frame-img", imgClassName)} />
     </div>
   );
 }
 
 export function Reveal({ children, className }: { children: ReactNode; className?: string }) {
+  const localizeContent = useContentText();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export function Reveal({ children, className }: { children: ReactNode; className
 
   return (
     <div ref={ref} className={cn("reveal-wait", className)}>
-      {children}
+      {localizeContent(children)}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useState } from "react";
 
 /** Hidden field bots fill; people never see it. */
@@ -8,11 +9,11 @@ export function Honeypot({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const localizeContent = useContentText();
   return (
     <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
       <label>
-        Company website
-        <input
+        {localizeContent("Company website")}<input
           type="text"
           name="company_website"
           tabIndex={-1}
@@ -38,6 +39,7 @@ export function HumanCheck({
   onHoney: (next: string) => void;
   tone?: "light" | "dark";
 }) {
+  const localizeContent = useContentText();
   return (
     <div className="relative">
       <Honeypot value={honey} onChange={onHoney} />
@@ -54,7 +56,7 @@ export function HumanCheck({
           checked={checked}
           onChange={(e) => onChecked(e.target.checked)}
         />
-        <span>I am a person. Keep automated visitors out of this house.</span>
+        <span>{localizeContent("I am a person. Keep automated visitors out of this house.")}</span>
       </label>
     </div>
   );

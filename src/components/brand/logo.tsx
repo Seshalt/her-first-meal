@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { usePublicSite } from "@/lib/use-public-site";
@@ -27,6 +28,7 @@ export function BrandTitle({
   showTagline?: boolean;
   className?: string;
 }) {
+  const localizeContent = useContentText();
   const { site } = usePublicSite();
   const name = site.brandName.trim() || "Her First Meal";
   const tagline = site.brandTagline.trim() || "We remember the mother.";
@@ -45,18 +47,18 @@ export function BrandTitle({
       >
         <span>{first} </span>
         <span className="italic text-gold">{middle}</span>
-        {last ? <span> {last}</span> : null}
+        {localizeContent(last ? <span> {last}</span> : null)}
       </span>
-      {showTagline ? (
+      {localizeContent(showTagline ? (
         <span
           className={cn(
             "mt-1.5 block uppercase text-current/55",
             size === "hero" ? "text-[0.7rem] tracking-[0.38em] md:text-xs" : "text-[0.58rem] tracking-[0.22em]",
           )}
         >
-          {tagline}
+          {localizeContent(tagline)}
         </span>
-      ) : null}
+      ) : null)}
     </span>
   );
 }
@@ -72,9 +74,10 @@ export function Wordmark({
   stacked?: boolean;
   mark?: boolean;
 }) {
+  const localizeContent = useContentText();
   return (
     <Link to={to} className={cn("flex min-w-0 items-center gap-2.5 text-foreground no-underline", className)}>
-      {mark ? <HouseMark className={cn("shrink-0", stacked ? "size-14" : "size-11 md:size-12")} /> : null}
+      {localizeContent(mark ? <HouseMark className={cn("shrink-0", stacked ? "size-14" : "size-11 md:size-12")} /> : null)}
       <BrandTitle size="nav" showTagline={false} className="block min-w-0" />
     </Link>
   );

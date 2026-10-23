@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import { listNotifications, markNotificationsRead } from "@/lib/server/profile";
 export const Route = createFileRoute("/app/profile")({ component: Profile });
 
 function Profile() {
+  const localizeContent = useContentText();
   const { locale, t } = useI18n();
   const [home, setHome] = useState<Awaited<ReturnType<typeof getMyHome>> | null>(null);
   const [notes, setNotes] = useState<Awaited<ReturnType<typeof listNotifications>>>([]);
@@ -27,7 +29,7 @@ function Profile() {
     void listNotifications().then(setNotes);
   }, []);
 
-  if (!home) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">Opening your profile…</p>;
+  if (!home) return <p className="px-5 pt-32 font-display text-3xl text-muted-foreground">{localizeContent("Opening your profile…")}</p>;
   const p = home.profile;
 
   async function save() {
@@ -55,56 +57,56 @@ function Profile() {
         appliances: home.grocery.appliances,
       },
     });
-    toast.success("Saved.");
+    toast.success(localizeContent("Saved."));
   }
 
   return (
     <div>
       <RoomHero
-        kicker="Settings"
-        title="Your house, your terms"
-        body={p.email ?? t("profile.body")}
+        kicker={localizeContent("Settings")}
+        title={localizeContent("Your house, your terms")}
+        body={localizeContent(p.email ?? t("profile.body"))}
         src="/images/postpartum-rest.jpg"
-        alt={altFor("/images/postpartum-rest.jpg")}
+        alt={localizeContent(altFor("/images/postpartum-rest.jpg"))}
         tone="gold"
       />
       <RoomBody className="max-w-2xl space-y-12">
         <section className="space-y-4">
-          <Label>Name</Label>
+          <Label>{localizeContent("Name")}</Label>
           <Input
             value={p.displayName ?? ""}
             onChange={(e) => setHome({ ...home, profile: { ...p, displayName: e.target.value } })}
           />
-          <Label>Location</Label>
+          <Label>{localizeContent("Location")}</Label>
           <Input value={p.location ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, location: e.target.value } })} />
-          <Label>ZIP</Label>
+          <Label>{localizeContent("ZIP")}</Label>
           <Input value={p.zipCode ?? ""} onChange={(e) => setHome({ ...home, profile: { ...p, zipCode: e.target.value } })} />
-          <Label>{t("profile.state")}</Label>
+          <Label>{localizeContent(t("profile.state"))}</Label>
           <select
             className="h-12 w-full rounded-xl border border-border bg-transparent px-3"
             value={p.stateCode ?? ""}
             onChange={(e) => setHome({ ...home, profile: { ...p, stateCode: e.target.value } })}
           >
             <option value="">—</option>
-            {US_STATES.map((s) => (
+            {localizeContent(US_STATES.map((s) => (
               <option key={s.code} value={s.code}>
-                {s.name}
+                {localizeContent(s.name)}
               </option>
-            ))}
+            )))}
           </select>
-          <Label>{t("profile.language")}</Label>
+          <Label>{localizeContent(t("profile.language"))}</Label>
           <LocaleSwitch tone="gold" />
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">{t("profile.season")}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{localizeContent(t("profile.season"))}</p>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(STAGE_LABEL) as Stage[]).map((s) => (
+            {localizeContent((Object.keys(STAGE_LABEL) as Stage[]).map((s) => (
               <Pill key={s} active={p.stage === s} onClick={() => setHome({ ...home, profile: { ...p, stage: s } })}>
-                {t(`stage.${s}` as MsgKey)}
+                {localizeContent(t(`stage.${s}` as MsgKey))}
               </Pill>
-            ))}
+            )))}
           </div>
         </section>
         <section>
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">{t("profile.diets")}</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{localizeContent(t("profile.diets"))}</p>
           <div className="mt-4">
             <DietPicks
               value={home.diet.diets}
@@ -113,9 +115,9 @@ function Profile() {
           </div>
         </section>
         <section>
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">Grocery stores</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{localizeContent("Grocery stores")}</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {STORES.map((s) => (
+            {localizeContent(STORES.map((s) => (
               <Pill
                 key={s}
                 active={home.grocery.stores.includes(s)}
@@ -126,18 +128,17 @@ function Profile() {
                   setHome({ ...home, grocery: { ...home.grocery, stores } });
                 }}
               >
-                {s}
+                {localizeContent(s)}
               </Pill>
-            ))}
+            )))}
           </div>
         </section>
         <section>
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">Kitchen tools</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{localizeContent("Kitchen tools")}</p>
           <p className="mt-3 text-sm leading-6 text-ink-soft">
-            Choose the appliances you actually have so the kitchen setup stays realistic.
-          </p>
+            {localizeContent("Choose the appliances you actually have so the kitchen setup stays realistic.")}</p>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {KITCHEN_APPLIANCES.map((item) => {
+            {localizeContent(KITCHEN_APPLIANCES.map((item) => {
               const active = home.grocery.appliances.includes(item.id);
               return (
                 <button
@@ -156,66 +157,61 @@ function Profile() {
                       : "rounded-[20px] border border-border bg-card p-4 text-left transition hover:-translate-y-0.5 hover:border-gold"
                   }
                 >
-                  <span className="grid size-9 place-items-center rounded-xl bg-background text-lg">{item.icon}</span>
-                  <span className="mt-3 block text-sm font-semibold">{item.label}</span>
+                  <span className="grid size-9 place-items-center rounded-xl bg-background text-lg">{localizeContent(item.icon)}</span>
+                  <span className="mt-3 block text-sm font-semibold">{localizeContent(item.label)}</span>
                 </button>
               );
-            })}
+            }))}
           </div>
         </section>
         <section>
-          <p className="text-xs uppercase tracking-[0.28em] text-earth">Appearance</p>
+          <p className="text-xs uppercase tracking-[0.28em] text-earth">{localizeContent("Appearance")}</p>
           <p className="mt-3 text-base leading-relaxed text-ink-soft">
-            Light, dark, or match your device. This lives here in settings — not on the public homepage.
-          </p>
+            {localizeContent("Light, dark, or match your device. This lives here in settings — not on the public homepage.")}</p>
           <ThemeToggle className="mt-4" />
         </section>
         <Button onClick={() => void save()} size="lg">
-          Save changes
-        </Button>
+          {localizeContent("Save changes")}</Button>
         <section>
           <div className="flex items-end justify-between gap-4">
-            <h2 className="font-display text-4xl">Notifications</h2>
+            <h2 className="font-display text-4xl">{localizeContent("Notifications")}</h2>
             <button
               type="button"
               className="text-sm text-primary"
               onClick={() => void markNotificationsRead().then(() => listNotifications().then(setNotes))}
             >
-              Mark read
-            </button>
+              {localizeContent("Mark read")}</button>
           </div>
           <div className="editorial-rule mt-6" />
           <ul>
-            {notes.length === 0 ? (
-              <li className="py-8 text-ink-soft">No notices yet.</li>
+            {localizeContent(notes.length === 0 ? (
+              <li className="py-8 text-ink-soft">{localizeContent("No notices yet.")}</li>
             ) : (
               notes.map((n) => (
                 <li key={n.id} className="border-b border-border py-6">
-                  <p className="font-display text-2xl">{n.title}</p>
-                  <p className="mt-2 text-ink-soft">{n.body}</p>
+                  <p className="font-display text-2xl">{localizeContent(n.title)}</p>
+                  <p className="mt-2 text-ink-soft">{localizeContent(n.body)}</p>
                 </li>
               ))
-            )}
+            ))}
           </ul>
         </section>
         <p className="text-sm">
           <Link to="/privacy" className="text-primary">
-            Privacy
-          </Link>
+            {localizeContent("Privacy")}</Link>
         </p>
         <Button
           variant="outline"
           onClick={() => {
             if (confirm("Delete your account and personal records?")) {
               void deleteAccount().then(() => {
-                toast.success("Account removed.");
+                toast.success(localizeContent("Account removed."));
                 window.location.href = "/";
               });
             }
           }}
         >
-          Delete account
-        </Button>
+          {localizeContent("Delete account")}</Button>
       </RoomBody>
     </div>
   );

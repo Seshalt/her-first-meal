@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { Check } from "lucide-react";
 import { DIETS, type DietFlag } from "@/lib/content/catalog";
 import { useT } from "@/lib/i18n/provider";
@@ -10,10 +11,11 @@ export function DietPicks({
   value: string[];
   onChange: (next: string[]) => void;
 }) {
+  const localizeContent = useContentText();
   const t = useT();
   return (
     <div className="grid grid-cols-2 gap-3 [perspective:1000px] sm:grid-cols-3">
-      {DIETS.map((d, index) => {
+      {localizeContent(DIETS.map((d, index) => {
         const key = `diet.${d.id}` as MsgKey;
         const active = value.includes(d.id);
         return (
@@ -31,19 +33,19 @@ export function DietPicks({
             }`}
           >
             <span className="absolute -right-7 -top-7 size-20 rounded-full bg-gold/20 blur-sm transition-transform duration-500 group-hover:scale-125" />
-            <span className="text-[10px] uppercase tracking-[0.18em] opacity-60">Preference {index + 1}</span>
-            <span className="mt-5 block font-display text-xl leading-none">{t(key)}</span>
+            <span className="text-[10px] uppercase tracking-[0.18em] opacity-60">{localizeContent("Preference ")}{localizeContent(index + 1)}</span>
+            <span className="mt-5 block font-display text-xl leading-none">{localizeContent(t(key))}</span>
             <span
               className={`absolute bottom-3 right-3 grid size-7 place-items-center rounded-full border transition ${
                 active ? "border-white/50 bg-white/15" : "border-border bg-background/70"
               }`}
               aria-hidden="true"
             >
-              {active ? <Check className="size-4" /> : null}
+              {localizeContent(active ? <Check className="size-4" /> : null)}
             </span>
           </button>
         );
-      })}
+      }))}
     </div>
   );
 }

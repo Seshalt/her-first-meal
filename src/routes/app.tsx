@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/app-shell";
 import { RequireMember } from "@/components/gates/require-member";
@@ -6,11 +7,12 @@ import "../member-experience.css";
 export const Route = createFileRoute("/app")({ component: AppLayout });
 
 function AppLayout() {
+  const localizeContent = useContentText();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const bare = pathname.startsWith("/app/onboarding");
   return (
     <RequireMember>
-      {bare ? (
+      {localizeContent(bare ? (
         <div className="onboarding-v3">
           <Outlet />
         </div>
@@ -18,7 +20,7 @@ function AppLayout() {
         <AppShell hideNouri={pathname.startsWith("/app/nouri")}>
           <Outlet />
         </AppShell>
-      )}
+      ))}
     </RequireMember>
   );
 }

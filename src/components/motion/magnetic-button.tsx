@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useRef, type MouseEvent, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ export function MagneticLink({
   children: ReactNode;
   className?: string;
 }) {
+  const localizeContent = useContentText();
   const ref = useRef<HTMLAnchorElement>(null);
 
   const onMove = (e: MouseEvent) => {
@@ -37,7 +39,7 @@ export function MagneticLink({
         className,
       )}
     >
-      {children}
+      {localizeContent(children)}
     </Link>
   );
 }

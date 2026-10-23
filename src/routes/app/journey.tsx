@@ -1,3 +1,4 @@
+import { useText as useContentText } from "@/lib/i18n/use-text";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { RoomHero } from "@/components/layout/room-hero";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/app/journey")({ component: Journey });
 
 function Journey() {
+  const localizeContent = useContentText();
   const [week, setWeek] = useState(21);
   const [selected, setSelected] = useState(21);
 
@@ -37,16 +39,16 @@ function Journey() {
   return (
     <div>
       <RoomHero
-        kicker="Pregnancy journey"
-        title="The house grows with you."
-        body={`You are in week ${week}. Later weeks wait as a preview — never a locked-door insult.`}
+        kicker={localizeContent("Pregnancy journey")}
+        title={localizeContent("The house grows with you.")}
+        body={localizeContent(`You are in week ${week}. Later weeks wait as a preview — never a locked-door insult.`)}
         src="/images/hydration.jpg"
-        alt={altFor("/images/hydration.jpg")}
+        alt={localizeContent(altFor("/images/hydration.jpg"))}
         tone="sea"
       />
       <div className="border-y border-border bg-sea py-5 text-primary-foreground">
         <div className="mx-auto flex max-w-5xl gap-2 overflow-x-auto px-5 md:px-10">
-          {WEEKS.map((w) => {
+          {localizeContent(WEEKS.map((w) => {
             const later = w.week > week + 1;
             return (
               <button
@@ -62,31 +64,31 @@ function Journey() {
                       : "bg-white/15 text-paper",
                   w.week === week && selected !== w.week && "ring-2 ring-gold",
                 )}
-                aria-label={`Week ${w.week}${later ? " locked preview" : ""}`}
+                aria-label={localizeContent(`Week ${w.week}${later ? " locked preview" : ""}`)}
               >
-                {w.week}
+                {localizeContent(w.week)}
               </button>
             );
-          })}
+          }))}
         </div>
       </div>
       <p className="mx-auto max-w-5xl px-5 py-10 text-sm uppercase tracking-[0.28em] text-earth md:px-10">
-        {locked ? "Preview" : "Open"} · Week {selected}
+        {localizeContent(locked ? "Preview" : "Open")} {localizeContent(" · Week ")}{localizeContent(selected)}
       </p>
-      {chapters.map((c, i) => (
+      {localizeContent(chapters.map((c, i) => (
         <article key={c.title} className="grid min-h-[70vh] lg:grid-cols-2 lg:min-h-[78vh]">
           <div className={i % 2 === 1 ? "relative min-h-[48vh] lg:order-2 lg:min-h-[78vh]" : "relative min-h-[48vh] lg:min-h-[78vh]"}>
-            <img src={c.src} alt={c.alt} className="media absolute inset-0 h-full w-full object-cover" />
+            <img src={c.src} alt={localizeContent(c.alt)} className="media absolute inset-0 h-full w-full object-cover" />
           </div>
           <div className={`flex flex-col justify-center px-5 py-16 md:px-16 ${c.wash}`}>
-            <p className={`text-xs uppercase tracking-[0.32em] ${c.tone}`}>{c.kicker}</p>
-            <h2 className="mt-5 font-display text-[clamp(2.4rem,5vw,4.4rem)]">{c.title}</h2>
-            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft md:text-xl">{c.body}</p>
+            <p className={`text-xs uppercase tracking-[0.32em] ${c.tone}`}>{localizeContent(c.kicker)}</p>
+            <h2 className="mt-5 font-display text-[clamp(2.4rem,5vw,4.4rem)]">{localizeContent(c.title)}</h2>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft md:text-xl">{localizeContent(c.body)}</p>
           </div>
         </article>
-      ))}
+      )))}
       <p className="mx-auto max-w-5xl px-5 py-16 text-lg leading-relaxed text-ink-soft md:px-10">
-        Question for your provider: {content.ask}
+        {localizeContent("Question for your provider: ")}{localizeContent(content.ask)}
       </p>
     </div>
   );
