@@ -159,7 +159,7 @@ export const SESSION_TOKEN_COOKIE = "__Host-grok-auth.session_token";
 
 // Built separately so the `betterAuth({...})` call stays easy to edit without
 // breaking brackets (models often trip on the conditional plugin spread).
-const grokOAuthPlugin = federationConfigured
+const grokOAuth = federationConfigured
   ? genericOAuth({
       config: GROK_PROVIDERS.map(({ providerId, idp }) => ({
         providerId,
@@ -180,6 +180,25 @@ const grokOAuthPlugin = federationConfigured
       })),
     })
   : null;
+
+// The broker's registered callback URL predates Better Auth's social endpoint.
+// Keep that URL stable even though the app now uses signIn.social internally.
+const grokOAuthPlugin = grokOAuth && {
+  ...grokOAuth,
+  async init(ctx: Parameters<typeof grokOAuth.init>[0]) {
+    const initialized = await grokOAuth.init(ctx);
+    return {
+      ...initialized,
+      context: {
+        ...initialized.context,
+        socialProviders: initialized.context.socialProviders.map((provider) => ({
+          ...provider,
+          callbackPath: `/oauth2/callback/${provider.id}`,
+        })),
+      },
+    };
+  },
+};
 
 export const auth = betterAuth({
   baseURL,

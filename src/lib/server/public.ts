@@ -264,7 +264,7 @@ export const recoverOwner = createServerFn({ method: "POST" })
         name: "Maat",
         email,
         emailVerified: true,
-      });
+      }, { method: "admin" });
       targetId = created.id;
     }
 

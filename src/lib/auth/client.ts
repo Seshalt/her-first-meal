@@ -1,4 +1,4 @@
-import { genericOAuthClient, twoFactorClient } from "better-auth/client/plugins";
+import { twoFactorClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { runPreSignInSignOut, runSignOut } from "../../../scripts/sign-out-plan.mjs";
 import { GROK_PROVIDERS as ALL_GROK_PROVIDERS } from "./providers";
@@ -18,7 +18,7 @@ import { GROK_PROVIDERS as ALL_GROK_PROVIDERS } from "./providers";
  * the visitor stays signed in.
  */
 export const authClient = createAuthClient({
-  plugins: [genericOAuthClient(), twoFactorClient()],
+  plugins: [twoFactorClient()],
   fetchOptions: {
     onRequest(ctx) {
       const token = getBearerToken();
@@ -162,8 +162,8 @@ export async function signIn(
     return;
   }
 
-  const { data, error } = await authClient.signIn.oauth2({
-    providerId,
+  const { data, error } = await authClient.signIn.social({
+    provider: providerId,
     callbackURL,
     errorCallbackURL,
   });

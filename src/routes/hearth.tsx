@@ -198,9 +198,10 @@ function Hearth() {
       const { data, error } = await authClient.twoFactor.enable({
         password,
         issuer: "Her First Meal Admin",
+        method: "totp",
       });
       if (error) throw new Error(error.message ?? "Authenticator setup could not start.");
-      if (!data?.totpURI || !data.backupCodes?.length) {
+      if (data?.method !== "totp" || !data.totpURI || !data.backupCodes?.length) {
         throw new Error("Authenticator setup did not return a secret and recovery codes.");
       }
       setSetupUri(data.totpURI);
