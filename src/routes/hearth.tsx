@@ -1,3 +1,4 @@
+import { buildAuthenticatorQr } from "@/lib/auth/setup-qr";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Copy, KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
@@ -43,6 +44,7 @@ function Hearth() {
   const guard = useFormGuard();
 
   const secret = useMemo(() => totpSecret(setupUri), [setupUri]);
+  const setupQr = useMemo(() => buildAuthenticatorQr(setupUri), [setupUri]);
 
   useEffect(() => {
     document.title = "Private";
@@ -467,7 +469,26 @@ function Hearth() {
             ) : (
               <form onSubmit={verifySetup} className="space-y-5">
                 <section className="rounded-2xl border border-white/10 bg-black/15 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c4a574]">1. Add account manually</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c4a574]">1. Add to your authenticator</p>
+                  {setupQr && (
+                    <div className="mt-3 space-y-3">
+                      <p className="text-sm leading-6 text-[#efe6d6]/75">
+                        In Duo Mobile, tap <strong>Add</strong>, then <strong>Use QR code</strong>. Point your phone at the code below and save the new account.
+                      </p>
+                      <svg
+                        role="img"
+                        aria-label="Authenticator setup QR code"
+                        viewBox={`0 0 ${setupQr.size} ${setupQr.size}`}
+                        shapeRendering="crispEdges"
+                        className="mx-auto block h-auto w-full max-w-64 rounded-md bg-white"
+                      >
+                        <rect width={setupQr.size} height={setupQr.size} fill="#fff" />
+                        <path d={setupQr.path} fill="#000" />
+                      </svg>
+                    </div>
+                  )}
+                  <details className="mt-4" open={setupQr ? undefined : true}>
+                    <summary className="cursor-pointer text-sm text-[#efe6d6]/75">Enter a setup key manually</summary>
                   <p className="mt-3 text-xs leading-5 text-[#efe6d6]/60">
                     In your authenticator app choose “Enter setup key” or “Manual entry.” Account: <strong className="text-[#efe6d6]">{email || "owner"}</strong>. Type: time based.
                   </p>
@@ -477,6 +498,7 @@ function Hearth() {
                       <Copy className="size-4" />
                     </button>
                   </div>
+                  </details>
                 </section>
 
                 <section className="rounded-2xl border border-white/10 bg-black/15 p-4">
