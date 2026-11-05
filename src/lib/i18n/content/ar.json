@@ -1914,5 +1914,16 @@
   "/ month": "/ شهر",
   "/ session": "/ جلسة",
   "/ year": "/ سنة",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "تستخدم الخدمة المعلومات التي تختار حفظها — مثل مرحلة الحمل أو ما بعد الولادة، والتفضيلات الغذائية، والأطعمة التي تتجنبها أو تستمتع بها، وحجم الأسرة، ومعلومات مخزون المؤن، والمدينة أو الرمز البريدي (ZIP code)، والمتاجر المفضلة، وتسجيلات المتابعة — لاختيار محتوى من المكتبة المدمجة في Her First Meal وتنظيم تجربتك كعضو."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "تستخدم الخدمة المعلومات التي تختار حفظها — مثل مرحلة الحمل أو ما بعد الولادة، والتفضيلات الغذائية، والأطعمة التي تتجنبها أو تستمتع بها، وحجم الأسرة، ومعلومات مخزون المؤن، والمدينة أو الرمز البريدي (ZIP code)، والمتاجر المفضلة، وتسجيلات المتابعة — لاختيار محتوى من المكتبة المدمجة في Her First Meal وتنظيم تجربتك كعضو.",
+  "An account with that email already exists. Sign in or reset your password.": "يوجد حساب مسجّل بهذا البريد الإلكتروني بالفعل. سجّل الدخول أو أعد تعيين كلمة المرور.",
+  "Authenticator code": "رمز تطبيق المصادقة",
+  "Backup code": "رمز احتياطي",
+  "Confirm your identity.": "أكّد هويتك.",
+  "Could not check your account. Please try again.": "تعذّر التحقق من حسابك. يُرجى المحاولة مرة أخرى.",
+  "Enter one of your saved backup codes.": "أدخل أحد رموزك الاحتياطية المحفوظة.",
+  "Enter the six-digit code from your authenticator app.": "أدخل الرمز المكوّن من ستة أرقام من تطبيق المصادقة.",
+  "Use a backup code": "استخدم رمزًا احتياطيًا",
+  "Use a different account": "استخدم حسابًا آخر",
+  "Use authenticator code": "استخدم رمز تطبيق المصادقة",
+  "Verify your email before opening your membership.": "تحقّق من بريدك الإلكتروني قبل فتح عضويتك."
 }

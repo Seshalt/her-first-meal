@@ -11,7 +11,7 @@ import { claimMembership, getCheckoutByToken } from "@/lib/server/checkout";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { EmailFactorForm } from "@/components/security/email-factor";
-import { requestEmailFactor } from "@/lib/server/email-factor";
+import { getEmailFactorStatus, requestEmailFactor } from "@/lib/server/email-factor";
 import { DietPicks } from "@/components/house/diet-picks";
 import { LocaleSwitch } from "@/components/i18n/locale-switch";
 import { JOIN_DIETS_STORAGE } from "@/lib/content/catalog";
@@ -47,7 +47,7 @@ function Join() {
   const localizeContent = useContentText();
   const { token } = Route.useSearch();
   const navigate = useNavigate();
-  const { user, isPending } = useCurrentUserState();
+  const { user } = useCurrentUserState();
   const { site, content } = usePublicSite();
   const { t, locale } = useI18n();
   const [email, setEmail] = useState("");
@@ -55,7 +55,7 @@ function Join() {
   const [password, setPassword] = useState("");
   const [diets, setDiets] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
-  const [manualSignup, setManualSignup] = useState(false);
+  const [formError, setFormError] = useState("");
   const [checkoutState, setCheckoutState] = useState<CheckoutState>("checking");
   const [factor, setFactor] = useState<{
     needed: boolean;
@@ -94,20 +94,35 @@ function Join() {
     };
   }, [token]);
 
+  async function finishMembership() {
+    await claimMembership({ data: { token } });
+    await saveJoinDiets({ data: { diets, language: locale } });
+    void navigate({ to: "/app/onboarding" });
+  }
+
   useEffect(() => {
-    if (checkoutState !== "paid" || manualSignup || busy || isPending || !user || factor?.needed) return;
+    if (checkoutState !== "paid" || !user) return;
     let live = true;
-    void claimMembership({ data: { token } })
-      .then(() => {
-        if (live) void navigate({ to: "/app/onboarding" });
-      })
-      .catch((err) => {
-        if (live) toast.error(localizeContent(err instanceof Error ? err.message : "Could not open your membership yet."));
-      });
-    return () => {
-      live = false;
-    };
-  }, [busy, checkoutState, factor?.needed, isPending, manualSignup, navigate, token, user, localizeContent]);
+    void (async () => {
+      try {
+        const status = await getEmailFactorStatus();
+        if (!live) return;
+        if (status.needed) {
+          setFactor({ ...status, sent: false });
+          if (!status.configured) return;
+          const sent = await requestEmailFactor();
+          if (live) setFactor(sent);
+          return;
+        }
+        await finishMembership();
+      } catch (err) {
+        if (live) setFormError(err instanceof Error ? err.message : "Could not open your membership yet.");
+      }
+    })();
+    return () => { live = false; };
+    // Recheck only when the authenticated identity or paid checkout changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutState, token, user?.id]);
 
   async function onEmail(e: FormEvent) {
     e.preventDefault();
@@ -121,7 +136,7 @@ function Join() {
       return;
     }
     setBusy(true);
-    setManualSignup(true);
+    setFormError("");
     try {
       const { error } = await authClient.signUp.email({
         email,
@@ -145,18 +160,12 @@ function Join() {
       }
       if (!sessionReady) throw new Error("Your account was created, but the secure session is still starting. Please sign in once and continue.");
 
-      await claimMembership({ data: { token } });
-      await saveJoinDiets({ data: { diets, language: locale } }).catch(() => undefined);
-      toast.success(localizeContent("Payment confirmed. Your account is ready."));
+      // The identity effect verifies the email before claiming membership.
 
-      const status = await requestEmailFactor();
-      if (status.needed) {
-        setFactor(status);
-        return;
-      }
-      void navigate({ to: "/app/onboarding" });
     } catch (err) {
-      toast.error(localizeContent(err instanceof Error ? err.message : "Could not create the account."));
+      const message = err instanceof Error ? err.message : "Could not create the account.";
+      setFormError(message);
+      toast.error(localizeContent(message));
     } finally {
       setBusy(false);
     }
@@ -182,6 +191,7 @@ function Join() {
         </div>
 
         <div className="flex min-h-dvh flex-col justify-center bg-wash-clay px-5 py-28 md:px-16">
+          {formError && <p role="alert" className="mb-5 max-w-md rounded-xl bg-clay px-4 py-3 text-sm text-paper">{localizeContent(formError)}</p>}
           {localizeContent(checkoutState === "checking" ? (
             <div className="max-w-md rounded-[28px] border border-border bg-card p-7 shadow-[var(--shadow-border)]">
               <p className="text-xs uppercase tracking-[0.22em] text-earth">{localizeContent("Secure checkout")}</p>
@@ -257,8 +267,7 @@ function Join() {
                   sent={factor.sent}
                   configured={factor.configured}
                   onVerified={() => {
-                    setFactor(null);
-                    void navigate({ to: "/app/onboarding" });
+                    void finishMembership().catch((err) => setFormError(err instanceof Error ? err.message : "Could not open your membership yet."));
                   }}
                 />
               ) : (
@@ -279,6 +288,7 @@ function Join() {
                       type="password"
                       required
                       minLength={10}
+                      maxLength={128}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="new-password"

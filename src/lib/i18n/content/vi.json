@@ -1914,5 +1914,16 @@
   "/ month": "/ tháng",
   "/ session": "/ buổi",
   "/ year": "/ năm",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Dịch vụ sử dụng thông tin bạn chọn lưu — chẳng hạn như giai đoạn mang thai hoặc sau sinh, sở thích ăn uống, thực phẩm bạn tránh hoặc yêu thích, số người trong hộ gia đình, thông tin về thực phẩm dự trữ, thành phố hoặc mã ZIP, cửa hàng ưu tiên và thông tin cập nhật — để chọn nội dung từ thư viện tích hợp sẵn của Her First Meal và sắp xếp trải nghiệm thành viên của bạn."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Dịch vụ sử dụng thông tin bạn chọn lưu — chẳng hạn như giai đoạn mang thai hoặc sau sinh, sở thích ăn uống, thực phẩm bạn tránh hoặc yêu thích, số người trong hộ gia đình, thông tin về thực phẩm dự trữ, thành phố hoặc mã ZIP, cửa hàng ưu tiên và thông tin cập nhật — để chọn nội dung từ thư viện tích hợp sẵn của Her First Meal và sắp xếp trải nghiệm thành viên của bạn.",
+  "An account with that email already exists. Sign in or reset your password.": "Đã tồn tại tài khoản dùng địa chỉ email đó. Hãy đăng nhập hoặc đặt lại mật khẩu.",
+  "Authenticator code": "Mã từ ứng dụng xác thực",
+  "Backup code": "Mã dự phòng",
+  "Confirm your identity.": "Xác nhận danh tính của bạn.",
+  "Could not check your account. Please try again.": "Không thể kiểm tra tài khoản của bạn. Vui lòng thử lại.",
+  "Enter one of your saved backup codes.": "Nhập một trong các mã dự phòng bạn đã lưu.",
+  "Enter the six-digit code from your authenticator app.": "Nhập mã gồm sáu chữ số từ ứng dụng xác thực của bạn.",
+  "Use a backup code": "Sử dụng mã dự phòng",
+  "Use a different account": "Sử dụng tài khoản khác",
+  "Use authenticator code": "Sử dụng mã từ ứng dụng xác thực",
+  "Verify your email before opening your membership.": "Xác minh email của bạn trước khi kích hoạt tư cách thành viên."
 }

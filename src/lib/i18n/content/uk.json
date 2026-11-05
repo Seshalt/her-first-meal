@@ -1914,5 +1914,16 @@
   "/ month": "/ місяць",
   "/ session": "/ сеанс",
   "/ year": "/ рік",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Сервіс використовує інформацію, яку ви вирішите зберегти, — наприклад, етап вагітності або післяпологового періоду, харчові уподобання, продукти, яких ви уникаєте або які вам подобаються, кількість людей у домогосподарстві, інформацію про запаси продуктів удома, місто або ZIP-код, бажані магазини та відмітки про стан, — щоб вибирати матеріали з вбудованої бібліотеки Her First Meal і організовувати взаємодію з сервісом для учасників."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Сервіс використовує інформацію, яку ви вирішите зберегти, — наприклад, етап вагітності або післяпологового періоду, харчові уподобання, продукти, яких ви уникаєте або які вам подобаються, кількість людей у домогосподарстві, інформацію про запаси продуктів удома, місто або ZIP-код, бажані магазини та відмітки про стан, — щоб вибирати матеріали з вбудованої бібліотеки Her First Meal і організовувати взаємодію з сервісом для учасників.",
+  "An account with that email already exists. Sign in or reset your password.": "Обліковий запис із цією адресою електронної пошти вже існує. Увійдіть або скиньте пароль.",
+  "Authenticator code": "Код автентифікатора",
+  "Backup code": "Резервний код",
+  "Confirm your identity.": "Підтвердьте свою особу.",
+  "Could not check your account. Please try again.": "Не вдалося перевірити ваш обліковий запис. Спробуйте ще раз.",
+  "Enter one of your saved backup codes.": "Введіть один зі збережених резервних кодів.",
+  "Enter the six-digit code from your authenticator app.": "Введіть шестизначний код із застосунку-автентифікатора.",
+  "Use a backup code": "Використати резервний код",
+  "Use a different account": "Використати інший обліковий запис",
+  "Use authenticator code": "Використати код автентифікатора",
+  "Verify your email before opening your membership.": "Підтвердьте свою електронну адресу, перш ніж активувати членство."
 }

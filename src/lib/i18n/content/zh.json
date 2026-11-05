@@ -1914,5 +1914,16 @@
   "/ month": "/ 月",
   "/ session": "/ 次",
   "/ year": "/ 年",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "该服务会使用您选择保存的信息——例如孕期或产后阶段、饮食偏好、避免或喜爱的食物、家庭人数、食品储藏信息、城市或邮政编码、偏好的商店以及打卡记录——从 Her First Meal 的内置内容库中挑选内容，并为您安排会员体验。"
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "该服务会使用您选择保存的信息——例如孕期或产后阶段、饮食偏好、避免或喜爱的食物、家庭人数、食品储藏信息、城市或邮政编码、偏好的商店以及打卡记录——从 Her First Meal 的内置内容库中挑选内容，并为您安排会员体验。",
+  "An account with that email already exists. Sign in or reset your password.": "已存在使用该电子邮件地址的账户。请登录或重置密码。",
+  "Authenticator code": "身份验证器代码",
+  "Backup code": "备用代码",
+  "Confirm your identity.": "确认您的身份。",
+  "Could not check your account. Please try again.": "无法检查您的账户。请重试。",
+  "Enter one of your saved backup codes.": "请输入您保存的备用代码之一。",
+  "Enter the six-digit code from your authenticator app.": "请输入身份验证器应用中的六位数代码。",
+  "Use a backup code": "使用备用代码",
+  "Use a different account": "使用其他账户",
+  "Use authenticator code": "使用身份验证器代码",
+  "Verify your email before opening your membership.": "请先验证您的电子邮件地址，再开通会员。"
 }

@@ -1914,5 +1914,16 @@
   "/ month": "/ माह",
   "/ session": "/ सत्र",
   "/ year": "/ वर्ष",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "यह सेवा आपकी ओर से सेव की गई जानकारी—जैसे गर्भावस्था या प्रसवोत्तर अवस्था, आहार संबंधी प्राथमिकताएँ, वे खाद्य पदार्थ जिनसे आप परहेज़ करती हैं या जिन्हें पसंद करती हैं, परिवार के सदस्यों की संख्या, पैंट्री की जानकारी, शहर या ZIP कोड, पसंदीदा स्टोर और चेक-इन—का उपयोग Her First Meal की अंतर्निहित लाइब्रेरी से सामग्री चुनने और आपके सदस्य अनुभव को व्यवस्थित करने के लिए करती है।"
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "यह सेवा आपकी ओर से सेव की गई जानकारी—जैसे गर्भावस्था या प्रसवोत्तर अवस्था, आहार संबंधी प्राथमिकताएँ, वे खाद्य पदार्थ जिनसे आप परहेज़ करती हैं या जिन्हें पसंद करती हैं, परिवार के सदस्यों की संख्या, पैंट्री की जानकारी, शहर या ZIP कोड, पसंदीदा स्टोर और चेक-इन—का उपयोग Her First Meal की अंतर्निहित लाइब्रेरी से सामग्री चुनने और आपके सदस्य अनुभव को व्यवस्थित करने के लिए करती है।",
+  "An account with that email already exists. Sign in or reset your password.": "इस ईमेल पते से पहले से एक खाता मौजूद है। साइन इन करें या अपना पासवर्ड रीसेट करें।",
+  "Authenticator code": "ऑथेंटिकेटर कोड",
+  "Backup code": "बैकअप कोड",
+  "Confirm your identity.": "अपनी पहचान की पुष्टि करें।",
+  "Could not check your account. Please try again.": "आपका खाता जाँचा नहीं जा सका। कृपया फिर से कोशिश करें।",
+  "Enter one of your saved backup codes.": "अपने सहेजे गए बैकअप कोड में से एक दर्ज करें।",
+  "Enter the six-digit code from your authenticator app.": "अपने ऑथेंटिकेटर ऐप से छह अंकों का कोड दर्ज करें।",
+  "Use a backup code": "बैकअप कोड का उपयोग करें",
+  "Use a different account": "किसी दूसरे खाते का उपयोग करें",
+  "Use authenticator code": "ऑथेंटिकेटर कोड का उपयोग करें",
+  "Verify your email before opening your membership.": "अपनी सदस्यता खोलने से पहले अपने ईमेल पते की पुष्टि करें।"
 }

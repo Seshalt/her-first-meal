@@ -38,7 +38,7 @@ export async function sendHouseMail(input: {
         to,
         subject: input.subject,
         text: input.text,
-        html: input.html ?? `<pre>${input.text}</pre>`,
+        ...(input.html ? { html: input.html } : {}),
       }),
     });
     if (!response.ok) {

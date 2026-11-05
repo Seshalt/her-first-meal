@@ -2,6 +2,8 @@ import { useText as useContentText } from "@/lib/i18n/use-text";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { LockKeyhole } from "lucide-react";
+import { toast } from "sonner";
+import { signOut } from "@/lib/auth/client";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getEmailFactorStatus } from "@/lib/server/email-factor";
@@ -10,11 +12,12 @@ import { getMembershipAccess } from "@/lib/server/checkout";
 export function RequireMember({ children }: { children: ReactNode }) {
   const localizeContent = useContentText();
   const { user, isPending } = useCurrentUserState();
+  const userId = user?.id;
   const [factorNeeded, setFactorNeeded] = useState<boolean | null>(null);
   const [membershipActive, setMembershipActive] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setFactorNeeded(null);
       setMembershipActive(null);
       return;
@@ -31,7 +34,7 @@ export function RequireMember({ children }: { children: ReactNode }) {
     return () => {
       live = false;
     };
-  }, [user]);
+  }, [userId]);
 
   if (isPending || (user && (factorNeeded === null || membershipActive === null))) {
     return (
@@ -60,6 +63,9 @@ export function RequireMember({ children }: { children: ReactNode }) {
             className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 active:scale-95"
           >
             {localizeContent("Choose membership")}</Link>
+          <button type="button" className="mx-auto mt-4 block text-sm text-primary underline" onClick={() => void signOut("/login").catch(() => toast.error(localizeContent("Sign-out failed")))}>
+            {localizeContent("Use a different account")}
+          </button>
         </section>
       </main>
     );

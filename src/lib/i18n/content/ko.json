@@ -1914,5 +1914,16 @@
   "/ month": "/ 월",
   "/ session": "/ 세션",
   "/ year": "/ 년",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "이 서비스는 회원님이 저장하기로 선택한 정보(예: 임신 또는 산후 단계, 식단 선호도, 피하거나 즐겨 먹는 음식, 가구원 수, 식료품 저장 공간 정보, 도시 또는 ZIP 코드, 선호하는 매장, 체크인 기록)를 사용하여 Her First Meal에 내장된 라이브러리에서 콘텐츠를 선택하고 회원 경험을 구성합니다."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "이 서비스는 회원님이 저장하기로 선택한 정보(예: 임신 또는 산후 단계, 식단 선호도, 피하거나 즐겨 먹는 음식, 가구원 수, 식료품 저장 공간 정보, 도시 또는 ZIP 코드, 선호하는 매장, 체크인 기록)를 사용하여 Her First Meal에 내장된 라이브러리에서 콘텐츠를 선택하고 회원 경험을 구성합니다.",
+  "An account with that email already exists. Sign in or reset your password.": "해당 이메일로 이미 계정이 있습니다. 로그인하거나 비밀번호를 재설정하세요.",
+  "Authenticator code": "인증 앱 코드",
+  "Backup code": "백업 코드",
+  "Confirm your identity.": "본인 여부를 확인하세요.",
+  "Could not check your account. Please try again.": "계정을 확인할 수 없습니다. 다시 시도해 주세요.",
+  "Enter one of your saved backup codes.": "저장해 둔 백업 코드 중 하나를 입력하세요.",
+  "Enter the six-digit code from your authenticator app.": "인증 앱에 표시된 6자리 코드를 입력하세요.",
+  "Use a backup code": "백업 코드 사용",
+  "Use a different account": "다른 계정 사용",
+  "Use authenticator code": "인증 앱 코드 사용",
+  "Verify your email before opening your membership.": "멤버십을 개설하기 전에 이메일을 인증하세요."
 }

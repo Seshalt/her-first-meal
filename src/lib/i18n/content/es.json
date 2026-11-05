@@ -1914,5 +1914,16 @@
   "/ month": "/ mes",
   "/ session": "/ sesión",
   "/ year": "/ año",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "El servicio utiliza la información que eliges guardar —como la etapa del embarazo o posparto, las preferencias alimentarias, los alimentos que evitas o disfrutas, el tamaño del hogar, la información de la despensa, la ciudad o el código postal, las tiendas preferidas y los registros de seguimiento— para seleccionar contenido de la biblioteca integrada de Her First Meal y organizar tu experiencia como miembro."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "El servicio utiliza la información que eliges guardar —como la etapa del embarazo o posparto, las preferencias alimentarias, los alimentos que evitas o disfrutas, el tamaño del hogar, la información de la despensa, la ciudad o el código postal, las tiendas preferidas y los registros de seguimiento— para seleccionar contenido de la biblioteca integrada de Her First Meal y organizar tu experiencia como miembro.",
+  "An account with that email already exists. Sign in or reset your password.": "Ya existe una cuenta con ese correo electrónico. Inicia sesión o restablece tu contraseña.",
+  "Authenticator code": "Código de autenticación",
+  "Backup code": "Código de respaldo",
+  "Confirm your identity.": "Confirma tu identidad.",
+  "Could not check your account. Please try again.": "No se pudo verificar tu cuenta. Inténtalo de nuevo.",
+  "Enter one of your saved backup codes.": "Introduce uno de tus códigos de respaldo guardados.",
+  "Enter the six-digit code from your authenticator app.": "Introduce el código de seis dígitos de tu aplicación de autenticación.",
+  "Use a backup code": "Usar un código de respaldo",
+  "Use a different account": "Usar otra cuenta",
+  "Use authenticator code": "Usar un código de autenticación",
+  "Verify your email before opening your membership.": "Verifica tu correo electrónico antes de acceder a tu membresía."
 }

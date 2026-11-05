@@ -1914,5 +1914,16 @@
   "/ month": "/ lună",
   "/ session": "/ sesiune",
   "/ year": "/ an",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Serviciul folosește informațiile pe care alegeți să le salvați — cum ar fi etapa sarcinii sau postpartum, preferințele alimentare, alimentele pe care le evitați sau vă plac, mărimea gospodăriei, informațiile despre cămară, orașul sau codul poștal, magazinele preferate și actualizările periodice — pentru a selecta conținut din biblioteca integrată Her First Meal și a vă organiza experiența de membru."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Serviciul folosește informațiile pe care alegeți să le salvați — cum ar fi etapa sarcinii sau postpartum, preferințele alimentare, alimentele pe care le evitați sau vă plac, mărimea gospodăriei, informațiile despre cămară, orașul sau codul poștal, magazinele preferate și actualizările periodice — pentru a selecta conținut din biblioteca integrată Her First Meal și a vă organiza experiența de membru.",
+  "An account with that email already exists. Sign in or reset your password.": "Există deja un cont cu această adresă de e-mail. Conectați-vă sau resetați-vă parola.",
+  "Authenticator code": "Cod de autentificare",
+  "Backup code": "Cod de rezervă",
+  "Confirm your identity.": "Confirmați-vă identitatea.",
+  "Could not check your account. Please try again.": "Nu am putut verifica contul. Încercați din nou.",
+  "Enter one of your saved backup codes.": "Introduceți unul dintre codurile de rezervă salvate.",
+  "Enter the six-digit code from your authenticator app.": "Introduceți codul din șase cifre din aplicația de autentificare.",
+  "Use a backup code": "Folosiți un cod de rezervă",
+  "Use a different account": "Folosiți un alt cont",
+  "Use authenticator code": "Folosiți codul de autentificare",
+  "Verify your email before opening your membership.": "Verificați-vă adresa de e-mail înainte de a vă activa abonamentul."
 }

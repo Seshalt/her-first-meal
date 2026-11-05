@@ -1914,5 +1914,16 @@
   "/ month": "/ buwan",
   "/ session": "/ sesyon",
   "/ year": "/ taon",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Ginagamit ng serbisyo ang impormasyong pinili mong i-save — gaya ng yugto ng pagbubuntis o postpartum, mga kagustuhan sa pagkain, mga pagkaing iniiwasan o gustong kainin, laki ng sambahayan, impormasyon tungkol sa mga pagkaing nakaimbak sa bahay, lungsod o ZIP code, mga gustong tindahan, at mga check-in — upang pumili ng content mula sa built-in na library ng Her First Meal at ayusin ang iyong karanasan bilang miyembro."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Ginagamit ng serbisyo ang impormasyong pinili mong i-save — gaya ng yugto ng pagbubuntis o postpartum, mga kagustuhan sa pagkain, mga pagkaing iniiwasan o gustong kainin, laki ng sambahayan, impormasyon tungkol sa mga pagkaing nakaimbak sa bahay, lungsod o ZIP code, mga gustong tindahan, at mga check-in — upang pumili ng content mula sa built-in na library ng Her First Meal at ayusin ang iyong karanasan bilang miyembro.",
+  "An account with that email already exists. Sign in or reset your password.": "May account na gamit ang email na iyon. Mag-sign in o i-reset ang iyong password.",
+  "Authenticator code": "Code ng authenticator",
+  "Backup code": "Backup code",
+  "Confirm your identity.": "Kumpirmahin ang iyong pagkakakilanlan.",
+  "Could not check your account. Please try again.": "Hindi nasuri ang iyong account. Pakisubukang muli.",
+  "Enter one of your saved backup codes.": "Ilagay ang isa sa mga na-save mong backup code.",
+  "Enter the six-digit code from your authenticator app.": "Ilagay ang anim-na-digit na code mula sa iyong authenticator app.",
+  "Use a backup code": "Gumamit ng backup code",
+  "Use a different account": "Gumamit ng ibang account",
+  "Use authenticator code": "Gumamit ng code mula sa authenticator",
+  "Verify your email before opening your membership.": "I-verify ang iyong email bago buksan ang iyong membership."
 }

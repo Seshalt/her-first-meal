@@ -20,6 +20,7 @@ export function EmailFactorForm({
   const localizeContent = useContentText();
   const { site } = usePublicSite();
   const [code, setCode] = useState("");
+  const [delivered, setDelivered] = useState(sent);
   const [busy, setBusy] = useState(false);
 
   async function onSubmit(e: FormEvent) {
@@ -40,6 +41,8 @@ export function EmailFactorForm({
     setBusy(true);
     try {
       const next = await requestEmailFactor();
+      setDelivered(next.sent);
+      if (!next.needed) { onVerified(); return; }
       toast.success(localizeContent(next.sent ? `A new code is on the way to ${next.emailMasked}.` : site.factorNoMail));
     } catch (err) {
       toast.error(localizeContent(err instanceof Error ? err.message : "Could not send another code."));
@@ -55,7 +58,7 @@ export function EmailFactorForm({
       <p className="text-sm leading-relaxed text-ink-soft">
         {localizeContent(site.factorBody.replace("{email}", emailMasked))}
       </p>
-      {localizeContent(!sent ? (
+      {localizeContent(!(sent || delivered) ? (
         <p className="rounded-xl bg-clay/10 px-4 py-3 text-sm text-clay-deep">
           {localizeContent(configured ? site.factorSendFail : site.factorNoMail)}
         </p>

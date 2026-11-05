@@ -44,9 +44,6 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     rateLimit(`email-factor:${context.userId}`, 6, 15 * 60 * 1000);
     const email = await accountEmail(context.userId);
-    if (!mailConfigured()) {
-      throw new Error("Email verification is temporarily unavailable. Please try again later.");
-    }
     await ensureProfile(context.userId, email || null, null);
     const sql = await getSql();
     const rows = await sql<{ email_factor_ok: boolean }>`
@@ -54,6 +51,9 @@ export const requestEmailFactor = createServerFn({ method: "POST" })
     `;
     if (rows[0]?.email_factor_ok) {
       return { needed: false, sent: false, emailMasked: maskEmail(email), configured: true };
+    }
+    if (!mailConfigured()) {
+      throw new Error("Email verification is temporarily unavailable. Please try again later.");
     }
     if (!email.includes("@")) {
       throw new Error("This account needs an email before we can send a sign-in code.");

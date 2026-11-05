@@ -1914,5 +1914,16 @@
   "/ month": "/ Monat",
   "/ session": "/ Sitzung",
   "/ year": "/ Jahr",
-  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Der Dienst verwendet die Informationen, die Sie speichern möchten – beispielsweise Schwangerschafts- oder Wochenbettphase, Ernährungspräferenzen, Lebensmittel, die Sie meiden oder gerne essen, Haushaltsgröße, Informationen zu Ihrem Vorratsschrank, Stadt oder ZIP-Code, bevorzugte Geschäfte und Check-ins –, um Inhalte aus der integrierten Bibliothek von Her First Meal auszuwählen und Ihr Mitgliedererlebnis zu organisieren."
+  "The service uses the information you choose to save — such as pregnancy or postpartum stage, dietary preferences, foods you avoid or enjoy, household size, pantry information, city or ZIP code, preferred stores, and check-ins — to select content from Her First Meal’s built-in library and organize your member experience.": "Der Dienst verwendet die Informationen, die Sie speichern möchten – beispielsweise Schwangerschafts- oder Wochenbettphase, Ernährungspräferenzen, Lebensmittel, die Sie meiden oder gerne essen, Haushaltsgröße, Informationen zu Ihrem Vorratsschrank, Stadt oder ZIP-Code, bevorzugte Geschäfte und Check-ins –, um Inhalte aus der integrierten Bibliothek von Her First Meal auszuwählen und Ihr Mitgliedererlebnis zu organisieren.",
+  "An account with that email already exists. Sign in or reset your password.": "Für diese E-Mail-Adresse gibt es bereits ein Konto. Melde dich an oder setze dein Passwort zurück.",
+  "Authenticator code": "Authentifizierungscode",
+  "Backup code": "Wiederherstellungscode",
+  "Confirm your identity.": "Bestätige deine Identität.",
+  "Could not check your account. Please try again.": "Dein Konto konnte nicht überprüft werden. Bitte versuche es erneut.",
+  "Enter one of your saved backup codes.": "Gib einen deiner gespeicherten Wiederherstellungscodes ein.",
+  "Enter the six-digit code from your authenticator app.": "Gib den sechsstelligen Code aus deiner Authenticator-App ein.",
+  "Use a backup code": "Wiederherstellungscode verwenden",
+  "Use a different account": "Ein anderes Konto verwenden",
+  "Use authenticator code": "Authentifizierungscode verwenden",
+  "Verify your email before opening your membership.": "Bestätige deine E-Mail-Adresse, bevor du deine Mitgliedschaft eröffnest."
 }

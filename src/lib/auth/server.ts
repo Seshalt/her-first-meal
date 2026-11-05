@@ -213,14 +213,10 @@ export const auth = betterAuth({
     },
   },
 
-  // Cache the session in the short-lived signed `session_data` cookie so reads
-  // (incl. the client's `/get-session`) skip the DB — this shrinks the "loading"
-  // window and reduces auth flicker. See the `auth` skill for the full
-  // flicker-prevention guidance (gate on `isPending`; SSR the session).
+  // Check live sessions so password resets and sign-outs revoke access immediately.
   session: {
     expiresIn: 60 * 60 * 24 * 60,
     updateAge: 60 * 60 * 24,
-    cookieCache: { enabled: true, maxAge: 300 },
   },
 
   // Local email/password — toggled only via `./email-password` (not a plugin).
@@ -231,6 +227,7 @@ export const auth = betterAuth({
           minPasswordLength: 10,
           maxPasswordLength: 128,
           resetPasswordTokenExpiresIn: 60 * 60,
+          revokeSessionsOnPasswordReset: true,
           sendResetPassword: async ({ user, url }) => {
             const result = await sendHouseMail({
               to: user.email,

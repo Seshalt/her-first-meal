@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { PublicFooter, PublicNav } from "@/components/layout/public-chrome";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
-import { GROK_PROVIDERS, authClient, authEnabled, rememberSessionToken, signIn } from "@/lib/auth/client";
+import { GROK_PROVIDERS, authClient, authEnabled, rememberSessionToken, signIn, signOut } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { HumanCheck, useFormGuard } from "@/components/security/human-check";
 import { usePublicSite } from "@/lib/use-public-site";
 import { getEmailFactorStatus, requestEmailFactor } from "@/lib/server/email-factor";
 import { EmailFactorForm } from "@/components/security/email-factor";
+import { AuthChallenge } from "@/components/security/auth-challenge";
 import { readableAuthError } from "@/lib/auth/errors";
 
 export const Route = createFileRoute("/login")({
@@ -20,11 +21,13 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const localizeContent = useContentText();
   const { user, isPending } = useCurrentUserState();
+  const userId = user?.id;
   const { site, content } = usePublicSite();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [mfa, setMfa] = useState(false);
   const [home, setHome] = useState<"/" | "/app" | null>(null);
   const [formError, setFormError] = useState("");
   const [factor, setFactor] = useState<{
@@ -36,26 +39,31 @@ function Login() {
   const guard = useFormGuard();
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     let live = true;
     void (async () => {
       try {
         const status = await getEmailFactorStatus();
         if (!live) return;
         if (status.needed) {
+          setFactor({ ...status, sent: false });
+          if (!status.configured) return;
           const sent = await requestEmailFactor();
           if (live) setFactor(sent);
           return;
         }
         if (live) setHome("/app");
-      } catch {
-        if (live) setFactor({ needed: true, sent: false, configured: false, emailMasked: "your email" });
+      } catch (err) {
+        if (live) {
+          setFormError(readableAuthError(err, "Could not check your account. Please try again."));
+          setFactor((current) => current ?? { needed: true, sent: false, configured: false, emailMasked: "your email" });
+        }
       }
     })();
     return () => {
       live = false;
     };
-  }, [user]);
+  }, [userId]);
 
   if (!isPending && user && factor?.needed) {
     // stay on the door and collect the email code
@@ -74,19 +82,20 @@ function Login() {
     setFormError("");
     try {
       const { data, error } = await authClient.signIn.email({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         rememberMe: true,
       });
       if (error) throw error;
-      rememberSessionToken((data as { token?: string } | null)?.token);
-      const status = await requestEmailFactor();
-      if (status.needed) {
-        setFactor(status);
-        toast.success(localizeContent(status.sent ? `A code is on the way to ${status.emailMasked}.` : "Enter the email code to finish signing in."));
+      if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+        setMfa(true);
         return;
       }
-      window.location.replace("/app");
+      rememberSessionToken((data as { token?: string } | null)?.token);
+      await authClient.getSession();
+      // The session effect checks verification once. Sending here too invalidates
+      // the first code and can leave the customer looking at a stale email.
+
     } catch (err) {
       const message = readableAuthError(err, "That email or password does not match.");
       setFormError(message);
@@ -119,7 +128,14 @@ function Login() {
           <h1 className="mt-5 font-display text-[clamp(2.8rem,6vw,4.8rem)] leading-[0.95]">{localizeContent(site.loginTitle)}</h1>
           <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-soft">{localizeContent(site.loginBody)}</p>
           <div className="editorial-rule mt-8" />
-          {localizeContent(factor?.needed ? (
+          {formError && user && <p role="alert" className="mt-4 max-w-md text-sm text-clay">{localizeContent(formError)}</p>}
+          {localizeContent(user && <button type="button" className="mt-5 text-sm text-primary underline" onClick={() => void signOut("/login").catch((err) => setFormError(readableAuthError(err, "Sign-out failed")))}>
+            {localizeContent("Use a different account")}
+          </button>)}
+
+          {localizeContent(mfa ? (
+            <AuthChallenge onVerified={() => window.location.replace("/login")} />
+          ) : factor?.needed ? (
             <EmailFactorForm
               emailMasked={factor.emailMasked}
               sent={factor.sent}
